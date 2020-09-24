@@ -1,12 +1,29 @@
 import numpy as np
 import pandas as pd
-from src.models.optimizers import *
-from lightgbm import LGBMClassifier
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, roc_auc_score, roc_curve
-from src.features.dicts import *
-import random
-from sklearn.model_selection import KFold
 import iisignature
+import os
+import random
+
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+from lightgbm import LGBMClassifier
+
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, roc_auc_score, roc_curve
+from sklearn import preprocessing
+from sklearn.model_selection import KFold, RandomizedSearchCV, GridSearchCV
+from sklearn.linear_model import LogisticRegression
+
+from dicts import *
+from optimizers import *
+
+
+def create_folder(path):
+    try:
+        # Create target directory
+        os.mkdir(path)
+        print("Directory ", path, " created ")
+    except FileExistsError:
+        print("Directory ", path, " already exists")
 
 
 def compute_icu(df_merge2, definition, return_results=False):
@@ -88,8 +105,7 @@ def dataframe_from_definition_discard(path_df, a1=6, a2=3, definition='t_sepsis_
     df_sepsis = pd.read_csv(path_df, \
                             low_memory=False,
                             parse_dates=['admittime', 'dischtime', 'deathtime', 'intime', 'outtime',
-                                         'starttime_first_vent', 'endtime_first_vent', 'charttime',
-                                         't_suspicion', 't_sofa', 't_sepsis_min', 't_sepsis_max'])
+                                         'charttime', 't_suspicion', 't_sofa', 't_sepsis_min', 't_sepsis_max'])
 
     df_sepsis['floored_charttime'] = df_sepsis['charttime'].dt.floor('h')
 
@@ -98,7 +114,7 @@ def dataframe_from_definition_discard(path_df, a1=6, a2=3, definition='t_sepsis_
 
     ### deleting rows that patients are dead already
     df_sepsis = df_sepsis[(df_sepsis['deathtime'] > df_sepsis['charttime']) | df_sepsis.deathtime.isnull()]
-    df_sepsis['gender'] = df_sepsis['gender'].replace(('M', 'F'), (0, 1))
+    df_sepsis['gender'] = df_sepsis['gender'].replace(('M', 'F'), (1, 0))
 
     ### Newly added by Lingyi to fill in the gaps
     df_sepsis_intime = df_sepsis[identifier + static_vars].sort_values(['icustay_id', 'floored_charttime']).groupby(
@@ -159,12 +175,110 @@ def dataframe_from_definition_discard(path_df, a1=6, a2=3, definition='t_sepsis_
 
     icustay_id_to_included_bool = (df_merge2.groupby(['icustay_id']).size() >= 4)
     icustay_id_to_included = df_merge2.icustay_id.unique()[icustay_id_to_included_bool]
+
     df_merge2 = df_merge2[df_merge2.icustay_id.isin(icustay_id_to_included)]
 
     ### Mortality check
     df_merge2['mortality'] = (~df_merge2.deathtime.isnull()).astype(int)
+    df_merge2['sepsis_hour'] = (df_merge2[definition] - df_merge2['intime']).dt.total_seconds() / 60 / 60
 
     print("Final size:", df_merge2.deathtime.size)
+
+    return df_merge2
+
+
+def dataframe_from_definition_discard_venn(path_df, icustay_ids, a1=6, a2=3, definition='t_sofa'):
+    """
+        For specific definition among the three, deleting patients who has been diagnosied
+        beofre a1 hours in icu and trimming valid patients' data such that all the data after
+        a2 hours after sepsis onset according to definition will be deleted.
+
+
+    nonsepsis==True: we keep nonsepsis data; otherwsie, we do not keep them
+
+    """
+
+    pd.set_option('display.max_columns', None)
+
+    ##Reading df:
+
+    df_sepsis = pd.read_csv(path_df, \
+                            low_memory=False,
+                            parse_dates=['admittime', 'dischtime', 'deathtime', 'intime', 'outtime',
+                                         'starttime_first_vent', 'endtime_first_vent', 'charttime',
+                                         't_suspicion', 't_sofa', 't_sepsis_min', 't_sepsis_max'])
+
+    df_sepsis['floored_charttime'] = df_sepsis['charttime'].dt.floor('h')
+
+    df_sepsis = df_sepsis.sort_values(['icustay_id', 'floored_charttime'])
+    print('Initial size:', df_sepsis.deathtime.size)
+
+    df_sepsis = df_sepsis[df_sepsis.icustay_id.isin(icustay_ids)]
+
+    ### deleting rows that patients are dead already
+    df_sepsis = df_sepsis[(df_sepsis['deathtime'] > df_sepsis['charttime']) | df_sepsis.deathtime.isnull()]
+    df_sepsis['gender'] = df_sepsis['gender'].replace(('M', 'F'), (1, 0))
+
+    ### Newly added by Lingyi to fill in the gaps
+    df_sepsis_intime = df_sepsis[identifier + static_vars].sort_values(['icustay_id', 'floored_charttime']).groupby(
+        ['icustay_id'], as_index=False).first()
+    df_sepsis_intime['floored_intime'] = df_sepsis_intime['intime'].dt.floor('h')
+    df_sepsis_intime2 = df_sepsis_intime[df_sepsis_intime['floored_charttime'] > df_sepsis_intime['floored_intime']]
+    df_sepsis_intime2.drop(['floored_charttime'], axis=1, inplace=True)
+    df_sepsis_intime2.rename(columns={"floored_intime": "floored_charttime"}, inplace=True)
+    df_sepsis = pd.concat([df_sepsis, df_sepsis_intime2], ignore_index=True, sort=False).sort_values(
+        ['icustay_id', 'floored_charttime'])
+
+    ### Discarding patients developing sepsis within 4 hour in ICU
+    df_sepsis = df_sepsis[(df_sepsis[definition].between(df_sepsis.intime + pd.Timedelta(hours=4), \
+                                                         df_sepsis.outtime, inclusive=True)) \
+                          | (df_sepsis[definition].isnull())]
+
+    print("Size of instances after discarding patients developing sepsis within 4 hour in ICU:",
+          df_sepsis.deathtime.size)
+
+    df_first = df_sepsis[static_vars + categorical_vars + identifier].groupby(by=identifier, as_index=False).first()
+    df_mean = df_sepsis[numerical_vars + identifier].groupby(by=identifier, as_index=False).mean()
+    df_max = df_sepsis[flags + identifier].groupby(by=identifier, as_index=False).max()
+    df_merge = df_first.merge(df_mean, on=identifier).merge(df_max, on=identifier)
+    df_merge.equals(df_merge.sort_values(identifier))
+    df_merge.set_index('icustay_id', inplace=True)
+
+    ### Resampling
+    df_merge2 = df_merge.groupby(by='icustay_id').apply(lambda x: x.set_index('floored_charttime'). \
+                                                        resample('H').first()).reset_index()
+
+    print("Size after averaging hourly measurement and resampling:", df_merge2.deathtime.size)
+
+    df_merge2[['subject_id', 'hadm_id', 'icustay_id'] + static_vars] = df_merge2[
+        ['subject_id', 'hadm_id', 'icustay_id'] + static_vars].groupby('icustay_id', as_index=False).apply(
+        lambda v: v.ffill())
+
+    ### Deleting cencored data after a2
+    df_merge2 = df_merge2[
+        ((df_merge2.floored_charttime - df_merge2[definition]).dt.total_seconds() / 60 / 60 < a2 + 1.0) \
+        | (df_merge2[definition].isnull())]
+
+    print("Size of instances after getting censored data:", df_merge2.deathtime.size)
+
+    ### Adding icu stay since intime
+    df_merge2['rolling_los_icu'] = (df_merge2['outtime'] - df_merge2['intime']).dt.total_seconds() / 60 / 60
+    df_merge2['hour'] = (df_merge2['floored_charttime'] - df_merge2['intime']).dt.total_seconds() / 60 / 60
+
+    #     ## Discarding patients staying less than 4 hour or longer than 20 days
+    #     df_merge2=df_merge2[(df_merge2['rolling_los_icu']<=20*24) & (4.0<=df_merge2['rolling_los_icu'])]
+
+    #     print("Size of instances after discarding patients staying less than 4 hour or longer than 20 days:",df_merge2.deathtime.size)
+
+    ### Triming the data to icu instances only
+    df_merge2 = df_merge2[df_merge2['floored_charttime'] <= df_merge2['outtime']]
+    df_merge2 = df_merge2[df_merge2['intime'] <= df_merge2['floored_charttime']]
+    print("After triming the data to icu instances:", df_merge2.deathtime.size)
+
+    df_merge2 = df_merge2[df_merge2.icustay_id.isin(icustay_id_to_included)]
+    ### Mortality check
+    df_merge2['mortality'] = (~df_merge2.deathtime.isnull()).astype(int)
+    df_merge2['sepsis_hour'] = (df_merge2[definition] - df_merge2['intime']).dt.total_seconds() / 60 / 60
 
     return df_merge2
 
@@ -363,8 +477,7 @@ def jamesfeature(df, Data_Dir='./', definition='t_sepsis_min', save=True):
 
 
 def validation_treebased(model, dataset, labels, scores, \
-                         train_patient_indices, train_full_indices,
-                         test_patient_indices, test_full_indices, \
+                         train_full_indices, test_full_indices, \
                          binary=True):
     """
 
@@ -467,6 +580,118 @@ def validation_treebased(model, dataset, labels, scores, \
         print(classification_report(train_binary_true, train_binary_preds))
 
         return train_preds
+
+
+grid_parameters = {  # LightGBM
+    'n_estimators': [40, 70, 100, 200, 400, 500, 800],
+    'learning_rate': [0.08, 0.1, 0.12, 0.05],
+    'colsample_bytree': [0.5, 0.6, 0.7, 0.8],
+    'max_depth': [4, 5, 6, 7, 8],
+    'num_leaves': [5, 10, 16, 20, 25, 36, 49],
+    'reg_alpha': [0.001, 0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 20, 50, 100],
+    'reg_lambda': [0.001, 0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 20, 50, 100],
+    'min_split_gain': [0.0, 0.1, 0.2, 0.3, 0.4],
+    'subsample': np.arange(10)[5:] / 12,
+    'subsample_freq': [10, 20],
+    #         'min_data_in_leaf':[100,300,500],
+    'max_bin': [100, 250, 500, 1000],
+    'min_child_samples': [49, 99, 159, 199, 259, 299],
+    'min_child_weight': np.arange(30) + 20}
+
+
+def validation_tuning(model, dataset, labels, train_full_indices, test_full_indices, param_grid, \
+                      grid=False, n_iter=30, n_jobs=-1, scoring='roc_auc', verbose=2, binary=True):
+    """
+
+        For chosen model, we conduct hyperparameter-tuning.
+
+
+    """
+
+    k = len(train_full_indices)
+
+    cv = [[np.concatenate(train_full_indices[i]), np.concatenate(test_full_indices[i])] for i in range(k)]
+
+    if grid:
+        gs = GridSearchCV(estimator=model, \
+                          param_grid=param_grid, \
+                          n_jobs=n_jobs, \
+                          cv=cv, \
+                          scoring=scoring, \
+                          verbose=verbose)
+    else:
+
+        gs = RandomizedSearchCV(model, \
+                                param_grid, \
+                                n_jobs=n_jobs, \
+                                n_iter=n_iter, \
+                                cv=cv, \
+                                scoring=scoring, \
+                                verbose=verbose)
+
+    fitted_model = gs.fit(X=dataset, y=labels)
+    best_params_ = fitted_model.best_params_
+
+    return best_params_
+
+
+# def validation_treebased_cross(model, dataset1,dataset2, labels1, labels2, \
+#                          train_patient_indices1,train_full_indices1,
+#                          test_patient_indices2,test_full_indices2):
+
+#     """
+
+#         For chosen model, and for dataset after all necessary transforms, we conduct validation and testing simutaneously.
+
+
+#     """
+
+
+#     labels_true=np.empty((0,1),int)
+#     train_preds=np.empty((0,1),int)
+#     train_idxs=np.empty((0,1),int)
+#     prob_preds=np.empty((0,1),float)
+#     k=len(train_full_indices1)
+#     val_idx_collection=[]
+
+#     for i in range(k):
+
+# #        print('Now training on the', i, 'splitting')
+
+#         tra_dataset=dataset1[np.concatenate(train_full_indices1[i]),:]
+#         val_dataset =dataset2[np.concatenate(test_full_indices2[i]),:]
+
+
+#         tra_binary_labels = labels1[np.concatenate(train_full_indices1[i])]
+#         val_binary_labels = labels2[np.concatenate(test_full_indices2[i])]
+
+
+#         model.fit(X=tra_dataset,y=tra_binary_labels)
+
+#         predicted_prob=model.predict_proba(val_dataset)[:,1]
+#         prob_preds=np.append(prob_preds,predicted_prob)
+#         train_idxs=np.append(train_idxs,np.concatenate(test_full_indices2[i]))
+#         labels_true=np.append(labels_true, val_binary_labels)
+#     fpr, tpr, thresholds = roc_curve(labels_true, prob_preds, pos_label=1)
+#     index=np.where(tpr>=0.85)[0][0]
+#      #   train_preds=np.array((prob_preds>=thresholds[index]).astype('int'))
+#     #    print(train_preds.shape)
+#     train_preds=np.append(train_preds,(prob_preds>=thresholds[index]).astype('int'))
+# #        CM=confusion_matrix(labels_true,train_preds)
+# #         print(CM)
+# #         print(classification_report(labels_true,train_preds))
+# #        print('auc and sepcificity',roc_auc_score(labels_true,prob_preds),fpr[len(fpr)-index])
+#     print('auc and sepcificity',roc_auc_score(labels_true,prob_preds),1-fpr[index])
+#     print('accuracy',accuracy_score(labels_true,train_preds))
+
+
+# #            train_preds=np.append(train_preds,(predicted_prob>=0.5).astype('int'))
+
+# #             test_utility=compute_utility(val_scores, predicted_prob, thresh)
+# #             print('Utility score:',test_utility)
+# #             test_utilities.append(test_utility)
+
+#     return train_preds, prob_preds, labels_true,roc_auc_score(labels_true,prob_preds),1-fpr[index],accuracy_score(labels_true,train_preds)
 
 
 def patient_level_performance_new(train_preds, labels_true, test_full_indices, k=5):

@@ -21,7 +21,7 @@ class TimeSeriesDataset(Dataset):
         - When getting dataset[column_name] it would be good to return a TimeSeriesDataset instance instead of a tensor
         we then need to implement how to add, subtract, divide etc with this class.
     """
-    def __init__(self, data=None, columns=None):
+    def __init__(self, data=None, columns=None, lengths=None):
         """
         Args:
             data (list): A list of variable length tensors. The shape must be [1, L_i, C] where L_i is the variable time
@@ -30,7 +30,10 @@ class TimeSeriesDataset(Dataset):
         """
         if data is not None:
             self.data = torch.nn.utils.rnn.pad_sequence(data, padding_value=np.nan, batch_first=True)
-            self.lengths = [d.size(0) for d in data]
+            if lengths==None:
+                self.lengths = [d.size(0) for d in data]
+            else:
+                self.lengths=lengths
             self.columns = columns
 
             # Error handling
@@ -158,7 +161,6 @@ class TimeSeriesDataset(Dataset):
         dataset = TimeSeriesDataset(self[columns], columns)
         dataset.lengths = self.lengths
         return dataset
-
 
 class ListDataset(Dataset):
     """Simple dataset for ragged length list-style data.
