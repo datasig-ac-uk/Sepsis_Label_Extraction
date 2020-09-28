@@ -12,3 +12,6 @@ DATA_DIR = ROOT_DIR + '/data'
 MODELS_DIR = ROOT_DIR + '/models'
 OUTPUT_DIR=ROOT_DIR + '/outputs'
 # Packages/functions used everywhere
+
+from src.omni.functions import *
+
