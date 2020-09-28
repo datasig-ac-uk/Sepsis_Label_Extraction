@@ -652,7 +652,7 @@ if __name__ == '__main__':
             dataset.save(Save_Dir + definition[1:] + '_ffill_test.tsd')
         else:
             dataset.save(Save_Dir + definition[1:] + '_ffill_train.tsd')
-
+        print('gengerate and save labels')
         for T in [4, 6, 8, 12]:
             print('T= ' + str(T))
             labels, scores = label_scores(df_sepsis1, a1=T, Data_Dir=Save_Dir, definition=definition, save=True,test=test)
