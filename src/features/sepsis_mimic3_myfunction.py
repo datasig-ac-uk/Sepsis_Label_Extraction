@@ -426,8 +426,6 @@ def icu_lengths(df_sepsis,definition='t_sepsis_min',path_save='./',save=True):
 
 ################################### Outputing labels ########################################   
 
-
-
 def labels_generator(df, a1=6,Data_Dir='./',definition='t_sepsis_min',save=True):
     
         """
@@ -441,10 +439,8 @@ def labels_generator(df, a1=6,Data_Dir='./',definition='t_sepsis_min',save=True)
         if save:
             np.save(Data_Dir+'label'+definition[1:]+'_'+str(a1)+'.npy', label)
         print('length of label',len(label))
-        
-        df['SepsisLabel']=label
-        
-        return label, scores.values
+
+        return label
 
 def labels_validation(labels, val_full_indices):
     """
