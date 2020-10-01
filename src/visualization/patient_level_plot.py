@@ -94,6 +94,17 @@ def venn_3counts(a, b, c):
 
 
 def plot_venn(x, y, T, test_metric, metric_thresh, precision, cohort):
+    """
+
+    :param x:
+    :param y:
+    :param T:
+    :param test_metric:
+    :param metric_thresh:
+    :param precision:
+    :param cohort:
+    :return:
+    """
     definitions = ['t_sofa', 't_suspicion', 't_sepsis_min']
     thresholds = np.arange(precision) / precision
     Data_Dir = './further_split_{}_{}/'.format(x, y)
@@ -152,3 +163,6 @@ def plot_venn(x, y, T, test_metric, metric_thresh, precision, cohort):
         axs[i].set_title(Definitions[i])
         # plt.show()
     plt.tight_layout()
+
+if __name__ == '__main__':
+    plot_venn(24,12,6,'sensitivity',0.85,2000,'full')
