@@ -399,6 +399,40 @@ def dataframe_cv_pack(df_sepsis,k=5,definition='t_sepsis_min',path_save='./',sav
 
     return icustay_lengths, tra_patient_indices,tra_full_indices,val_patient_indices,val_full_indices
 
+def cv_pack(icustay_lengths,k=5,definition='t_sepsis_min',path_save='./',save=True):
+    
+    """
+    
+        outputing k cv splitting.
+        
+        
+        We store/call the random indice with name
+        
+            path_save+'icustay_lengths'+definition[1:]+'.npy'
+            path_save+'shuffled_indices'+definition[1:]+'.npy'
+            
+    """
+    if not save:
+        
+        shuffled_indices=np.load(path_save+'shuffled_indices'+definition[1:]+'.npy')
+        total_indices=len(shuffled_indices)
+
+    else:
+        total_indices=len(icustay_lengths)        
+        shuffled_indices=np.arange(total_indices)
+        random.seed(42)
+        random.shuffle(shuffled_indices)
+        np.save(path_save+'shuffled_indices'+definition[1:]+'.npy',shuffled_indices)
+        
+    #Getting the full indices      
+    icustay_fullindices=patient_idx(icustay_lengths)
+    
+    tra_patient_indices,tra_full_indices,val_patient_indices,val_full_indices=cv_bundle(icustay_fullindices,\
+                                                                                        shuffled_indices,\
+                                                                                         k=k)
+
+    return tra_patient_indices,tra_full_indices,val_patient_indices,val_full_indices
+
 
 ################################### For train/test set  without cv splitting ########################################   
 
