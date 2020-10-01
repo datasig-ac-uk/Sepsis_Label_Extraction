@@ -30,10 +30,10 @@ def get_data(definition,a1,Data_Dir,path_df):
         features = jamesfeature(df_sepsis1, Data_Dir=Data_Dir, definition=definition)
     print(features.shape)
     try:
-        scores = np.load(Data_Dir + 'scores' + definition[1:] + '_' + str(a1) + '.npy')
         labels = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(a1) + '.npy')
     except:
-        labels, scores = label_scores(df_sepsis1, a1=a1, Data_Dir=Data_Dir, definition=definition, save=True)
+        labels = label_generator(df_sepsis1, a1=a1, Data_Dir=Data_Dir, definition=definition, save=True)
+        
     icustay_lengths, train_patient_indices, train_full_indices, test_patient_indices, test_full_indices = dataframe_cv_pack(
         df_sepsis1,
         k=5, definition=definition,
