@@ -450,3 +450,19 @@ def labels_generator(df, a1=6,Data_Dir='./',definition='t_sepsis_min',save=True)
         
         return label, scores.values
 
+def labels_validation(labels, val_full_indices):
+    """
+        labels on validation sets
+    
+    """
+    
+    labels_true=np.empty((0,1),int)   
+    k=len(test_full_indices)
+    
+    for i in range(k):
+
+        val_binary_labels = labels[np.concatenate(val_full_indices[i])]        
+        labels_true=np.append(labels_true, val_binary_labels)    
+
+       
+    return labels_true
