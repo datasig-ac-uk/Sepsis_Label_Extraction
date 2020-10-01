@@ -57,10 +57,9 @@ for a1 in [4,6,8,12]:
         df_sepsis1 = dataframe_from_definition_discard(path_df, definition=definition)
 
         try:
-            scores = np.load(Data_Dir + 'scores' + definition[1:] + '_' + str(a1) + '.npy')
             labels = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(a1) + '.npy')
         except:
-            labels, scores = label_scores(df_sepsis1, a1=a1, Data_Dir=Data_Dir, definition=definition, save=True)
+            labels= label_generator(df_sepsis1, a1=a1, Data_Dir=Data_Dir, definition=definition, save=True)
         df_sepsis1['SepsisLabel'] = labels
 
         icustay_lengths, train_patient_indices, train_full_indices, test_patient_indices, test_full_indices = dataframe_cv_pack(
