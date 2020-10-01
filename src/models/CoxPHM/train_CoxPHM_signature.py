@@ -15,7 +15,7 @@ def Coxph_df(df, features, feature_dict, T, labels):
     :param labels:
     :return:
     """
-
+    df['SepsisLabel']=labels
     df['censor_hours'] = T + 1 - df.groupby('icustay_id')['SepsisLabel'].cumsum()
 
     # construct output as reuiqred np structrued array format

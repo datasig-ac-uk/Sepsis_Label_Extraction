@@ -622,8 +622,8 @@ def lgbm_jm_transform(dataframe1, feature_dict=feature_dict, \
 
 if __name__ == '__main__':
     x,y = 24,12
-    test=False
-    path_df = DATA_DIR + '/raw/train_'+str(x)+'_'+str(y)+'.csv'
+    test=True
+    path_df = DATA_DIR + '/raw/val_'+str(x)+'_'+str(y)+'.csv'
     Save_Dir = DATA_DIR + '/processed/experiments_'+str(x)+'_'+str(y)+'/'
     print('generate features for sensitity ' +str(x)+'_'+str(y) + ' definition')
 

@@ -437,3 +437,66 @@ def auc_plot_patient_level(trues_list, probs_list, test_full_indices_list, names
     else:
 
         plt.show()
+
+def output_metric_level(CMs, pred_sepsispatient_list, levels=[0.88], test_metric='specificity'):
+    output = []
+
+    prvs_now = []
+    tprs_now = []
+    tnrs_now = []
+
+    for i in range(len(CMs)):
+        tpr, tnr, prv = decompose_confusion(CMs[i])
+        prvs_now.append(prv)
+        tnrs_now.append(tnr)
+        tprs_now.append(tpr)
+
+    prvs_now = np.array(prvs_now)
+    tnrs_now = np.array(tnrs_now)
+    tprs_now = np.array(tprs_now)
+
+    for j in range(len(levels)):
+        metric_thred = levels[j]
+        if test_metric == 'precision':
+            diff = prvs_now - metric_thred
+            min_value = np.min(diff[np.where(diff >= 0)[0]])
+            idx = np.where(diff == min_value)[0][0]
+        elif test_metric == 'sensitivity':
+            diff = tprs_now - metric_thred
+            min_value = np.min(diff[np.where(diff >= 0)[0]])
+            idx = np.where(diff == min_value)[0][0]
+
+        elif test_metric == 'specificity':
+            diff = tnrs_now - metric_thred
+            min_value = np.min(diff[np.where(diff >= 0)[0]])
+            idx = np.where(diff == min_value)[0][0]
+
+        output.append(pred_sepsispatient_list[idx])
+
+    return output, prvs_now[idx], tprs_now[idx], tnrs_now[idx], idx
+
+def decompose_confusion(CM):
+    FP = CM[0].sum() - CM[0, 0]
+
+    FN = CM[1].sum() - CM[1, 1]
+
+    TP = CM[1, 1]
+
+    TN = CM[0, 0]
+
+    # Sensitivity, hit rate, recall, or true positive rate
+    TPR = TP / (TP + FN)
+    # Specificity or true negative rate
+    TNR = TN / (TN + FP)
+    # Precision or positive predictive value
+    PPV = TP / (TP + FP)
+    # Negative predictive value
+    NPV = TN / (TN + FN)
+    # Fall out or false positive rate
+    FPR = FP / (FP + TN)
+    # False negative rate
+    FNR = FN / (TP + FN)
+    # False discovery rate
+    FDR = FP / (TP + FP)
+
+    return TPR, TNR, PPV

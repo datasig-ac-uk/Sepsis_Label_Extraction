@@ -16,7 +16,7 @@ def Coxph_df(df, features, feature_dict, T, labels):
     :param labels:
     :return:
     """
-
+    df['SepsisLabel'] = labels
     df['censor_hours'] = T + 1 - df.groupby('icustay_id')['SepsisLabel'].cumsum()
 
     # construct output as reuiqred np structrued array format
@@ -34,7 +34,7 @@ def Coxph_df(df, features, feature_dict, T, labels):
     return df2
 
 
-def Coxph_eval(df, model, T, save_dir):
+def Coxph_eval(df, model, T, save_dir=None):
     """
     :param df:
     :param model:
@@ -47,7 +47,8 @@ def Coxph_eval(df, model, T, save_dir):
     risk_score = 1 - np.exp(-H_t)
 
     df['risk_score'] = risk_score
-    np.save(save_dir, df['risk_score'])
+    if save_dir is not None:
+        np.save(save_dir, df['risk_score'])
     fpr, tpr, thresholds = roc_curve(df_coxph_test['label'], df_coxph_test['risk_score'], pos_label=1)
     index = np.where(tpr >= 0.85)[0][0]
     auc_score, specificity = auc(fpr, tpr), 1 - fpr[index]

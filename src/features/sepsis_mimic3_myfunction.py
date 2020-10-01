@@ -1,29 +1,12 @@
 import numpy as np
 import pandas as pd
-import iisignature
-import os
-import random
-
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
+from src.models.optimizers import *
 from lightgbm import LGBMClassifier
-
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, roc_auc_score, roc_curve
-from sklearn import preprocessing
-from sklearn.model_selection import KFold, RandomizedSearchCV, GridSearchCV
-from sklearn.linear_model import LogisticRegression
-
-from dicts import *
-from optimizers import *
-
-
-def create_folder(path):
-    try:
-        # Create target directory
-        os.mkdir(path)
-        print("Directory ", path, " created ")
-    except FileExistsError:
-        print("Directory ", path, " already exists")
+from src.features.dicts import *
+import random
+from sklearn.model_selection import KFold
+import iisignature
 
 
 def compute_icu(df_merge2, definition, return_results=False):
