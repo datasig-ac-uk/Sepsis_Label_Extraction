@@ -46,8 +46,11 @@ if __name__ == '__main__':
     path_df_test = DATA_DIR + '/raw/full_culture_data/test_data/metavision_sepsis_data_18_09_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'
         
     Save_Dir_train = DATA_DIR + '/processed/full_culture_data/experiments_'+str(x)+'_'+str(y)+'/train/'
+    create_folder(Save_Dir_train)
+    
     Save_Dir_test = DATA_DIR + '/processed/full_culture_data/experiments_'+str(x)+'_'+str(y)+'/test/'
-     
+    create_folder(Save_Dir_test)
+    
     print('generate features for sensitity ' +str(x)+'_'+str(y) + ' definition')
     
     results_train=[]
