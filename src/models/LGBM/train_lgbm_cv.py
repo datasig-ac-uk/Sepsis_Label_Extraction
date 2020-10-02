@@ -13,7 +13,7 @@ from src.features.LGBM.lgbm_functions import *
 
 if __name__ == '__main__':
     
-    Root='/data/processed/LGBM/full_culture_data/'
+    Root='/data/processed/full_culture_data/'
 
     a2,k=0,5
     x,y=24,12
@@ -65,6 +65,6 @@ if __name__ == '__main__':
             results.append([str(x)+','+str(y),a1,definition,auc,specificity,accuracy])
         
     result_df = pd.DataFrame(results, columns=['x,y','a1', 'definition', 'auc','speciticity','accuracy'])
-    result_df.to_csv(Data_Dir+"cv_results.csv")
+    result_df.to_csv(Data_Dir+"lgbm_cv_results.csv")
 
  
