@@ -42,9 +42,9 @@ if __name__ == '__main__':
     definitions=['t_sofa','t_suspicion','t_sepsis_min']
     T_list=[4, 6, 8, 12]
     
-    path_df_train = DATA_DIR + '/raw/val_'+str(x)+'_'+str(y)+'.csv'
-    path_df_test = DATA_DIR + '/raw/val_'+str(x)+'_'+str(y)+'.csv'
-    
+    path_df_train = DATA_DIR + '/raw/full_culture_data/train_data/metavision_sepsis_data_18_09_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'   
+    path_df_test = DATA_DIR + '/raw/full_culture_data/test_data/metavision_sepsis_data_18_09_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'
+        
     Save_Dir_train = DATA_DIR + '/processed/full_culture_data/experiments_'+str(x)+'_'+str(y)+'/train/'
     Save_Dir_test = DATA_DIR + '/processed/full_culture_data/experiments_'+str(x)+'_'+str(y)+'/test/'
      
@@ -59,24 +59,23 @@ if __name__ == '__main__':
         
         print('definition = '+str(definition))
         
-        print('generate features on train and test sets')
-        
+        print('generate features on train and test sets')       
         df_sepsis1_train = dataframe_from_definition_discard(path_df_train, definition=definition,a1=a1,a2=a2)
         df_sepsis1_test = dataframe_from_definition_discard(path_df_test, definition=definition,a1=a1,a2=a2)
         
-        print('save septic ratio for train and test sets')
+        print('save septic ratio for train and test sets')      
         icu_number,sepsis_icu_number, septic_ratio=compute_icu(df_sepsis1_train,definition,return_results=True)
         results_train.append([str(x)+','+str(y),definition,icu_number,sepsis_icu_number, septic_ratio])
         icu_number,sepsis_icu_number, septic_ratio=compute_icu(df_sepsis1_test,definition,return_results=True)
         results_test.append([str(x)+','+str(y),definition,icu_number,sepsis_icu_number, septic_ratio])
         
-        print('save ICU Ids for train and test sets')
+        print('save ICU Ids for train and test sets')       
         icuid_sequence_train=df_sepsis1_train.icustay_id.unique()
         np.save(Save_Dir_train +'icustay_id'+definition[1:]+'.npy',icuid_sequence_train)
         icuid_sequence_test=df_sepsis1_test.icustay_id.unique()
         np.save(Save_Dir_test +'icustay_id'+definition[1:]+'.npy',icuid_sequence_test)
         
-        print('save ICU lengths for train and test sets')
+        print('save ICU lengths for train and test sets')     
         icustay_lengths_train=list(df_sepsis1_train.groupby('icustay_id').size())
         np.save(Save_Dir_train +'icustay_lengths'+definition[1:]+'.npy',icustay_lengths_train)
         icustay_lengths_test=list(df_sepsis1_test.groupby('icustay_id').size())
@@ -104,10 +103,8 @@ if __name__ == '__main__':
             labels_train = label_generator(df_sepsis1_train, a1=T, Data_Dir=Save_Dir_train, definition=definition, save=True)
             labels_test = label_generator(df_sepsis1_test, a1=T, Data_Dir=Save_Dir_test, definition=definition, save=True)
             
-    print('save icu spetic ratio to csv')    
-              
+    print('save icu spetic ratio to csv')               
     result_df_train = pd.DataFrame(results_train, columns=['x,y', 'definition', 'total_icu_no','sepsis_no','septic_ratio'])
-    result_df_train.to_csv(Save_Dir_train+'icu_number.csv')
-     
+    result_df_train.to_csv(Save_Dir_train+'icu_number.csv')     
     result_df_test = pd.DataFrame(results_test, columns=['x,y', 'definition', 'total_icu_no','sepsis_no','septic_ratio'])
     result_df_test.to_csv(Save_Dir_test+'icu_number.csv')
