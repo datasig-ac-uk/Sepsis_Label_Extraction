@@ -13,7 +13,7 @@ from src.features.LGBM.lgbm_functions import *
 
 if __name__ == '__main__':
     
-    Root='/data/processed/LGBM/full_culture_data/'
+    Root='/data/processed/full_culture_data/'
 
     a2,k=0,5
     x,y=24,12
