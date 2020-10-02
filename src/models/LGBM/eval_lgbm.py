@@ -38,11 +38,7 @@ if __name__ == '__main__':
     results=[]
     
     for a1 in T_list:
-        
-        if a1!=6:
 
-            feature_generator(Data_Dir_train,df_path_train,a1=a1)
-            feature_generator(Data_Dir_test,df_path_test,a1=a1)
             
         for definition in definitions:
         
