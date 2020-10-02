@@ -5,7 +5,7 @@ import random
 import os
 import pickle
 
-from src.features.sepsis_mimic3_myfunction_new import *
+from src.features.sepsis_mimic3_myfunction import *
 from src.visualization.sepsis_mimic3_myfunction_patientlevel_clean import *
 from src.visualization.plot_functions_clean import *
 from src.visualization.table_functions_clean import *
