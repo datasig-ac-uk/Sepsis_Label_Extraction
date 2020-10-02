@@ -22,20 +22,13 @@ if __name__ == '__main__':
         a1,a2,k=6,0,5
         x,y=24,12
 
-        Data_Dir=Root+str(x)+'_'+str(y)+'/cv/'
-
-
+        Data_Dir=Root+'experiments_'+str(x)+'_'+str(y)+'/train/'
         definitions=[ 't_sofa','t_suspicion', 't_sepsis_min']
 
         print(Data_Dir)
 
         model=LGBMClassifier(random_state=42)
-        df_path='/data/raw/training_data/metavision_sepsis_data_18_09_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'
-
-
-        feature_generator(Data_Dir,df_path)
-
-
+ 
         for definition in definitions:
         
                 current_labels=np.load(Data_Dir+'label'+definition[1:]+'_'+str(a1)+'.npy')
