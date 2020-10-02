@@ -33,10 +33,6 @@ if __name__ == '__main__':
     
     for a1 in T_list:
         
-        if a1!=6:
-
-            feature_generator(Data_Dir,df_path,a1=a1)
-        
         for definition in definitions:
         
             print(a1,definition)
