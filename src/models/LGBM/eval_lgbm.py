@@ -18,27 +18,17 @@ if __name__ == '__main__':
     a2,k=0,5
     x,y=24,12
     
-    Data_Dir_train=Root+str(x)+'_'+str(y)+'/train/'
-    Data_Dir_test=Root+str(x)+'_'+str(y)+'/test/'
-   
-    create_folder(Data_Dir_train)
-    create_folder(Data_Dir_test)
+    Data_Dir_train=Root+'experiments_'+str(x)+'_'+str(y)+'/train/'
+    Data_Dir_test=Root+'experiments_'+str(x)+'_'+str(y)+'/test/'
 
-   
     Data_save=Root+'results/'
     
     definitions=[ 't_sofa','t_suspicion', 't_sepsis_min']
     T_list=[12,8,6,4]
-    
-     
-    df_path_train='/data/raw/training_data/further_split/train_'+str(x)+'_'+str(y)+'.csv'
-    df_path_test='/data/raw/training_data/further_split/val_'+str(x)+'_'+str(y)+'.csv'
-
-
+        
     results=[]
     
     for a1 in T_list:
-
             
         for definition in definitions:
         
@@ -62,7 +52,7 @@ if __name__ == '__main__':
             results.append([str(x)+','+str(y),a1,definition,auc,specificity,accuracy])
         
     result_df = pd.DataFrame(results, columns=['x,y','a1', 'definition', 'auc','speciticity','accuracy'])
-    result_df.to_csv(Data_Dir_test+"lgbm_results.csv")
+    result_df.to_csv(Data_Dir_test+"lgbm_test_results.csv")
 
         
 
