@@ -11,13 +11,11 @@ from definitions import *
 from src.features.sepsis_mimic3_myfunction import *
 
     
-    
 if __name__ == '__main__':
 
     x,y = 24,12    
     a2=0
-    definitions=['t_sofa','t_suspicion','t_sepsis_min']
-    T_list=[12,8,12,4]
+
     
     path_df_train='/scratch/mimiciii/training_data/further_split/train_'+str(x)+'_'+str(y)+'.csv'
     path_df_test='/scratch/mimiciii/training_data/further_split/val_'+str(x)+'_'+str(y)+'.csv'
