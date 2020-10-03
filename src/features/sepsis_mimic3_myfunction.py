@@ -385,7 +385,7 @@ def featureset_generator(path_df,Save_Dir,x=24,y=12, a2=0, T_list=[12,8,12,4],\
         print('gengerate and save labels')
         for T in T_list:
             print('T= ' + str(T))
-            labels = label_generator(df_sepsis1, a1=T, Data_Dir=Save_Dir, definition=definition, save=True)
+            labels = labels_generator(df_sepsis1, a1=T, Data_Dir=Save_Dir, definition=definition, save=True)
             
     print('save icu spetic ratio to csv')               
     result_df = pd.DataFrame(results, columns=['x,y', 'definition', 'total_icu_no','sepsis_no','septic_ratio'])
