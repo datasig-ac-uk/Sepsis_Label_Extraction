@@ -343,7 +343,7 @@ def timeseriesdataset_generator(icustay_lengths,features):
         
         return dataset
 
-def featureset_generator(path_df,Save_Dir,x=24,y=12, a2=0, T_list=[12,8,12,4],\
+def featureset_generator(path_df,Save_Dir,x=24,y=12, a2=0, T_list=[12,8,6,4],\
                    definitions=['t_sofa','t_suspicion','t_sepsis_min']):
     
     create_folder(Save_Dir)
