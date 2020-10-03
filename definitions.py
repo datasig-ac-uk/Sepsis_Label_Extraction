@@ -17,7 +17,9 @@ MODELS_DIR = ROOT_DIR + '/models/'
 OUTPUT_DIR=ROOT_DIR + '/outputs/'
 
 
-DATA_processed=DATA_DIR + '/processed/'
-DATA_raw=DATA_DIR + '/raw/'
+DATA_processed=DATA_DIR + 'processed/'
+DATA_raw=DATA_DIR + 'raw/'
 
+definitions=['t_sofa','t_suspicion','t_sepsis_min']
+T_list=[12,8,6,4]
 
