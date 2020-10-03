@@ -1,30 +1,14 @@
-
-
 import numpy as np
 import pandas as pd
 import iisignature
 import os
 import random
-import torch
-
-
-from datetime import datetime, timedelta
-
-from sklearn import preprocessing
-from sklearn.model_selection import KFold
-from sklearn.linear_model import LogisticRegression
 
 
 import sys
 sys.path.insert(0, '../../')
-print(sys.path)
 from definitions import *
-from src.data.dataset import TimeSeriesDataset
-from src.data.functions import torch_ffill
-from src.features.dicts import *
 from src.features.sepsis_mimic3_myfunction import *
-
-
 
     
     
@@ -47,6 +31,6 @@ if __name__ == '__main__':
     
     print('generate train/set features for sensitity ' +str(x)+'_'+str(y) + ' definition')
     
-    data_generator(path_df_train,Save_Dir_train,a2=a2, definitions=definitions)
-    data_generator(path_df_test_Dir_test,a2=a2, definitions=definitions,T_list=T_list)
+    featureset_generator(path_df_train,Save_Dir_train,x=x,y=y,a2=a2, definitions=definitions,T_list=T_list)
+    featureset_generator(path_df_test,Save_Dir_test,x=x,y=y,a2=a2, definitions=definitions,T_list=T_list)
 
