@@ -1,16 +1,20 @@
+import os
 import numpy as np
 import pandas as pd
 import iisignature
-import os
 import random
+import torch
 
-import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
 from sklearn.model_selection import KFold
+from sklearn import preprocessing
 
-from dicts import *
 
+# from dicts import *
+from src.data.dataset import TimeSeriesDataset
+from src.data.functions import torch_ffill
+from src.features.dicts import *
 
 def create_folder(path):
     try:
@@ -322,7 +326,7 @@ def lgbm_jm_transform(dataframe1,feature_dict=feature_dict,\
     return finaldata
 
 
-def dataset_generator(icustay_lengths,features):
+def timeseriesdataset_generator(icustay_lengths,features):
         
         """
         Generating dataset for lstm from features
@@ -339,7 +343,7 @@ def dataset_generator(icustay_lengths,features):
         
         return dataset
 
-def data_generator(path_df,Save_Dir,a2=0, T_list=[12,8,12,4],\
+def featureset_generator(path_df,Save_Dir,x=24,y=12, a2=0, T_list=[12,8,12,4],\
                    definitions=['t_sofa','t_suspicion','t_sepsis_min']):
     
     create_folder(Save_Dir)
@@ -374,7 +378,7 @@ def data_generator(path_df,Save_Dir,a2=0, T_list=[12,8,12,4],\
         features = jamesfeature(df_sepsis1, Data_Dir=Save_Dir, definition=definition)
  
         print('generate and save timeseries dataset for LSTM model input')    
-        dataset=dataset_generator(icustay_lengths,features)
+        dataset=timeseriesdataset_generator(icustay_lengths,features)
         
         dataset.save(Save_Dir + definition[1:] + '_ffill.tsd')
             
