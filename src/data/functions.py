@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from omni.functions import *
+from src.omni.functions import *
 
 
 def torch_ffill(data):
