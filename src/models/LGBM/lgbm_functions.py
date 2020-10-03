@@ -34,8 +34,10 @@ def model_validation(model, dataset, labels, tra_full_indices, val_full_indices)
     labels_true=np.empty((0,1),int)   
     tra_preds=np.empty((0,1),int)
     tra_idxs=np.empty((0,1),int)
-    k=len(train_full_indices)
-
+    prob_preds=np.empty((0,1),int)
+    
+    k=len(tra_full_indices)
+    
     val_idx_collection=[]
     
     for i in range(k):
