@@ -368,7 +368,7 @@ def featureset_generator(path_df,Save_Dir,x=24,y=12, a2=0, T_list=[12,8,12,4],\
         np.save(Save_Dir +'icustay_id'+definition[1:]+'.npy',icuid_sequence)
         
         print('save ICU lengths for data set')     
-        icustay_lengths=list(df_sepsis1_train.groupby('icustay_id').size())
+        icustay_lengths=list(df_sepsis1.groupby('icustay_id').size())
         np.save(Save_Dir +'icustay_lengths'+definition[1:]+'.npy',icustay_lengths)
 
         print('save processed dataframe for lstm model')
