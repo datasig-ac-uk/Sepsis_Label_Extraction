@@ -15,7 +15,7 @@ from dicts import *
 def create_folder(path):
     try:
         # Create target directory
-        os.mkdir(path)
+        os.makedirs(path)
         print("Directory " , path ,  " created ") 
     except FileExistsError:
         print("Directory " , path,  " already exists")   
@@ -321,7 +321,74 @@ def lgbm_jm_transform(dataframe1,feature_dict=feature_dict,\
 
     return finaldata
 
+
+def dataset_generator(icustay_lengths,features):
+        
+        """
+        Generating dataset for lstm from features
+        
+        """
+
+        index = np.cumsum(np.array([0] + icustay_lengths))
+        features_list = [torch.tensor(features[index[i]:index[i + 1]]) for i in range(index.shape[0] - 1)]
+        column_list = [item for item in range(features.shape[1])]
+        dataset = TimeSeriesDataset(data=features_list, columns=column_list, lengths=icustay_lengths)
+        dataset.data = torch_ffill(dataset.data)
+        dataset.data[torch.isnan(dataset.data)] = 0
+        dataset.data[torch.isinf(dataset.data)] = 0
+        
+        return dataset
+
+def data_generator(path_df,Save_Dir,a2=0, T_list=[12,8,12,4],\
+                   definitions=['t_sofa','t_suspicion','t_sepsis_min']):
     
+    create_folder(Save_Dir)
+    
+    results=[]
+    
+    for definition in definitions:
+        
+        a1=6
+        
+        print('definition = '+str(definition))
+        
+        print('generate features on data set')       
+        df_sepsis1 = dataframe_from_definition_discard(path_df, definition=definition,a1=a1,a2=a2)
+        
+        print('save septic ratio for data set')      
+        icu_number,sepsis_icu_number, septic_ratio=compute_icu(df_sepsis1,definition,return_results=True)
+        results.append([str(x)+','+str(y),definition,icu_number,sepsis_icu_number, septic_ratio])
+
+        print('save ICU Ids for data set')       
+        icuid_sequence=df_sepsis1.icustay_id.unique()
+        np.save(Save_Dir +'icustay_id'+definition[1:]+'.npy',icuid_sequence)
+        
+        print('save ICU lengths for data set')     
+        icustay_lengths=list(df_sepsis1_train.groupby('icustay_id').size())
+        np.save(Save_Dir +'icustay_lengths'+definition[1:]+'.npy',icustay_lengths)
+
+        print('save processed dataframe for lstm model')
+        df_sepsis1.to_pickle(Save_Dir+definition[1:]+'_dataframe.pkl')
+        
+        print('generate and save input features')
+        features = jamesfeature(df_sepsis1, Data_Dir=Save_Dir, definition=definition)
+ 
+        print('generate and save timeseries dataset for LSTM model input')    
+        dataset=dataset_generator(icustay_lengths,features)
+        
+        dataset.save(Save_Dir + definition[1:] + '_ffill.tsd')
+            
+        print('gengerate and save labels')
+        for T in T_list:
+            print('T= ' + str(T))
+            labels = label_generator(df_sepsis1, a1=T, Data_Dir=Save_Dir, definition=definition, save=True)
+            
+    print('save icu spetic ratio to csv')               
+    result_df = pd.DataFrame(results, columns=['x,y', 'definition', 'total_icu_no','sepsis_no','septic_ratio'])
+    result_df.to_csv(Save_Dir+'icu_number.csv')     
+
+
+
 ################################### CV splitting  ########################################   
 
 
