@@ -2,29 +2,28 @@ import numpy as np
 import pandas as pd
 import random
 import os
-import dill, pickle
+import pickle
 
 from lightgbm import LGBMClassifier
 
-
+import sys
+sys.path.insert(0, '../../../')
+from definitions import *
 from src.features.sepsis_mimic3_myfunction import *
-from src.features.LGBM.lgbm_functions import *
+from src.models.LGBM.lgbm_functions import *
 
 
 if __name__ == '__main__':
     
-    Root='/data/processed/full_culture_data/'
+    Root_Data=DATA_processed+'full_culture_data/'
 
     a2,k=0,5
     x,y=24,12
     
-    Data_Dir_train=Root+'experiments_'+str(x)+'_'+str(y)+'/train/'
-    Data_Dir_test=Root+'experiments_'+str(x)+'_'+str(y)+'/test/'
+    Data_Dir_train=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
+    Data_Dir_test=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/test/'
 
-    Data_save=Root+'results/'
-    
-    definitions=[ 't_sofa','t_suspicion', 't_sepsis_min']
-    T_list=[12,8,6,4]
+    Data_save=Root_Data+'results/'
         
     results=[]
     
@@ -48,7 +47,7 @@ if __name__ == '__main__':
             
             _, prob_preds_test, auc,specificity,accuracy=model_training(clf,feature_train,feature_test,label_train,label_test)
         
-            np.save(Data_Dir_test+probs+'lgbm_prob_preds'+definition[1:]+'_'+str(a1)+'.npy',prob_preds_test)
+            np.save(Data_Dir_test+'lgbm_prob_preds'+definition[1:]+'_'+str(a1)+'.npy',prob_preds_test)
             results.append([str(x)+','+str(y),a1,definition,auc,specificity,accuracy])
         
     result_df = pd.DataFrame(results, columns=['x,y','a1', 'definition', 'auc','speciticity','accuracy'])
