@@ -168,11 +168,11 @@ def model_training(model, train_set,test_set, train_labels, test_labels):
         index=np.where(tpr>=0.85)[0][0]
         test_preds=np.array((prob_preds_test>=thresholds[index]).astype('int'))
 
-        print('auc and sepcificity',roc_auc_score(labels2,prob_preds_test),1-fpr[index])
+        print('auc and sepcificity',roc_auc_score(test_labels,prob_preds_test),1-fpr[index])
         print('accuracy',accuracy_score(test_labels,test_preds))
         
-        return test_preds, prob_preds_test, roc_auc_score(labels2,prob_preds_test),\
-               1-fpr[index],accuracy_score(labels2,test_preds)
+        return test_preds, prob_preds_test, roc_auc_score(test_labels,prob_preds_test),\
+               1-fpr[index],accuracy_score(test_labels,test_preds)
 
 
 
