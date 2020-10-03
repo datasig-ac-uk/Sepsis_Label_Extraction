@@ -6,12 +6,18 @@ from definitions import *
 """
 from pathlib import Path
 
+# Packages/functions used everywhere
+from src.omni.functions import *
+
+
 ROOT_DIR = str(Path(__file__).resolve().parents[0])
 
-DATA_DIR = ROOT_DIR + '/data'
-MODELS_DIR = ROOT_DIR + '/models'
-OUTPUT_DIR=ROOT_DIR + '/outputs'
-# Packages/functions used everywhere
+DATA_DIR = ROOT_DIR + '/data/'
+MODELS_DIR = ROOT_DIR + '/models/'
+OUTPUT_DIR=ROOT_DIR + '/outputs/'
 
-from src.omni.functions import *
+
+DATA_processed=DATA_DIR + '/processed/'
+DATA_raw=DATA_DIR + '/raw/'
+
 
