@@ -18,15 +18,15 @@ from src.models.LGBM.lgbm_functions import *
 
 if __name__ == '__main__':
 
-        Root=DATA_processed+'full_culture_data/'
+        Root_Data=DATA_processed+'full_culture_data/'
 
-        Data_save=Root+'results/'
+        Data_save=Root_Data+'results/'
         create_folder(Data_save)
 
         a1,a2,k=6,0,5
         x,y=24,12
 
-        Data_Dir=Root+'experiments_'+str(x)+'_'+str(y)+'/train/'
+        Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
         definitions=[ 't_sofa','t_suspicion', 't_sepsis_min']
 
         print(Data_Dir)
