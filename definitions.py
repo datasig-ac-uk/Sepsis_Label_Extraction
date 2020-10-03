@@ -20,6 +20,7 @@ OUTPUT_DIR=ROOT_DIR + '/outputs/'
 DATA_processed=DATA_DIR + 'processed/'
 DATA_raw=DATA_DIR + 'raw/'
 
+xy_pairs=[(48,24),(24,12),(12,6),(6,3)]
 definitions=['t_sofa','t_suspicion','t_sepsis_min']
 T_list=[12,8,6,4]
 
