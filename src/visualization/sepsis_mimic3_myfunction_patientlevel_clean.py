@@ -3,14 +3,13 @@ import pandas as pd
 import random
 from sklearn.model_selection import KFold
 import os
-import dill, pickle
+import pickle
 
-from dicts import *
-from sepsis_mimic3_myfunction_new import *
+from src.features.dicts import *
+from src.features.sepsis_mimic3_myfunction import *
 
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
-from lightgbm import LGBMClassifier
 
 ################## Those for CV #############################
 
