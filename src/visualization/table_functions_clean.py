@@ -4,14 +4,18 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score,roc_curve, auc
 
 from src.features.sepsis_mimic3_myfunction import *
-from scr.visualization.sepsis_mimic3_myfunction_patientlevel_clean import output_at_metric_level
+from src.visualization.sepsis_mimic3_myfunction_patientlevel_clean import output_at_metric_level
 
-models_=['LGBM','LSTM','CoxPHM']
-definitions=['t_sofa','t_suspicion','t_sepsis_min']
+
+import sys
+sys.path.insert(0, '../../')
+
+from definitions import *
+
 headers=['H1','H2','H3']
 
 def instance_level_auc_pd_threemodels(labels_list_list,probs_list_list,\
-                                          models=models_, definitions=definitions,\
+                                          models=MODELS, definitions=definitions,\
                                           pd_save_name=None):
     """
         instance level auc pd outout for all three models
@@ -44,7 +48,7 @@ def instance_level_auc_pd_threemodels(labels_list_list,probs_list_list,\
         return output_df
     
 def patient_level_auc_pd_threemodels(fprs_list_list,tprs_list_list,\
-                                     models=models_,headers=headers,\
+                                     models=MODELS,headers=headers,\
                                      definitions=definitions,\
                                      pd_save_name=None,\
                                      numerics_format="{:.3f}",for_write=True):
@@ -79,7 +83,7 @@ def patient_level_auc_pd_threemodels(fprs_list_list,tprs_list_list,\
         return output_df      
 
 def patient_level_output_pd_threemodels(some_list_list,metric_seq_list_list,\
-                                        models=models_,headers=headers, definitions=definitions,\
+                                        models=MODELS,headers=headers, definitions=definitions,\
                                         metric_required=[0.375],numerics_format="{:.2%}",\
                                         operator=lambda x: x, for_write=True, pd_save_name=None):
     """

@@ -8,11 +8,15 @@ from sklearn.metrics import roc_auc_score,roc_curve, auc
 from matplotlib.patches import Rectangle
 
     
+import sys
+sys.path.insert(0, '../../')
+
+from definitions import *
 
 colors_barplot=sns.color_palette()
 colors_auc=sns.color_palette("Dark2")
 linestyles=[':','-.','-','--']        
-models_=['LGBM','LSTM','CoxPHM']
+
 
 
 ############################ For boxplot ############################
@@ -172,7 +176,7 @@ def auc_plot(trues_list,probs_list,names,fontsize=14,\
         
 def auc_subplots(trues_list,probs_list,names,\
                  fontsize=14,figsize=(15,5),\
-                 titles=models, colors=colors_auc,\
+                 titles=MODELS, colors=colors_auc,\
                  linestyles=linestyles,lw=2,\
                  loc="lower right",save_name=None):
     
@@ -274,7 +278,7 @@ def auc_subplots(trues_list,probs_list,names,\
 
         
 def auc_plot_patient_level(fprs,tprs,names,fontsize=14,\
-                            colors=colors_auc,titles=models_,\
+                            colors=colors_auc,titles=MODELS,\
                             linestyles=linestyles,lw = 2,\
                             loc="lower right",save_name=None):
     
@@ -320,7 +324,7 @@ def auc_plot_patient_level(fprs,tprs,names,fontsize=14,\
     plt.yticks(fontsize=fontsize-3)
     
     if save_name is not None:
-        plt.savefig(save_name+'.png')
+        plt.savefig(save_name+'.png',dpi=300)
     else:
         
         plt.show()
@@ -328,7 +332,7 @@ def auc_plot_patient_level(fprs,tprs,names,fontsize=14,\
         
 def auc_subplots_patient_level(fprs_list,tprs_list,names,\
                                fontsize=14,figsize=(15,5),\
-                               colors=colors_auc,titles=models_,\
+                               colors=colors_auc,titles=MODELS,\
                                linestyles=linestyles,lw = 2,\
                                loc="lower right", save_name=None):
     """
@@ -424,14 +428,14 @@ def auc_subplots_patient_level(fprs_list,tprs_list,names,\
     plt.yticks(fontsize=fontsize-3)
     
     if save_name is not None:
-        plt.savefig(save_name+'.png')
+        plt.savefig(save_name+'.png',dpi=300)
     else:
         
         plt.show()
 
 def recall_specificity_subplots_patient_level(pres_list,tprs_list,names,\
                                               fontsize=14,figsize=(15,5),\
-                                              titles=models_, colors=colors_auc,\
+                                              titles=MODELS, colors=colors_auc,\
                                               linestyles=linestyles,\
                                               loc="lower left",lw = 2,\
                                               save_name=None):
@@ -519,13 +523,13 @@ def recall_specificity_subplots_patient_level(pres_list,tprs_list,names,\
     plt.yticks(fontsize=fontsize-3)
     
     if save_name is not None:
-        plt.savefig(save_name+'.png')
+        plt.savefig(save_name+'.png',dpi=300)
     else:
         
         plt.show()
 
         
-def boxplots_prediction_time_inadvance(data_seqs,name_seq,ylabel,titles=models_,\
+def boxplots_prediction_time_inadvance(data_seqs,name_seq,ylabel,titles=MODELS,\
                                        figsize=(15,9),fontsize=14,notch=False,\
                                        widths=[0.7,0.7,0.7],savetitle=None):
     """
@@ -726,7 +730,7 @@ def trajectory_plot(probs_sample,labels_sample,\
     else:
         plt.show()
 
-def trajectory_plots(probs_samples,labels_sample, sublabels=models_,\
+def trajectory_plots(probs_samples,labels_sample, sublabels=MODELS,\
                     labels=['Risk score','Labels for T=6','Ground truth'],\
                     figsize=(10,3),fontsize=14,lw=2,save_name=None):
     """
