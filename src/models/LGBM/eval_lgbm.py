@@ -15,15 +15,16 @@ from src.models.LGBM.lgbm_functions import *
 
 if __name__ == '__main__':
     
-    Root_Data=DATA_processed+'full_culture_data/'
+    
 
     a2,k=0,5
     x,y=24,12
+    current_data='full_culture_data/'
+    Root_Data,Model_Dir,Data_save=folders(current_data)
     
     Data_Dir_train=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
     Data_Dir_test=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/test/'
 
-    Data_save=Root_Data+'results/'
         
     results=[]
     
@@ -51,7 +52,7 @@ if __name__ == '__main__':
             results.append([str(x)+','+str(y),a1,definition,auc,specificity,accuracy])
         
     result_df = pd.DataFrame(results, columns=['x,y','a1', 'definition', 'auc','speciticity','accuracy'])
-    result_df.to_csv(Data_Dir_test+"lgbm_test_results.csv")
+    result_df.to_csv(Data_save+str(x)+ '_' +str(y)+'_lgbm_test_results.csv')
 
         
 

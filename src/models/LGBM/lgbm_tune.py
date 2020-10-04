@@ -18,16 +18,13 @@ from src.models.LGBM.lgbm_functions import *
 
 if __name__ == '__main__':
 
-        Root_Data=DATA_processed+'full_culture_data/'
-
-        Data_save=Root_Data+'results/'
-        create_folder(Data_save)
+        current_data='full_culture_data/'
+        Root_Data,Model_Dir,_=folders(current_data)
 
         a1,a2,k=6,0,5
         x,y=24,12
 
         Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
-        definitions=[ 't_sofa','t_suspicion', 't_sepsis_min']
 
         print(Data_Dir)
 
@@ -47,7 +44,7 @@ if __name__ == '__main__':
                                       val_full_indices,grid_parameters, n_iter=1000)
         
 
-                with open(Data_save+'lgbm_best_paras'+definition[1:]+'.pkl', 'wb') as file:
+                with open(Model_Dir+'lgbm_best_paras'+definition[1:]+'.pkl', 'wb') as file:
                         pickle.dump(lgbm_best_paras_, file)
                 
 
