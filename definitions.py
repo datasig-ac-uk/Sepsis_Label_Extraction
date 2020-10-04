@@ -24,3 +24,5 @@ xy_pairs=[(48,24),(24,12),(12,6),(6,3)]
 definitions=['t_sofa','t_suspicion','t_sepsis_min']
 T_list=[12,8,6,4]
 
+MODELS=['LGBM','LSTM','CoxPHM']
+models=['lgbm','lstm','coxph']
