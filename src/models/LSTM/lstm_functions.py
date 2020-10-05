@@ -14,7 +14,7 @@ from src.data.functions import torch_ffill
 from src.data.torch_timeseries_dataset import LSTM_Dataset
 from torch.utils.data import DataLoader, TensorDataset
 from src.models.nets import LSTM
-
+from src.features.sepsis_mimic3_myfunction import *
 
 def folders(current_data):
     
@@ -29,9 +29,10 @@ def folders(current_data):
     return Root_Data,Model_Dir,Data_save
 
 def prepared_data_train(ts_dataset,labels,normalize,batch_size,device):
-
+    
+    dataset=ts_dataset
     if normalize:
-        scaler = TrickScaler(scaling='mms').fit(ts_dataset.data)
+        scaler = TrickScaler(scaling='mms').fit(dataset.data)
         dataset.data = scaler.transform(dataset.data)
     data = torch.FloatTensor(dataset.data.float())
     lengths = torch.FloatTensor(dataset.lengths)

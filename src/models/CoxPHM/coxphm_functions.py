@@ -7,6 +7,8 @@ sys.path.insert(0, '../../../')
 
 from definitions import *
 from src.features.dicts import *
+from src.features.sepsis_mimic3_myfunction import *
+
 
 def folders(current_data):
     
