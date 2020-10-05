@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
 
 #     Data_Dir = Root_Data + '/processed/experiments_' + str(x) + '_' + str(y) + '/H3_subset/'
-    Data_Dir = Root_Data + '/processed/experiments_' + str(x) + '_' + str(y) + '/train/'
+    Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
 
 
     for definition in definitions:
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 #         for T in [6]:
         for T in T_list:
             print('load timeseries dataset')
-            dataset = TimeSeriesDataset().load(Save_Dir + definition[1:] + '_ffill.tsd')
+            dataset = TimeSeriesDataset().load(Data_Dir + definition[1:] + '_ffill.tsd')
 
             print('load train labels')
             labels_train = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')

@@ -3,8 +3,9 @@ import numpy as np
 import os
 import time
 import torch
-
+import sys
 sys.path.insert(0, '../../../')
+
 from definitions import *
 from src.models.LSTM.lstm_functions import *
 from src.features.sepsis_mimic3_myfunction import *
@@ -19,7 +20,7 @@ if __name__ == '__main__':
     x, y = 24, 12
     current_data_folder='full_culture_data/'
     Root_Data,Model_Dir,Data_save=folders(current_data_folder)    
-    Data_Dir = Root_Data + '/processed/experiments_' + str(x) + '_' + str(y) + '/train/'
+    Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
 
 #     Save_Dir = DATA_DIR + '/processed/experiments_' + str(x) + '_' + str(y) + '/H3_subset/'
 
@@ -43,8 +44,8 @@ if __name__ == '__main__':
             model = LSTM(in_channels=dataset.data.shape[-1], num_layers=1, hidden_channels=config['hidden_channels'],
                          hidden_1=config['linear_channels'], out_channels=2,
                          dropout=0).to(device)
-                        model.load_state_dict(
-            torch.load(Model_Dir +definition[2:] +'_'+ str(x) + '_' + str(y) + '_' + str(T),
+            
+            model.load_state_dict(torch.load(Model_Dir +definition[2:] +'_'+ str(x) + '_' + str(y) + '_' + str(T),
                            map_location=torch.device('cpu')))
 #             model.load_state_dict(
 #                 torch.load(MODELS_DIR + '/LSTM/H3_subset/' +definition[2:] +'_'+ str(x) + '_' + str(y) + '_' + str(T),

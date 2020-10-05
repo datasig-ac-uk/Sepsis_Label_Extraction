@@ -10,7 +10,6 @@ from src.features.dicts import *
 from src.omni.functions import *
 from src.models.CoxPHM.coxphm_functions import *
 
-
 if __name__ == '__main__':
     x, y = 24, 12
     
