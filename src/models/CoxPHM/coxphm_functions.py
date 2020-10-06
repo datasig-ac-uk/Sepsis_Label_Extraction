@@ -7,20 +7,20 @@ sys.path.insert(0, '../../../')
 
 from definitions import *
 from src.features.dicts import *
-from src.features.sepsis_mimic3_myfunction import *
 
 
-def folders(current_data):
+
+# def folders(current_data):
     
-    Root_Data=DATA_processed+current_data  
+#     Root_Data=DATA_processed+current_data  
     
-    Model_Dir=MODELS_DIR+current_data+'CoxPHM/'    
-    create_folder(Model_Dir)
+#     Model_Dir=MODELS_DIR+current_data+'CoxPHM/'    
+#     create_folder(Model_Dir)
     
-    Data_save=Root_Data+'results/'
-    create_folder(Data_save)
+#     Data_save=Root_Data+'results/'
+#     create_folder(Data_save)
     
-    return Root_Data,Model_Dir,Data_save
+#     return Root_Data,Model_Dir,Data_save
 
 
 def Coxph_df(df, features, feature_dict, T, labels):

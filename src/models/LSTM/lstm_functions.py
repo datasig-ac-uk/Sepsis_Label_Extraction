@@ -16,17 +16,6 @@ from torch.utils.data import DataLoader, TensorDataset
 from src.models.nets import LSTM
 from src.features.sepsis_mimic3_myfunction import *
 
-def folders(current_data):
-    
-    Root_Data=DATA_processed+current_data  
-    
-    Model_Dir=MODELS_DIR+current_data+'LSTM/'    
-    create_folder(Model_Dir)
-    
-    Data_save=Root_Data+'results/'
-    create_folder(Data_save)
-    
-    return Root_Data,Model_Dir,Data_save
 
 def prepared_data_train(ts_dataset,labels,normalize,batch_size,device):
     

@@ -10,14 +10,14 @@ from src.features.dicts import *
 from src.omni.functions import *
 from src.models.CoxPHM.coxphm_functions import *
 
-
+from src.features.sepsis_mimic3_myfunction import *
 
 
 if __name__ == '__main__':
     x, y = 24, 12
     
     current_data_folder='full_culture_data/'
-    Root_Data,Model_Dir,_=folders(current_data_folder)
+    Root_Data,Model_Dir,_=folders(current_data_folder,model='CoxPHM')
     
     Data_Dir =Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     for definition in definitions:
         for T in T_list:
             print('load dataframe and input features')
-            df_sepsis_train = pd.read_pickle(Save_Dir + definition[1:] + '_dataframe.pkl')
+            df_sepsis_train = pd.read_pickle(Data_Dir + definition[1:] + '_dataframe.pkl')
             features_train = np.load(Data_Dir + 'james_features' + definition[1:] + '.npy')
 
             print('load train labels')

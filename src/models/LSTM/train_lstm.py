@@ -7,9 +7,7 @@ import torch
 sys.path.insert(0, '../../../')
 from definitions import *
 from src.models.LSTM.lstm_functions import *
-
-
-
+from src.features.sepsis_mimic3_myfunction import *
 
 if __name__ == '__main__':
     

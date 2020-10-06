@@ -20,7 +20,7 @@ if __name__ == '__main__':
     a2,k=0,5
     x,y=24,12
     current_data='full_culture_data/'
-    Root_Data,Model_Dir,Data_save=folders(current_data)
+    Root_Data,Model_Dir,Data_save=folders(current_data,model='LGBM')
     
     Data_Dir_train=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
     Data_Dir_test=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/test/'
