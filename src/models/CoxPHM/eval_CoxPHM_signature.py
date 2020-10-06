@@ -9,12 +9,13 @@ from src.features.scaler import *
 from src.features.dicts import *
 from src.omni.functions import *
 from src.models.CoxPHM.coxphm_functions import *
+from src.features.sepsis_mimic3_myfunction import *
 
 if __name__ == '__main__':
     x, y = 24, 12
     
     current_data_folder='full_culture_data/'    
-    Root_Data,Model_Dir,Data_save=folders(current_data_folder) 
+    Root_Data,Model_Dir,Data_save=folders(current_data_folder,model='CoxPHM') 
     
     Data_Dir =Root_Data+'experiments_'+str(x)+'_'+str(y)+'/test/'
     

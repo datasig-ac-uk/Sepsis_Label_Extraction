@@ -22,7 +22,7 @@ if __name__ == '__main__':
     
 
     current_data='full_culture_data/'
-    Root_Data,Model_Dir,Data_save=folders(current_data)
+    Root_Data,Model_Dir,Data_save=folders(current_data,model='LGBM')
     
     Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
     print(Data_Dir)
