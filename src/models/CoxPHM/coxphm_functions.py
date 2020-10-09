@@ -88,7 +88,7 @@ search_space = {
 
 def model_cv(config,data,a1):
     regularize, step_size = config['regularize'], config['step_size']
-    df_coxph,train_full_indices,test_full_indices,k=data
+    df_coxph,train_full_indices,test_full_indices,k=get_pinned_object(data)
     test_true, test_preds = [], []
     train_idxs = [np.concatenate(train_full_indices[i]) for i in range(len(train_full_indices))]
     test_idxs = [np.concatenate(test_full_indices[i]) for i in range(len(test_full_indices))]
