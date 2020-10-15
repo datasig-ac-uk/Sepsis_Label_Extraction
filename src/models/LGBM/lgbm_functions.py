@@ -7,18 +7,6 @@ from definitions import *
 from src.features.sepsis_mimic3_myfunction import *
 
 
-def folders(current_data):
-    
-    Root_Data=DATA_processed+current_data  
-    
-    Model_Dir=MODELS_DIR+current_data+'LGBM/'    
-    create_folder(Model_Dir)
-    
-    Data_save=Root_Data+'results/'
-    create_folder(Data_save)
-    
-    return Root_Data,Model_Dir,Data_save
-
 ################################### LGBM tuning/training ########################################   
 def feature_loading(Data_Dir,definition, a1, k=5,cv=True,save=True):
 
