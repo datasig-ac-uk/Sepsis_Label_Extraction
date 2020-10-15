@@ -78,7 +78,7 @@ def stacked_barplot3lists_compare(data1,data2, data3,\
     if save_name==None:
         plt.show()
     else:
-        plt.savefig(savetitle+".eps")
+        plt.savefig(save_name+".png",dpi=300)
   
 
 ############################ For confusion matrix plot ############################
@@ -169,7 +169,7 @@ def auc_plot(trues_list,probs_list,names,fontsize=14,\
     plt.yticks(fontsize=fontsize-3)
     
     if save_name is not None:
-        plt.savefig(save_name+'.png')
+        plt.savefig(save_name+'.png',dpi=300)
     else:        
         plt.show()
 
