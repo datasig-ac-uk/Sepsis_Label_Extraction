@@ -148,16 +148,16 @@ def model_tuning(model, dataset, labels,tra_full_indices, val_full_indices,param
     
     return best_params_        
        
-def feature_loading_model_tuning(model, Data_Dir,Model_Dir,definition,a1,grid_parameters,n_iter=1000,k=5,save=True):
+def feature_loading_model_tuning(model, Data_Dir,Model_Dir,definition,a1,grid_parameters,n_iter=1000,k=5,n_jobs=-1,save=True):
 
     current_labels,feature_data,_,tra_full_indices,_,val_full_indices=feature_loading(Data_Dir,\
                                                                                       definition,\
                                                                                       a1,\
-                                                                                      k=5,\
+                                                                                      k=k,\
                                                                                       save=save)
 
     lgbm_best_paras_=model_tuning(model,feature_data, current_labels,tra_full_indices,\
-                                      val_full_indices,grid_parameters, n_iter=n_iter)
+                                      val_full_indices,grid_parameters, n_iter=n_iter,n_jobs=n_jobs)
 
     with open(Model_Dir+'lgbm_best_paras'+definition[1:]+'.pkl', 'wb') as file:
                         pickle.dump(lgbm_best_paras_, file)
