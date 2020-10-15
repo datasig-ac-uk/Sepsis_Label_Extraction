@@ -6,8 +6,6 @@ import torch
 sys.path.insert(0, '../../../')
 from definitions import *
 from src.models.LSTM.lstm_functions import *
-from src.features.sepsis_mimic3_myfunction import *
-
 
 if __name__ == '__main__':
 
@@ -33,6 +31,7 @@ if __name__ == '__main__':
 
             print('load train labels')
             labels_train = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')
+
             # get torch dataloader for lstm
             train_dl, scaler = prepared_data_train(dataset, labels_train, True, 128, device)
 

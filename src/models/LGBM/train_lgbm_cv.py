@@ -21,10 +21,11 @@ if __name__ == '__main__':
 
     a2,k=0,5
 
+
     results=[]
     
     for x,y in xy_pairs:
-        Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/cv/'
+        Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
         print(Data_Dir)
 
         for a1 in T_list:    

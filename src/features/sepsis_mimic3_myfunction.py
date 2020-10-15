@@ -15,7 +15,6 @@ from sklearn import preprocessing
 from src.data.dataset import TimeSeriesDataset
 from src.data.functions import torch_ffill
 from src.features.dicts import *
-from definitions import *
 
 def create_folder(path):
     try:
@@ -24,19 +23,6 @@ def create_folder(path):
         print("Directory " , path ,  " created ") 
     except FileExistsError:
         print("Directory " , path,  " already exists")   
-        
-        
-def folders(current_data,model='LGBM'):
-    
-    Root_Data=DATA_processed+current_data  
-    
-    Model_Dir=MODELS_DIR+current_data+model+'/'    
-    create_folder(Model_Dir)
-    
-    Data_save=Root_Data+'results/'
-    create_folder(Data_save)
-    
-    return Root_Data,Model_Dir,Data_save
 
 ################################### Feature extractions     ######################################## 
 

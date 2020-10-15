@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
     a2,k=0,5
     x,y=24,12
+
     current_data='blood_culture_data/'
     Root_Data,Model_Dir,Data_save=folders(current_data,model=MODELS[0])
     
