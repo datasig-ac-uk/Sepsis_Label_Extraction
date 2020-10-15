@@ -45,7 +45,7 @@ def probs_extraction(prob_preds,labels,val_full_indices,a1=6):
     true_septic_lengths=np.empty((0,1),int)
     
     tt=0
-    k=len(test_full_indices)
+    k=len(val_full_indices)
     
     for i in range(k):
         
@@ -67,7 +67,7 @@ def probs_extraction(prob_preds,labels,val_full_indices,a1=6):
         labels_list_current=[labels[val_full_indices[i][j]] for j in range(current_patient_num)]
         labels_list=labels_list+labels_list_current
         
-        current_true_septic_perpatient=np.array([int(len(np.where(labels[test_full_indices[i][j]]>0)[0])>0) for j in range(current_patient_num)])        
+        current_true_septic_perpatient=np.array([int(len(np.where(labels[val_full_indices[i][j]]>0)[0])>0) for j in range(current_patient_num)])        
         true_septic_perpatient=np.append(true_septic_perpatient,current_true_septic_perpatient)        
         
 
@@ -91,7 +91,7 @@ def labels_validation(labels, val_full_indices):
     return labels_true
 
 
-def patient_level_performance(val_preds,labels_true,val_full_indices):
+def patient_level_performance(val_preds,labels_true,val_full_indices,a1=6):
     """
     
         Mainly computing patient_level performance 
@@ -112,8 +112,6 @@ def patient_level_performance(val_preds,labels_true,val_full_indices):
 
     
     """
-
-
     
     true_septic_perpatient=np.empty((0,1),int)
     preds_septic_perpatient=np.empty((0,1),int)
@@ -291,7 +289,7 @@ def patient_level_test_performance(test_preds,labels_true,test_full_indices, icu
                 
 
 def suboptimal_choice_patient_test(labels_true, prob_preds,test_full_indices,\
-                                   icuid_seq, a1=6, n=10,precision=100,discard=-1):
+                                   icuid_seq=None, a1=6, n=10,precision=100,discard=-1):
     
     """
     
@@ -323,22 +321,30 @@ def suboptimal_choice_patient_test(labels_true, prob_preds,test_full_indices,\
     for thred in thresholds:
         
         test_preds=(prob_preds>=thred).astype('int')  
-        
-        CM,sepsis_time_difference,\
+        if icuid_seq!=None:
+            CM,sepsis_time_difference,\
             icuid_seq_preds_septic,preds_septic_perpatient=patient_level_test_performance(test_preds,\
                                                                                          labels_true,\
                                                                                          test_full_indices,\
                                                                                          icuid_seq,\
                                                                                          a1=a1)
+        else:
+            CM,sepsis_time_difference,\
+            preds_septic_perpatient=patient_level_test_performance(test_preds,labels_true,\
+                                                                   test_full_indices,\
+                                                                   icuid_seq=icuid_seq,a1=a1)
 
         CMs.append(CM)
         time_difference_list.append(sepsis_time_difference)
-        icuid_seq_preds_septic_list.append(icuid_seq_preds_septic)
+        if icuid_seq!=None:
+            icuid_seq_preds_septic_list.append(icuid_seq_preds_septic)
         preds_septic_perpatient_list.append(preds_septic_perpatient)
 
-    
-    return CMs,time_difference_list,icuid_seq_preds_septic_list,preds_septic_perpatient_list
-
+    if icuid_seq!=None:
+        return CMs,time_difference_list,icuid_seq_preds_septic_list,preds_septic_perpatient_list
+    else:
+        return CMs,time_difference_list,preds_septic_perpatient_list
+        
 
 ################## Some useful functions #############################
 
@@ -370,23 +376,25 @@ def decompose_confusion(CM):
     # False discovery rate
     FDR = FP/(TP+FP)
     
+    acc=(TP+TN)/(FP+FN+TP+TN)
     
-    return TPR,TNR,PPV,FNR
+    return TPR,TNR,PPV,FNR,acc
 
 def decompose_cms(CMs):
     """
     Given 2dim CM sequence, output the corresponding sequence of Sensitivity,Specificity,FNR,precision
     """
-    tprs,tnrs,pres,fnrs=[],[],[],[]
+    tprs,tnrs,pres,fnrs,accs=[],[],[],[],[]
     for i in range(len(CMs)):
-        tpr,tnr,pre,fnr=decompose_confusion(CMs[i])
+        tpr,tnr,pre,fnr,acc=decompose_confusion(CMs[i])
 
         tprs.append(tpr)
         tnrs.append(tnr)
         fnrs.append(fnr)
         pres.append(pre)
-
-    return np.array(tprs),np.array(tnrs),np.array(fnrs),np.array(pres)
+        accs.append(acc)
+        
+    return np.array(tprs),np.array(tnrs),np.array(fnrs),np.array(pres), np.array(accs)
 
 def patient_level_auc(labels_true,probs_preds,full_indices,precision,n=10,discard=-1,a1=6):
     
@@ -401,7 +409,7 @@ def patient_level_auc(labels_true,probs_preds,full_indices,precision,n=10,discar
         
         CMs.append(CM)
         
-    tprs,tnrs,_,_=decompose_cms(CMs)
+    tprs,tnrs,_,_,_=decompose_cms(CMs)
     
     return np.array(tprs),1-np.array(tnrs)
 
@@ -416,7 +424,7 @@ def output_at_metric_level_using_CM(CMs,somelist,metric_required=[0.80,0.85],met
     
     for i in range(len(CMs)):   
     
-        tpr,tnr,ppv,_ = decompose_confusion(CMs[i])
+        tpr,tnr,ppv,_,_ = decompose_confusion(CMs[i])
         
         if metric=='sensitivity':
             metric_now.append(tpr)
@@ -473,7 +481,7 @@ def output_at_metric_level(somelist,metric_data,metric_required=[0.80,0.85]):
 
 def patient_level_main_outputs_threemodels(labels_list_list,probs_list_list,\
                                            test_indices_list_list,\
-                                           icuid_sequence_list_list,\
+                                           icuid_sequence_list_list=None,\
                                            models=['lgbm','lstm','coxph'],\
                                            definitions=['t_sofa','t_suspicion','t_sepsis_min'],\
                                            n=10,a1=6,precision=100):
@@ -505,38 +513,53 @@ def patient_level_main_outputs_threemodels(labels_list_list,probs_list_list,\
     """
     
     tprs_list_list,fprs_list_list,fnrs_list_list,\
-                   pres_list_list,time_list_list,icuid_seq_list_list=[],[],[],[],[],[]
+                   pres_list_list,accs_list_list,\
+                   time_list_list,icuid_seq_list_list=[],[],[],[],[],[],[]
 
 
     for model in range(len(models)):
     
-        tprs_list,fprs_list,fnrs_list,pres_list,time_list,icuid_seq_list=[],[],[],[],[],[]
+        tprs_list,fprs_list,fnrs_list,pres_list,accs_list,time_list,icuid_seq_list=[],[],[],[],[],[],[]
     
         for defi in range(len(definitions)):
-        
-            CMs,time_differences,icuid_seq,_=suboptimal_choice_patient_test(labels_list_list[model][defi],\
+            
+            if icuid_sequence_list_list!=None:
+                CMs,time_differences,icuid_seq,_=suboptimal_choice_patient_test(labels_list_list[model][defi],\
                                                                           probs_list_list[model][defi],\
                                                                           test_indices_list_list[model][defi],\
                                                                           icuid_sequence_list_list[model][defi],\
-                                                                          precision=precision,n=n,a1=a1)
+                                                                              precision=precision,n=n,a1=a1)
+            else:
+                CMs,time_differences,_=suboptimal_choice_patient_test(labels_list_list[model][defi],\
+                                                                          probs_list_list[model][defi],\
+                                                                          test_indices_list_list[model][defi],\
+                                                                          icuid_seq=None,\
+                                                                              precision=precision,n=n,a1=a1)
+                
 
-            tpr, tnr, fnr,pre = decompose_cms(CMs)        
+            tpr, tnr, fnr,pre,acc = decompose_cms(CMs)        
         
             tprs_list.append(tpr)        
             fprs_list.append(1-tnr)
             fnrs_list.append(fnr)
             pres_list.append(pre)
+            accs_list.append(acc)
             time_list.append(time_differences)
         
         tprs_list_list.append(tprs_list)        
         fprs_list_list.append(fprs_list)
         fnrs_list_list.append(fnrs_list)
-        pres_list_list.append(pres_list)   
+        pres_list_list.append(pres_list) 
+        accs_list_list.append(accs_list)
         time_list_list.append(time_list) 
-        icuid_seq_list_list.append(icuid_seq)
         
-    return tprs_list_list,fprs_list_list,fnrs_list_list,pres_list_list,time_list_list,icuid_seq_list_list
-
+        if icuid_sequence_list_list!=None:
+            icuid_seq_list_list.append(icuid_seq)
+    if icuid_sequence_list_list!=None:    
+        return tprs_list_list,fprs_list_list,fnrs_list_list,pres_list_list,accs_list_list,time_list_list,icuid_seq_list_list
+    else:
+        return tprs_list_list,fprs_list_list,fnrs_list_list,pres_list_list,accs_list_list,time_list_list
+        
 def patient_level_threded_output_threemodels(some_list_list, metric_seq_list_list,\
                                              models=['lgbm','lstm','coxph'],\
                                              definitions=['t_sofa','t_suspicion','t_sepsis_min'],\
