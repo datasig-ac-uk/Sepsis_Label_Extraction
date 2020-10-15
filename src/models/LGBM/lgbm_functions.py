@@ -9,8 +9,22 @@ from src.features.sepsis_mimic3_myfunction import *
 
 
 ################################### LGBM tuning/training ########################################   
+def feature_loading(Data_Dir,definition, a1, k=5,cv=True,save=True):
 
+    current_labels=np.load(Data_Dir+'label'+definition[1:]+'_'+str(a1)+'.npy')
+    feature_data=np.load(Data_Dir+'james_features'+definition[1:]+'.npy')
+    icustay_lengths=np.load(Data_Dir+'icustay_lengths'+definition[1:]+'.npy')
+    icustay_ids=np.load(Data_Dir+'icustay_id'+definition[1:]+'.npy')
+    if cv:
+        tra_patient_indices,tra_full_indices,val_patient_indices,val_full_indices=\
+            cv_pack(icustay_lengths,k=k,definition=definition,path_save=Data_Dir,save=save)
+    
+        return current_labels,feature_data,tra_patient_indices,tra_full_indices,val_patient_indices,val_full_indices
 
+    else:
+        return current_labels,feature_data,icustay_lengths, icustay_ids
+        
+        
 def model_validation(model, dataset, labels, tra_full_indices, val_full_indices):
     
     """
@@ -135,9 +149,48 @@ def model_tuning(model, dataset, labels,tra_full_indices, val_full_indices,param
     
     return best_params_        
        
+def feature_loading_model_tuning(model, Data_Dir,Model_Dir,definition,a1,grid_parameters,n_iter=1000,k=5,save=True):
+
+    current_labels,feature_data,_,tra_full_indices,_,val_full_indices=feature_loading(Data_Dir,\
+                                                                                      definition,\
+                                                                                      a1,\
+                                                                                      k=5,\
+                                                                                      save=save)
+
+    lgbm_best_paras_=model_tuning(model,feature_data, current_labels,tra_full_indices,\
+                                      val_full_indices,grid_parameters, n_iter=n_iter)
+
+    with open(Model_Dir+'lgbm_best_paras'+definition[1:]+'.pkl', 'wb') as file:
+                        pickle.dump(lgbm_best_paras_, file)
+
+def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1,k=5,save=False):
+    """
+    
+        features loading and model validating altogether for different culture
+    
+    """
+
+    current_labels,feature_data,_,tra_full_indices,_,val_full_indices=feature_loading(Data_Dir,\
+                                                                                      definition,\
+                                                                                      a1,\
+                                                                                      k=5,\
+                                                                                      save=save)
+     
+
+    with open(Model_Dir+'lgbm_best_paras'+definition[1:]+'.pkl', 'rb') as file:
+                    best_paras_=pickle.load(file)
+
+    clf=LGBMClassifier(random_state=42).set_params(**best_paras_)
+            
+    _, prob_preds, _,auc,specificity,accuracy=model_validation(clf,feature_data,\
+                                                                 current_labels,\
+                                                                 tra_full_indices,\
+                                                                  val_full_indices)
+    
+    return prob_preds,auc,specificity,accuracy
 
 
-
+                
 def model_training(model, train_set,test_set, train_labels, test_labels):
     
         """
