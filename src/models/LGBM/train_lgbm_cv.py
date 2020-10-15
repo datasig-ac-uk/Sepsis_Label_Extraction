@@ -16,45 +16,34 @@ from src.models.LGBM.lgbm_functions import *
 
 if __name__ == '__main__':
     
+    current_data='blood_culture_data/'
+    Root_Data,Model_Dir,Data_save=folders(current_data,model=MODELS[0])
 
     a2,k=0,5
-    x,y=24,12
-    
-
-    current_data='full_culture_data/'
-    Root_Data,Model_Dir,Data_save=folders(current_data,model='LGBM')
-    
-    Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
-    print(Data_Dir)
 
     results=[]
     
-    for a1 in T_list:    
-        for definition in definitions:
-        
-            print(a1,definition)       
-        
-            feature_data=np.load(Data_Dir+'james_features'+definition[1:]+'.npy')
-            current_labels=np.load(Data_Dir+'label'+definition[1:]+'_'+str(a1)+'.npy')
-            icustay_lengths=np.load(Data_Dir+'icustay_lengths'+definition[1:]+'.npy')  
-            tra_patient_indices,tra_full_indices,val_patient_indices,val_full_indices=\
-                    cv_pack(icustay_lengths,k=k,definition=definition,path_save=Data_Dir,save=False)
+    for x,y in xy_pairs:
+        Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/cv/'
+        print(Data_Dir)
 
-            with open(Model_Dir+'lgbm_best_paras'+definition[1:]+'.pkl', 'rb') as file:
-                best_paras_=pickle.load(file)
+        for a1 in T_list:    
+            for definition in definitions:
+        
+                print(x,y,a1,definition)       
+        
+                prob_preds,auc,specificity,accuracy=feature_loading_model_validation(Data_Dir,\
+                                                                                     Model_Dir,\
+                                                                                     definition,\
+                                                                                     a1)
                 
-            clf=LGBMClassifier(random_state=42).set_params(**best_paras_)
+                 
+                np.save(Data_Dir+'prob_preds'+definition[1:]+'_'+str(a1)+'.npy',prob_preds)
             
-            _, prob_preds, _,auc,specificity,accuracy=model_validation(clf,feature_data,\
-                                                                           current_labels,\
-                                                                           tra_full_indices,\
-                                                                           val_full_indices)
-            
-            np.save(Data_Dir+'prob_preds'+definition[1:]+'_'+str(a1)+'.npy',prob_preds)
-            
-            results.append([str(x)+','+str(y),a1,definition,auc,specificity,accuracy])
+                results.append([str(x)+','+str(y),a1,definition,auc,specificity,accuracy])
         
     result_df = pd.DataFrame(results, columns=['x,y','a1','definition', 'auc','speciticity','accuracy'])
     result_df.to_csv(Data_save+"lgbm_cv_results.csv")
-
+#     result_df=pd.read_csv(Data_save+"lgbm_cv_results.csv")
+    main_result_tables(result_df,Data_save,model='lgbm',purpose='cv')
  
