@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from lifelines import CoxPHFitter
 from sklearn.metrics import roc_curve, auc, accuracy_score
 
 import sys
@@ -7,20 +8,22 @@ sys.path.insert(0, '../../../')
 
 from definitions import *
 from src.features.dicts import *
+from src.features.sepsis_mimic3_myfunction import *
+import ray
+from ray import tune
+from ray.tune.utils import pin_in_object_store, get_pinned_object
 
-
-
-# def folders(current_data):
+def folders(current_data):
     
-#     Root_Data=DATA_processed+current_data  
+    Root_Data=DATA_processed+current_data  
     
-#     Model_Dir=MODELS_DIR+current_data+'CoxPHM/'    
-#     create_folder(Model_Dir)
+    Model_Dir=MODELS_DIR+current_data+'CoxPHM/'    
+    create_folder(Model_Dir)
     
-#     Data_save=Root_Data+'results/'
-#     create_folder(Data_save)
+    Data_save=Root_Data+'results/'
+    create_folder(Data_save)
     
-#     return Root_Data,Model_Dir,Data_save
+    return Root_Data,Model_Dir,Data_save
 
 
 def Coxph_df(df, features, feature_dict, T, labels):
@@ -78,11 +81,40 @@ def Coxph_eval(df, model, T, save_dir=None):
 original_features = feature_dict_james['vitals'] + feature_dict_james['laboratory'] \
                     + feature_dict_james['derived'] + ['age', 'gender', 'hour', 'HospAdmTime']
 
-coxph_hyperparameter = {
-    'regularize_sofa': 0.01,
-    'step_size_sofa': 0.3,
-    'regularize_suspicion': 0.01,
-    'step_size_suspicion': 0.3,
-    'regularize_sepsis_min': 0.01,
-    'step_size_sepsis_min': 0.3,
+search_space = {
+    'regularize': tune.uniform(5e-2, 1e-3),
+    'step_size': tune.uniform(0, 0.5)
 }
+
+def model_cv(config,data,a1):
+    regularize, step_size = config['regularize'], config['step_size']
+    df_coxph,train_full_indices,test_full_indices,k=get_pinned_object(data)
+    test_true, test_preds = [], []
+    train_idxs = [np.concatenate(train_full_indices[i]) for i in range(len(train_full_indices))]
+    test_idxs = [np.concatenate(test_full_indices[i]) for i in range(len(test_full_indices))]
+    try:
+        for i in range(k):
+             x_train = df_coxph.iloc[train_idxs[i], :]
+             x_test = df_coxph.iloc[test_idxs[i], :]
+             cph = CoxPHFitter(penalizer=regularize).fit(x_train, duration_col='censor_hours', event_col='label',
+                                              show_progress=False, step_size=step_size)
+             # cph.print_summary()
+             H_t = cph.predict_cumulative_hazard(x_test).iloc[a1 + 1, :]
+             risk_score = 1 - np.exp(-H_t)
+             x_test['risk_score'] = risk_score
+             fpr, tpr, thresholds = roc_curve(x_test['label'], x_test['risk_score'], pos_label=1)
+             index = np.where(tpr >= 0.85)[0][0]
+             print('auc and sepcificity', auc(fpr, tpr), 1 - fpr[index])
+             test_true.append(x_test['label'].values)
+             test_preds.append(x_test['risk_score'].values)
+        test_true_full = np.concatenate([test_true[i].reshape(-1, 1) for i in range(len(test_true))])
+        test_preds_full = np.concatenate([test_preds[i].reshape(-1, 1) for i in range(len(test_preds))])
+        print(test_true_full.shape, test_preds_full.shape)
+        fpr, tpr, thresholds = roc_curve(test_true_full, test_preds_full, pos_label=1)
+        index = np.where(tpr >= 0.85)[0][0]
+        specificity = 1 - fpr[index]
+        print('auc and sepcificity', auc(fpr, tpr), 1 - fpr[index])
+        auc_score=auc(fpr,tpr)
+    except:
+        auc_score=0
+    tune.report(mean_accuracy=auc_score)
