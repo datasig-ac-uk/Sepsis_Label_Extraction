@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     
     print("Give dataset summary: gender,mortality,age,los, sepsis hour since ICU.")
-    Root_Data=DATA_processed+'full_culture_data/'
+    Root_Data=DATA_processed+'blood_culture_data/'
     Data_save=Root_Data+'summary/'        
     create_folder(Data_save)
     
@@ -52,13 +52,13 @@ if __name__ == '__main__':
     los=[]
     sepsis_hours=[]
 
-    for x,y in xy_pairs[1:2]:
+    for x,y in xy_pairs:
 
         if x!=48:
-            df_path='/scratch/mimiciii/training_data/further_split/val_'+str(x)+'_'+str(y)+'.csv'
-
+                df_path='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'
         else:
-            df_path='/data/raw/training_data/metavision_sepsis_data_18_09_20.csv'
+            df_path='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20.csv'
+
 
         genders_=[]
         mortalities_=[]
