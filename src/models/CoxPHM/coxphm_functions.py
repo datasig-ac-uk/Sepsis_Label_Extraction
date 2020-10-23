@@ -13,20 +13,9 @@ import ray
 from ray import tune
 from ray.tune.utils import pin_in_object_store, get_pinned_object
 
-def folders(current_data):
-    
-    Root_Data=DATA_processed+current_data  
-    
-    Model_Dir=MODELS_DIR+current_data+'CoxPHM/'    
-    create_folder(Model_Dir)
-    
-    Data_save=Root_Data+'results/'
-    create_folder(Data_save)
-    
-    return Root_Data,Model_Dir,Data_save
 
 
-def Coxph_df(df, features, feature_dict, T, labels):
+def Coxph_df(df, features, feature_dict, T, labels,signature=True):
     """
     :param df:
     :param features:
@@ -40,8 +29,13 @@ def Coxph_df(df, features, feature_dict, T, labels):
 
     # construct output as reuiqred np structrued array format
     rest_features = [str(i) for i in range(features.shape[1])[len(feature_dict):]]
-    total_features = original_features + rest_features
-    df2 = pd.DataFrame(features, columns=total_features)
+    if signature:
+        total_features = original_features + rest_features
+        df2 = pd.DataFrame(features, columns=total_features)
+    else:
+        total_features=original_features
+        df2 = pd.DataFrame(features[:,:len(feature_dict)], columns=total_features)
+
 
     df2.replace(np.inf, np.nan, inplace=True)
     df2.replace(-np.inf, np.nan, inplace=True)

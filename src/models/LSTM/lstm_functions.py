@@ -21,16 +21,6 @@ from src.features.sepsis_mimic3_myfunction import *
 from ray import tune
 
 
-def folders(current_data):
-    Root_Data = DATA_processed + current_data
-
-    Model_Dir = MODELS_DIR + current_data + 'LSTM/'
-    create_folder(Model_Dir)
-
-    Data_save = Root_Data + 'results/'
-    create_folder(Data_save)
-
-    return Root_Data, Model_Dir, Data_save
 
 
 def prepared_data_train(ts_dataset, labels, normalize, batch_size, device):
@@ -105,7 +95,7 @@ def eval_model(test_dl, model, save_dir):
     accuracy = accuracy_score(test_true, test_pred_labels)
     print('accuracy=', accuracy)
 
-    return auc_score, specificity, accuracy, test_true, test_preds
+    return auc_score, specificity, accuracy, test_true, test_preds[:,1]
 
 
 def model_cv(config, data_list, device):
@@ -168,6 +158,6 @@ search_space = {
     "p": tune.choice([20]),
     "hidden_channels": tune.choice([16, 32, 48, 64]),
     "linear_channels": tune.choice([16, 32, 48, 64]),
-    "epochs": tune.sample_from(lambda _: np.random.randint(low=10, high=35)),
-    "lr": tune.uniform(1e-4, 1e-3)
+    "epochs": tune.sample_from(lambda _: np.random.randint(low=10, high=30)),
+    "lr": tune.uniform(1e-4, 8e-4)
 }
