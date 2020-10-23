@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     print(Data_Dir)
 
-    for definition in definitions:
+    for definition in ['t_suspicion','t_sepsis_min']:
         labels = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(a1) + '.npy')
         dataset = TimeSeriesDataset().load(Data_Dir + definition[1:] + '_ffill.tsd')
         icustay_lengths = np.load(Data_Dir + 'icustay_lengths' + definition[1:] + '.npy')
