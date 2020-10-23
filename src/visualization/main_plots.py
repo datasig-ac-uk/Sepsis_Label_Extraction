@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     print("Collecting results at setting x,y,T=24,12,6 from three models", MODELS[0],MODELS[1],MODELS[-1])
     
-    Root_Data=DATA_processed+'full_culture_data/'
+    Root_Data=DATA_processed+'blood_culture_data/'
     Data_Dir=Root_Data+'experiments_24_12/test/'
     print("The interim results will be collected from ", Data_Dir)
     
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     probs_list_list=[]
     test_indices_list_list=[]
     icuid_sequence_list_list=[]
-
+    n=100
     for model in models:
         
         print("Now Collecting results from model", model)
@@ -42,7 +42,6 @@ if __name__ == '__main__':
         labels_list=[]
         probs_list=[]
         test_indices_list=[]
-        icuid_sequence_list=[]
 
         
         for definition in definitions:
@@ -52,19 +51,15 @@ if __name__ == '__main__':
         
             icu_lengths_now=np.load(Data_Dir+'icustay_lengths'+definition[1:]+'.npy')        
             icustay_fullindices_now=patient_idx(icu_lengths_now)
-        
-            icuid_sequence_now=np.load(Data_Dir+'icustay_id'+definition[1:]+'.npy') 
-                
+                        
             labels_list.append(labels_now)
             probs_list.append(probs_now)
             test_indices_list.append(icustay_fullindices_now)
-            icuid_sequence_list.append(icuid_sequence_now)
 
 
         labels_list_list.append(labels_list)
         probs_list_list.append(probs_list)
         test_indices_list_list.append(test_indices_list)
-        icuid_sequence_list_list.append(icuid_sequence_list)
     
     ######### Instance level auc plot/table #################
     print("Instance level now:")
@@ -80,10 +75,11 @@ if __name__ == '__main__':
     ######### Patient level auc plots/tables #################
     print("Patient level now:")
     tprs_list_list,fprs_list_list, fnrs_list_list,pres_list_list,\
-    time_list_list, icuid_list_list=patient_level_main_outputs_threemodels(labels_list_list,\
+    accs_list_list,time_list_list=patient_level_main_outputs_threemodels(labels_list_list,\
                                                                            probs_list_list,\
                                                                            test_indices_list_list,\
-                                                                           icuid_sequence_list_list)
+                                                                           n=n,\
+                                                                           icuid_sequence_list_list=None)
     print("Patient level AUC plots for three models.")
     auc_subplots_patient_level(fprs_list_list,tprs_list_list,names,titles=MODELS,\
                                save_name=Data_save_plots+"auc_plot_patient_level_three_models_test")
@@ -99,8 +95,12 @@ if __name__ == '__main__':
     print("Saving patient-level specificity at fixed sensitivity level 0.85 for three models.")
     patient_level_output_pd_threemodels(fprs_list_list,tprs_list_list,metric_required=[0.85],\
                                         operator=lambda x: 1-x, for_write=False,\
-                                        pd_save_name=Data_save_tables+"specificity_patient_level_three_models_test")
+                                     pd_save_name=Data_save_tables+"specificity_patient_level_three_models_test")
     
+    print("Saving patient-level accuracy at fixed sensitivity level 0.85 for three models.")
+    patient_level_output_pd_threemodels(accs_list_list,tprs_list_list,metric_required=[0.85],\
+                                        operator=lambda x: x, for_write=False,\
+                                        pd_save_name=Data_save_tables+"accuracy_patient_level_three_models_test")
     ######### Patient level early prediction performance #################    
     
     print("Box plot (test set) of how far in advance sepsis casesbeing predicted correctly at sensitivity 85%")
@@ -110,6 +110,7 @@ if __name__ == '__main__':
     ylabel='Hour'
     name_seqs=names
     boxplots_prediction_time_inadvance(time_prediction_in_advance_list_list_tpr,\
-                                       name_seqs, ylabel, savetitle=Data_save_plots+'boxplot_three_models_tpr_test')
+                                       name_seqs, ylabel,\
+                                       savetitle=Data_save_plots+'boxplot_three_models_tpr_test')
     
     

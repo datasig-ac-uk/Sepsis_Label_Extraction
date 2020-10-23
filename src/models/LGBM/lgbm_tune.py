@@ -18,13 +18,14 @@ from src.models.LGBM.lgbm_functions import *
 
 if __name__ == '__main__':
 
-        current_data='full_culture_data/'
-        Root_Data,Model_Dir,_=folders(current_data)
+        current_data='blood_culture_data/'
+        Root_Data,Model_Dir,_=folders(current_data,model=MODELS[0])
 
         a1,a2,k=6,0,5
         x,y=24,12
-
-        Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
+        n_iter=1000
+        
+        Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/cv/'
 
         print(Data_Dir)
 
@@ -32,19 +33,7 @@ if __name__ == '__main__':
  
         for definition in definitions:
         
-                current_labels=np.load(Data_Dir+'label'+definition[1:]+'_'+str(a1)+'.npy')
-                feature_data=np.load(Data_Dir+'james_features'+definition[1:]+'.npy')
-                icustay_lengths=np.load(Data_Dir+'icustay_lengths'+definition[1:]+'.npy')
-           
-                tra_patient_indices,tra_full_indices,val_patient_indices,val_full_indices=\
-            cv_pack(icustay_lengths,k=k,definition=definition,path_save=Data_Dir,save=True)
-        
-
-                lgbm_best_paras_=model_tuning(model,feature_data, current_labels,tra_full_indices,\
-                                      val_full_indices,grid_parameters, n_iter=1000)
-        
-
-                with open(Model_Dir+'lgbm_best_paras'+definition[1:]+'.pkl', 'wb') as file:
-                        pickle.dump(lgbm_best_paras_, file)
+            feature_loading_model_tuning(model, Data_Dir,Model_Dir,definition,\
+                                         a1,grid_parameters,n_iter=niter,k=k,save=True)
                 
 

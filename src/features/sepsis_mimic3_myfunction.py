@@ -12,6 +12,7 @@ from sklearn import preprocessing
 
 
 # from dicts import *
+from definitions import *
 from src.data.dataset import TimeSeriesDataset
 from src.data.functions import torch_ffill
 from src.features.dicts import *
@@ -22,7 +23,19 @@ def create_folder(path):
         os.makedirs(path)
         print("Directory " , path ,  " created ") 
     except FileExistsError:
-        print("Directory " , path,  " already exists")   
+        print("Directory " , path,  " already exists")  
+        
+def folders(current_data,model='LGBM'):
+    
+    Root_Data=DATA_processed+current_data  
+    
+    Model_Dir=MODELS_DIR+current_data+model+'/'    
+    create_folder(Model_Dir)
+    
+    Data_save=Root_Data+'results/'
+    create_folder(Data_save)
+    
+    return Root_Data,Model_Dir,Data_save
 
 ################################### Feature extractions     ######################################## 
 
@@ -184,9 +197,6 @@ def dataframe_from_definition_discard(path_df, a1=6,a2=3,definition='t_sepsis_mi
     return df_merge2
 
 def jamesfeature(df,Data_Dir='./',definition='t_sepsis_min',save=True):
-        
-        
-
     
         df['HospAdmTime']=(df['admittime'] - df['intime']).dt.total_seconds()/60/60
         
@@ -528,7 +538,52 @@ def icu_lengths(df_sepsis,definition='t_sepsis_min',path_save='./',save=True):
         np.save(path_save+'icustay_lengths'+definition[1:]+'.npy',icustay_lengths)
 
     return icustay_lengths
+################################### temporal functions for fake tests ########################################   
 
+def inclusion_check(element,seq):
+    """
+    if idx in seq: return location
+    
+    else: return None
+    
+    """
+    
+    try: 
+        location=np.where(seq==element)[0][0]
+        return location
+    except:
+        return None
+
+def extracting_valid_ids(valid_icustay_ids,total_icustay_ids,icustay_lengths):
+    """
+    Input: 
+    
+    valid_icustay_ids: the icustay_ids we want to extract(for test )
+    total_icustay_ids: the total set of icustay_ids
+    icustay_lengths: corresponding icustay lengths for total_icustay_ids
+    
+    Output:
+    
+    valid_locations: the locations of valid_icustay_ids in whole dataset
+
+    
+    """
+    
+    lens=len(valid_icustay_ids)
+    locations=np.array([inclusion_check(valid_icustay_ids[i],total_icustay_ids) for i in range(lens)])
+
+    icustay_fullindices=patient_idx(icustay_lengths)
+
+
+    valid_locations=[]
+    
+    for j in range(len(locations)):
+        if locations[j] is not None:
+            valid_locations.append(icustay_fullindices[locations[j]])
+    
+    print(len(valid_locations))
+    
+    return np.concatenate(valid_locations)
 ################################### Outputing labels ########################################   
 
 def labels_generator(df, a1=6,Data_Dir='./',definition='t_sepsis_min',save=True):
@@ -554,7 +609,7 @@ def labels_validation(labels, val_full_indices):
     """
     
     labels_true=np.empty((0,1),int)   
-    k=len(test_full_indices)
+    k=len(val_full_indices)
     
     for i in range(k):
 
@@ -563,3 +618,23 @@ def labels_validation(labels, val_full_indices):
 
        
     return labels_true
+
+def main_result_tables(results_dfs,Data_save,model='lgbm',purpose='cv'):
+    
+    outputs=[]
+    
+    for j in range(len(xy_pairs)):
+    
+        for a1 in T_list:
+        
+            (x,y)=xy_pairs[j]
+
+            df_now=results_dfs[(results_dfs['x,y']==str(x)+','+str(y))&(results_dfs['a1']==a1)]
+
+            output=["{:.3f}".format(list(df_now.auc)[i])+'/'+"{:.3f}".format(list(df_now.speciticity)[i])+'/'+\
+            "{:.3f}".format(list(df_now.accuracy)[i])+' &' for i in range(len(definitions))]
+    
+            outputs.append([str(x)+','+str(y),a1,output[0],output[1],output[-1]])
+    
+    output_df= pd.DataFrame(outputs, columns=['x,y', 'T','H1','H2','H3'])
+    output_df.to_csv(Data_save+model+'_'+purpose+'_results(forwrite).csv')
