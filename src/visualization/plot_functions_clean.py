@@ -668,6 +668,10 @@ def finding_sample_idxs(idx1_septicicuid,test_patient_indices,icustay_lengths=No
                                    for i in range(len(idx1_septic_original))])
 
 
+def tresholding(probs_sample,thred):
+    
+    idx=np.where(probs_sample>=thred)[0][0]
+    return np.array([int(i>=idx) for i in range(len(probs_sample))])
 
 def rect_line_at_turn(path,turn_value=1,replace_value=0):
 
@@ -700,71 +704,46 @@ def rect_line_at_turn(path,turn_value=1,replace_value=0):
         
         return np.arange(len(path)),path,np.arange(len(path)),path
         
-def trajectory_plot(probs_sample,labels_sample,\
+def trajectory_plot(probs_sample,labels_sample,thred=None,\
                     labels=['Risk score','Labels for T=6','Ground truth'],\
-                    figsize=(10,3),fontsize=14,save_name=None):
-    """
+                    figsize=(10,3),fontsize=14,savename=None):
     
-    """
-               
     plt.figure(figsize=figsize)
 
-    plt.plot(probs_sample,linestyle='-.',lw=2,label='Risk score')
-
     new_time_seq,new_path,true_times,true_labels=rect_line_at_turn(labels_sample)
+    
+    plt.plot(true_times,true_labels,linestyle='-.',label='Ground truth',lw=2,color=sns.color_palette()[1])
+    
+    plt.plot(new_time_seq,new_path,lw=2,label='Labels for T=6',color=sns.color_palette()[1])
+    
+    plt.plot(probs_sample,linestyle=':',lw=1.5,marker='x',label='Risk score',color=sns.color_palette()[0])
+    
+    if thred is not None:
+        
+        threds=[thred for i in range(len(probs_sample))]
+        
+        plt.plot(threds,lw=2,linestyle=':',label='Threshold',color=sns.color_palette()[2])
+        
+        pred_labels=tresholding(probs_sample,thred)
+        
+        
+        new_time_pred,pred_paths,_,_=rect_line_at_turn(pred_labels)
 
-    plt.plot(new_time_seq,new_path,lw=2,label='Labels for T=6')
+        plt.plot(new_time_pred,pred_paths,lw=2,label='Predicted labels',color=sns.color_palette()[2])
 
-    plt.plot(true_times,true_labels,linestyle=':',label='Ground truth',lw=2)
-
-    plt.xlabel('ICU length-of-stay since ICU admission (Hour) of one spetic patient',fontsize=fontsize)
+    plt.xlabel('ICU length-of-stay since ICU admission (Hour) of one septic patient',fontsize=fontsize)
 
     plt.legend(loc='upper left',bbox_to_anchor=(1.005, 1),fontsize=fontsize-1)
 
     plt.xticks(fontsize=fontsize-1)
     plt.yticks(fontsize=fontsize-1)
     
-    if save_name is not None:
+    if savename is not None:
         
-        plt.savefig(save_name+'.png',dpi=300,bbox_inches='tight')
+        plt.savefig(savename+'.png',dpi=300,bbox_inches='tight')
     else:
         plt.show()
-
-def trajectory_plots(probs_samples,labels_sample, sublabels=MODELS,\
-                    labels=['Risk score','Labels for T=6','Ground truth'],\
-                    figsize=(10,3),fontsize=14,lw=2,save_name=None):
-    """
         
-        Pick one septic icu_id for illustration for three models.
-        
-        We look at the whole path of the patient till onset time, visualise the risk score at each time point, and thus predicted status, while comparing to the ground truth label.
-        
-    """    
-    plt.figure(figsize=figsize)
-    
-    for i in range(len(sublabels)):
-        
-        plt.plot(np.arange(len(probs_samples[i])),probs_samples[i],linestyle='-.',\
-                 lw=lw,label='Risk score for '+sublabels[i])
-
-    new_time_seq,new_path,true_times,true_labels=rect_line_at_turn(labels_sample)
-
-    plt.plot(new_time_seq,new_path,lw=lw,label='Labels for T=6')
-
-    plt.plot(true_times,true_labels,linestyle=':',label='Ground truth',lw=lw)
-
-    plt.xlabel('ICU length-of-stay since ICU admission (Hour) of one spetic patient',fontsize=fontsize)
-
-    plt.legend(loc='upper left',bbox_to_anchor=(1.005, 1),fontsize=fontsize-1)
-
-    plt.xticks(fontsize=fontsize-1)
-    plt.yticks(fontsize=fontsize-1)
-    
-    if save_name is not None:
-        
-        plt.savefig(save_name+'.png',dpi=300,bbox_inches='tight')
-    else:
-        plt.show()
 
 
 
