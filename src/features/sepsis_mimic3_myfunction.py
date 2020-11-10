@@ -101,7 +101,7 @@ def partial_sofa(df):
     
     return sofa
 
-def dataframe_from_definition_discard(path_df, a1=6,a2=3,definition='t_sepsis_min'):
+def dataframe_from_definition_discard(path_df, a1=4,a2=3,definition='t_sepsis_min'):
     """
         For specific definition among the three, deleting patients who has been diagnosied
         beofre a1 hours in icu and trimming valid patients' data such that all the data after
