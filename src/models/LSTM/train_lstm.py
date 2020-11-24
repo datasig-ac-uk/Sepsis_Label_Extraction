@@ -9,24 +9,25 @@ from src.models.LSTM.lstm_functions import *
 from src.features.sepsis_mimic3_myfunction import *
 
 
-if __name__ == '__main__':
+def train_LSTM(T_list, x_y, definitions, data_folder):
+    """
+    Training on the CoxPHM model for specified T,x_y and definition parameters, save the trained model in model
+    directory
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-    print(os.environ["CUDA_VISIBLE_DEVICES"])
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    print(device)
-    T_list=[6]
-    for x, y in [ (24, 12)]:
+    :param T_list(list of int): list of parameter T
+    :param x_y(list of int):list of sensitivity parameter x and y
+    :param definitions(list of str): list of definitions. e.g.['t_suspision','t_sofa','t_sepsis_min']
+    :param data_folder(str): folder name specifying
+    :return: save trained model
+    """
+    for x, y in x_y:
 
-        current_data_folder = 'absolute_values/'
-        Root_Data, Model_Dir, Data_save = folders(current_data_folder,model='LSTM')
+        Root_Data, Model_Dir, Data_save, _, _ = folders(data_folder, model='LSTM')
 
-        #     Data_Dir = Root_Data + '/processed/experiments_' + str(x) + '_' + str(y) + '/H3_subset/'
         Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
 
         for definition in definitions:
             config = load_pickle(MODELS_DIR + 'hyperparameter/LSTM/config' + definition[1:])
-        #         for T in [6]:
             for T in T_list:
                 print('load timeseries dataset')
                 dataset = TimeSeriesDataset().load(Data_Dir + definition[1:] + '_ffill.tsd')
@@ -38,18 +39,23 @@ if __name__ == '__main__':
                 train_dl, scaler = prepared_data_train(dataset, labels_train, True, 128, device)
 
                 save_pickle(scaler, Model_Dir + 'hyperparameter/scaler' + definition[1:])
-                #             save_pickle(scaler,MODELS_DIR+'/LSTM/hyperparameter/scaler'+definition[1:]+'H3_subset')
+                # specify lstm model architecture with tuned hyperparameter s
 
-                # specify lstm model architecture
-
-                model = LSTM(in_channels=dataset.data.shape[-1], num_layers=1, hidden_channels=config['hidden_channels'],
-                         hidden_1=config['linear_channels'], out_channels=2,
-                         dropout=0).to(device)
+                model = LSTM(in_channels=dataset.data.shape[-1], num_layers=1,
+                             hidden_channels=config['hidden_channels'],
+                             hidden_1=config['linear_channels'], out_channels=2,
+                             dropout=0).to(device)
 
                 train_model(model, train_dl, n_epochs=config['epochs'],
-                        save_dir=Model_Dir + '_' + str(x) + '_' + str(y) + '_' + str(T)+ definition[1:],
-                        loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=config['lr']))
+                            save_dir=Model_Dir + '_' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:],
+                            loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=config['lr']))
 
-#             train_model(model, train_dl, n_epochs=config['epochs'],
-#                     save_dir=MODELS_DIR + '/LSTM/H3_subset/' +definition[2:] +'_'+ str(x) + '_' + str(y) + '_' + str(T),
-#                     loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=config['lr']))
+
+if __name__ == '__main__':
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    print(os.environ["CUDA_VISIBLE_DEVICES"])
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    print(device)
+    data_folder = 'blood_only_data/'
+    train_LSTM(T_list,xy_pairs,definitions,data_folder)

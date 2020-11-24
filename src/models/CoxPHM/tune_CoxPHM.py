@@ -11,20 +11,26 @@ from ray import tune
 from ray.tune.utils import pin_in_object_store, get_pinned_object
 from src.features.sepsis_mimic3_myfunction import *
 
-if __name__ == '__main__':
-    current_data = 'blood_only_data/'
-    signature=False
-    Root_Data, Model_Dir, _ = folders(current_data, model='CoxPHM_no_sig')
 
-    a1, a2, k = 6, 0, 5
-    x, y = 24, 12
+def tune_CoxPHM(data_folder, definitions, T=6, x_y=(24, 12), k=5, signature=True):
+    """
 
+
+    :param data_folder:
+    :param definitions:
+    :param T:
+    :param x_y:
+    :param k:
+    :param signature:
+    :return:
+    """
+    x, y = x_y
+    Root_Data, Model_Dir, _, _, _ = folders(data_folder, model='CoxPHM') if signature \
+        else folders(data_folder, model='CoxPHM_no_sig')
     Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/cv/'
 
-    print(Data_Dir)
-
-    for definition in ['t_sofa']:
-        labels = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(a1) + '.npy')
+    for definition in definitions:
+        labels = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')
         df = pd.read_pickle(Data_Dir + definition[1:] + '_dataframe.pkl')
         features = np.load(Data_Dir + 'james_features' + definition[1:] + '.npy')
 
@@ -33,10 +39,10 @@ if __name__ == '__main__':
             cv_pack(icustay_lengths, k=k, definition=definition, path_save=Data_Dir, save=True)
 
         # prepare dataframe for coxph model
-        df_coxph = Coxph_df(df, features, original_features, a1, labels,signature=False)
+        df_coxph = Coxph_df(df, features, original_features, T, labels, signature=False)
         ray.init(num_cpus=5)
         data = pin_in_object_store([df_coxph, tra_full_indices, val_full_indices, k])
-        analysis = tune.run(partial(model_cv, data=data, a1=a1),
+        analysis = tune.run(partial(model_cv, data=data, T=T),
                             name='mimic_coxph' + definition[1:], config=search_space,
                             resources_per_trial={"cpu": 1}, num_samples=100,
                             max_failures=5, reuse_actors=True, verbose=1)
@@ -46,3 +52,12 @@ if __name__ == '__main__':
             best_trial.last_result["mean_accuracy"]))
         save_pickle(best_trial.config, Model_Dir + 'hyperparameter/' + 'config' + definition[1:])
         ray.shutdown()
+
+
+if __name__ == '__main__':
+    current_data = 'blood_only_data/'
+    tune_CoxPHM(current_data,definitions, T=6, x_y=(24, 12), k=5, signature=True)
+
+
+
+
