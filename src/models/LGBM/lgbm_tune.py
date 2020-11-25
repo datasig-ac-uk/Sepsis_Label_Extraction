@@ -19,7 +19,7 @@ from src.models.LGBM.lgbm_functions import *
 if __name__ == '__main__':
 
         current_data='blood_culture_data/'
-        Root_Data,Model_Dir,_=folders(current_data,model=MODELS[0])
+        Root_Data,Model_Dir,_,_,_=folders(current_data,model=MODELS[0])
 
         a1,a2,k=6,0,5
         x,y=24,12
