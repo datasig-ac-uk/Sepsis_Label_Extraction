@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
         a1,a2,k=6,0,5
         x,y=24,12
-        n_iter=1000
+        n_iter=500
         
         Data_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/cv/'
 
@@ -34,6 +34,6 @@ if __name__ == '__main__':
         for definition in definitions:
         
             feature_loading_model_tuning(model, Data_Dir,Model_Dir,definition,\
-                                         a1,grid_parameters,n_iter=niter,k=k,save=True)
+                                         a1,grid_parameters,n_iter=n_iter,k=k,save=True)
                 
 
