@@ -38,7 +38,7 @@ if __name__ == '__main__':
                 prob_preds,auc,specificity,accuracy=feature_loading_model_validation(Data_Dir,\
                                                                                      Model_Dir,\
                                                                                      definition,\
-                                                                                     a1)
+                                                                                     a1,save=True)
                 
                  
                 np.save(Output_predictions_cv+'prob_preds_'+str(x)+'_'+str(y)+'_'+str(a1)+'_'+definition[1:]+'.npy',prob_preds)
