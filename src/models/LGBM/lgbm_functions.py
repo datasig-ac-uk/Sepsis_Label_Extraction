@@ -6,6 +6,7 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 from definitions import *
 from src.features.sepsis_mimic3_myfunction import *
 
+import joblib
 
 ################################### LGBM tuning/training ########################################   
 def feature_loading(Data_Dir,definition, a1, k=5,cv=True,save=True):
@@ -148,7 +149,7 @@ def model_tuning(model, dataset, labels,tra_full_indices, val_full_indices,param
     
     return best_params_        
        
-def feature_loading_model_tuning(model, Data_Dir,Model_Dir,definition,a1,grid_parameters,n_iter=1000,k=5,n_jobs=-1,save=True):
+def feature_loading_model_tuning(model, Data_Dir,Model_Dir,definition,a1,grid_parameters,n_iter=1000,k=5,n_jobs=-1,scoring='roc_auc',save=True):
 
     current_labels,feature_data,_,tra_full_indices,_,val_full_indices=feature_loading(Data_Dir,\
                                                                                       definition,\
@@ -190,7 +191,45 @@ def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1,k=5,sav
 
 
                 
-def model_training(model, train_set,test_set, train_labels, test_labels):
+# def model_training(model, train_set,test_set, train_labels, test_labels):
+    
+#         """
+        
+#         For chosen model, conduct standard training and testing
+        
+#         Input:
+#             model
+#             train_set,test_set: numpy version
+#             train_labels, test_labels: numpy array
+             
+#         Output:
+#             test_preds:  predicted labels on test set (numpy array)
+#             prob_preds_test: predicted risk scores for the predicted test labels (numpy array)
+            
+#             auc score
+#             sepcificity at fixed sensitivity level
+#             accuracy at fixed sensitivity level
+
+        
+        
+#         """        
+    
+#         model.fit(X=train_set,y=train_labels)              
+#         prob_preds_test=model.predict_proba(test_set)[:,1]
+
+
+#         print('Test:')
+#         fpr, tpr, thresholds = roc_curve(test_labels, prob_preds_test, pos_label=1)
+#         index=np.where(tpr>=0.85)[0][0]
+#         test_preds=np.array((prob_preds_test>=thresholds[index]).astype('int'))
+
+#         print('auc and sepcificity',roc_auc_score(test_labels,prob_preds_test),1-fpr[index])
+#         print('accuracy',accuracy_score(test_labels,test_preds))
+        
+#         return test_preds, prob_preds_test, roc_auc_score(test_labels,prob_preds_test),\
+#                1-fpr[index],accuracy_score(test_labels,test_preds)
+
+def model_training(model_dir, test_set,  test_labels):
     
         """
         
@@ -213,11 +252,11 @@ def model_training(model, train_set,test_set, train_labels, test_labels):
         
         """        
     
-        model.fit(X=train_set,y=train_labels)              
+        model=joblib.load(model_dir)           
         prob_preds_test=model.predict_proba(test_set)[:,1]
 
 
-        print('Test:')
+        print('Model fitting:')
         fpr, tpr, thresholds = roc_curve(test_labels, prob_preds_test, pos_label=1)
         index=np.where(tpr>=0.85)[0][0]
         test_preds=np.array((prob_preds_test>=thresholds[index]).astype('int'))
@@ -227,6 +266,27 @@ def model_training(model, train_set,test_set, train_labels, test_labels):
         
         return test_preds, prob_preds_test, roc_auc_score(test_labels,prob_preds_test),\
                1-fpr[index],accuracy_score(test_labels,test_preds)
+
+        
+def model_fit_saving(model, train_set,train_labels, save_name):
+    
+        """
+        
+        For chosen model, conduct standard training and testing
+        
+        Input:
+            model
+            train_set,test_set: numpy version
+            train_labels, test_labels: numpy array
+
+        """        
+    
+        model.fit(X=train_set,y=train_labels)  
+        joblib.dump(model, save_name)
+        
+        
+
+
 
 
 
