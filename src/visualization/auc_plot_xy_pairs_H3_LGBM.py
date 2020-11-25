@@ -27,10 +27,9 @@ if __name__ == '__main__':
     definition='t_sepsis_min'
     
     current_data='blood_culture_data/'
-    model='lgbm'
-    Root_Data,Model_Dir,Data_save=folders(current_data,model=MODELS[0])
-    Data_save=Root_Data+'plots/'
-    create_folder(Data_save)
+
+    Root_Data,_,_,Output_predictions,Output_results=folders(current_data,model=MODELS[0])
+
     
     for x,y in xy_pairs:
     
@@ -40,7 +39,7 @@ if __name__ == '__main__':
     
         labels_now=np.load(Data_Dir+'label'+definition[1:]+'_6.npy')
     
-        probs_now=np.load(Data_Dir+'lgbm_prob_preds'+definition[1:]+'_6.npy')
+        probs_now=np.load(Output_predictions+'prob_preds_'+str(x)+'_'+str(y)+'_'+str(a1)+'_'+definition[1:]+'.npy')
     
         icu_lengths_now=np.load(Data_Dir+'icustay_lengths'+definition[1:]+'.npy')        
     
@@ -56,9 +55,9 @@ if __name__ == '__main__':
     names=['48,24','24,12','12,6','6,3']
     
     auc_plot(labels_list,probs_list,names=names,\
-                     save_name=Data_save+'auc_plot_instance_level_'+model+'_sepsis_min_test') 
+                     save_name=Output_results+'auc_plot_instance_level_'+model+'_sepsis_min_test') 
     auc_plot_patient_level(fprs_list,tprs_list,names=names,\
-                     save_name=Data_save+'auc_plot_patient_level_'+model+'_sepsis_min_test') 
+                     save_name=Output_results+'auc_plot_patient_level_'+model+'_sepsis_min_test') 
     
     
  
