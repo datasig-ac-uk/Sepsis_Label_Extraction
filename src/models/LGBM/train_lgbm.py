@@ -21,7 +21,7 @@ if __name__ == '__main__':
     Root_Data,Model_Dir,_,_,_=folders(current_data,model='LGBM')
 
  
-    train_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/train/'
+    train_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/cv/'
 
     for definition in definitions:
         
