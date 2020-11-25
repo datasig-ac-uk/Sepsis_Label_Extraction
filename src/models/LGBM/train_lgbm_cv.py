@@ -41,7 +41,7 @@ if __name__ == '__main__':
                                                                                      a1)
                 
                  
-                np.save(Output_predictions_cv+'prob_preds_'+str(x)+'_'+str(y)+'_'+str(a1)+definition[1:]+'.npy',prob_preds)
+                np.save(Output_predictions_cv+'prob_preds_'+str(x)+'_'+str(y)+'_'+str(a1)+'_'+definition[1:]+'.npy',prob_preds)
             
                 results.append([str(x)+','+str(y),a1,definition,auc,specificity,accuracy])
         
