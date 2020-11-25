@@ -177,8 +177,11 @@ def CI_std_output(fprs_lists,tprs_lists,\
 # colors_shade=sns.color_palette("Set2")
 
 colors_shade=sns.color_palette("Pastel2")
-def auc_subplots(trues_list,probs_list,names,tprs_lists=None,fontsize=14,figsize=(15,5),\
-                 titles=MODELS, colors=colors_auc, colors_shade=colors_shade,\
+def auc_subplots(trues_list, probs_list,error_lists,names,\
+                 mean_fpr_list=[np.linspace(0, 1, 30+0*i) for i in range(3)],\
+                 fontsize=14,figsize=(15,5), titles=MODELS,\
+                 colors=[colors_shade[0],colors_shade[2],colors_shade[1]],\
+                 colors_line=[colors_auc[0],colors_auc[2],colors_auc[1]],\
                  linestyles=linestyles,lw=2, loc="lower right",save_name=None):
     
     """
@@ -206,6 +209,7 @@ def auc_subplots(trues_list,probs_list,names,tprs_lists=None,fontsize=14,figsize
     
     """
 
+
     plt.figure(figsize=figsize)
     plt.subplot(131)
     
@@ -216,11 +220,14 @@ def auc_subplots(trues_list,probs_list,names,tprs_lists=None,fontsize=14,figsize
         fpr, tpr, _ = roc_curve(trues_list[0][i], probs_list[0][i])
         roc_auc = auc(fpr, tpr)
         
-        plt.plot(fpr, tpr, color=colors[i],linestyle=linestyles[i],\
-                 lw=lw, label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
+        mean_tpr=np.interp(mean_fpr_list[i],fpr,tpr)
+        plt.plot(mean_fpr_list[i], mean_tpr,  color=colors_line[i],\
+                    lw=lw,linestyle=linestyles[i],label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
         
-        if tprs_lists is not None:
-            plt.fill_between(tprs_lists[0], tprs_lists[1][0][i], tprs_lists[-1][0][i], color=colors_shade[i], alpha=.2)
+#         plt.errorbar(mean_fpr_list[i], mean_tpr, error_lists[-1][i], color=colors[i],\
+#                     lw=lw,linestyle=linestyles[i],label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
+        plt.fill_between(mean_fpr_list[i], mean_tpr-error_lists[-1][i], mean_tpr+error_lists[-1][i], color=colors[i])
+
         
     plt.plot([0, 1], [0, 1], color='gray', lw=lw, linestyle='--')
     plt.xlim([0.0, 1.0])
@@ -240,13 +247,16 @@ def auc_subplots(trues_list,probs_list,names,tprs_lists=None,fontsize=14,figsize
         fpr, tpr, _ = roc_curve(trues_list[1][i], probs_list[1][i])
         roc_auc = auc(fpr, tpr)
         
-        plt.plot(fpr, tpr, color=colors[i],linestyle=linestyles[i],\
-                 lw=lw, label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
 
-        if tprs_lists is not None:
-            plt.fill_between(tprs_lists[0], tprs_lists[1][1][i], tprs_lists[-1][1][i], color=colors_shade[i], alpha=.2)
-
+        mean_tpr=np.interp(mean_fpr_list[i],fpr,tpr)
         
+        plt.plot(mean_fpr_list[i], mean_tpr,  color=colors_line[i],\
+                    lw=lw,linestyle=linestyles[i],label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
+        
+#         plt.errorbar(mean_fpr_list[i], mean_tpr, error_lists[-1][i], color=colors[i],\
+#                     lw=lw,linestyle=linestyles[i],label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
+        plt.fill_between(mean_fpr_list[i], mean_tpr-error_lists[-1][i], mean_tpr+error_lists[-1][i], color=colors[i])
+ 
     plt.plot([0, 1], [0, 1], color='gray', lw=lw, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -265,12 +275,14 @@ def auc_subplots(trues_list,probs_list,names,tprs_lists=None,fontsize=14,figsize
         fpr, tpr, _ = roc_curve(trues_list[-1][i], probs_list[-1][i])
         roc_auc = auc(fpr, tpr)
         
-        plt.plot(fpr, tpr, color=colors[i],linestyle=linestyles[i],\
-                 lw=lw, label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
+        mean_tpr=np.interp(mean_fpr_list[i],fpr,tpr)
+        plt.plot(mean_fpr_list[i], mean_tpr,  color=colors_line[i],\
+                    lw=lw,linestyle=linestyles[i],label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
+        
+#         plt.errorbar(mean_fpr_list[i], mean_tpr, error_lists[-1][i], color=colors[i],\
+#                     lw=lw,linestyle=linestyles[i],label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
+        plt.fill_between(mean_fpr_list[i], mean_tpr-error_lists[-1][i], mean_tpr+error_lists[-1][i], color=colors[i])
 
-        if tprs_lists is not None:
-            plt.fill_between(tprs_lists[0], tprs_lists[1][-1][i], tprs_lists[-1][-1][i], color=colors_shade[i], alpha=.2)
-      
     plt.plot([0, 1], [0, 1], color='gray', lw=lw, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -285,6 +297,7 @@ def auc_subplots(trues_list,probs_list,names,tprs_lists=None,fontsize=14,figsize
     else:
         
         plt.show()
+
 
         
         ############## Patient level ####################
