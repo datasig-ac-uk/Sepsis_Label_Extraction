@@ -19,13 +19,14 @@ if __name__ == '__main__':
 
         save=True
         current_data='blood_culture_data/'
-        Root_Data,Model_Dir,Data_save=folders(current_data,model=MODELS[0])
-
+        Root_Data,Model_Dir,_,Output_predictions,Output_results=folders(current_data,model=MODELS[0])
+        
+        Output_predictions_cv=Output_predictions+'cv/'
         Data_Dir=Root_Data+'experiments_24_12/cv/'
 
         n=100
     
-        model,k,a1='lgbm',5,6
+        model,k,x,y,a1='lgbm',5,24,12,6
         print("Now Collecting results from model", model)
         
         tprs_list,tnrs_list,fnrs_list,accs_list=[],[],[],[]
@@ -36,7 +37,7 @@ if __name__ == '__main__':
         for definition in definitions:
             print(definition)
             labels=np.load(Data_Dir+'label'+definition[1:]+'_6.npy')    
-            probs_now=np.load(Data_Dir+'prob_preds'+definition[1:]+'_6.npy')
+            probs_now=np.load(Output_predictions_cv+'prob_preds_'+str(x)+'_'+str(y)+'_'+str(a1)+'_'+definition[1:]+'.npy')
 
             
             _, _,_,_,val_full_indices=dataframe_cv_pack(None,k=k,\
@@ -57,5 +58,5 @@ if __name__ == '__main__':
         output_df= pd.DataFrame(results, columns=['definition','auc','sepcificity','accuracy'])
         
         if save:
-            output_df.to_csv(Data_save+'lgbm_patient_level_train_results.csv')
+            output_df.to_csv(Output_results+'lgbm_patient_level_cv_results.csv')
         print(output_df)
