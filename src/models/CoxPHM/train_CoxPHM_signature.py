@@ -27,7 +27,7 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder,signature):
     :return: save trained model
     """
     for x, y in x_y:
-        Root_Data, Model_Dir, _ = folders(data_folder, model='CoxPHM') if signature else \
+        Root_Data, Model_Dir, _ , _, _= folders(data_folder, model='CoxPHM') if signature else \
             folders(data_folder, model='CoxPHM_no_sig')
 
         Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'

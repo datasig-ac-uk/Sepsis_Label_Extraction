@@ -266,7 +266,7 @@ def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save
       #  plt.legend()
        # print('mean_'+labels[i],np.mean(np.array(true_septic_time_list[3*i])),'median_'+labels[i],np.median(np.array(true_septic_time_list[3*i])))
 
-    true_onset_time_dist(true_septic_time_list)
+    #true_onset_time_dist(true_septic_time_list)
 
 
 
@@ -283,7 +283,7 @@ def time_difference_dist_model(true_septic_time_list, identified_pred_sepsis_tim
             true_septic_time_list[i].index.isin(identified_pred_sepsis_time[i].index)]
         identified_time_difference = identified_true_sepsis_time.values - identified_pred_sepsis_time[i].values
         for time in time_grid:
-            time_diff.append('>=' + str(time))
+            time_diff.append(r'$\geq' + str(time))
             models.append(model_grid[i])
 
             proportion.append(np.where(identified_time_difference > time)[0].shape[0] / len(true_septic_time_list[i]))
@@ -305,17 +305,17 @@ def time_difference_dist_definitions(true_septic_time_list, identified_pred_seps
             true_septic_time_list[3 * i].index.isin(identified_pred_sepsis_time[3 * i].index)]
         identified_time_difference = identified_true_sepsis_time.values - identified_pred_sepsis_time[3 * i].values
         for time in time_grid:
-            time_diff.append('>=' + str(time))
+            time_diff.append(r'$\geq$' + str(time))
             defs.append(def_grid[i])
 
             proportion.append(
                 np.where(identified_time_difference > time)[0].shape[0] / len(true_septic_time_list[3 * i]))
-        print(len(true_septic_time_list[3 * i]))
+        #print(len(true_septic_time_list[3 * i]))
     data_dict = {'HOB': time_diff, 'def': defs, 'proportion': proportion}
-    plt.figure(figsize=(8, 6))
-    plt.rcParams.update({'font.size': 12})
+    plt.figure(figsize=(12, 9))
+    plt.rcParams.update({'font.size': 17})
     sns.barplot(x="HOB", y="proportion", hue="def", data=pd.DataFrame.from_dict(data_dict))
-    plt.savefig(save_dir + 'Time_diff_dist_definitions' + '.png')
+    plt.savefig(save_dir + 'Time_diff_dist_definitions' + '.jpeg',dpi=350)
 
 
 def onset_time_dist_definitions(true_septic_time_list, identified_pred_sepsis_time,
@@ -334,7 +334,7 @@ def onset_time_dist_definitions(true_septic_time_list, identified_pred_sepsis_ti
 
             proportion.append(
                 np.where(identified_true_sepsis_time >= time)[0].shape[0] / len(true_septic_time_list[3 * i]))
-        print(len(true_septic_time_list[3 * i]))
+        #print(len(true_septic_time_list[3 * i]))
     data_dict = {'icustay': icustay, 'def': defs, 'proportion': proportion}
     plt.figure(figsize=(8, 6))
     plt.rcParams.update({'font.size': 12})
@@ -376,16 +376,16 @@ def median_time_difference(true_septic_time_list, identified_pred_sepsis_time, t
                 median_list.append(np.median(
                     identified_true_sepsis_time.values[ids] - identified_pred_sepsis_time[3 * i + j].values[ids]))
                 model_def.append(def_grid[i] + '&' + model_grid[j])
-                icustay.append('>='+str(time))
+                icustay.append(r'$\geq$'+str(time))
     data_dict = {'icustay': icustay, 'model_definitions': model_def, 'median of HBO': median_list}
     df = pd.DataFrame.from_dict(data_dict)
     df['definition'] = [item[:2] for item in df['model_definitions'].values]
     df['model'] = [item[3:] for item in df['model_definitions'].values]
-    plt.figure(figsize=(8, 6))
-    plt.rcParams.update({'font.size': 12})
+    plt.figure(figsize=(12, 9))
+    plt.rcParams.update({'font.size': 17})
     sns.lineplot(data=df, x='icustay', y='median of HBO', hue='definition', style='model', markers=True,sort=False)
-    plt.legend(loc='upper left', prop={'size': 10})
-    plt.savefig(save_dir + 'median of HOB' + '.png')
+    plt.legend(loc='lower right', prop={'size': 16})
+    plt.savefig(save_dir + 'median of HOB' + '.jpeg',dpi=350)
 
 def median_flagtime_on_true(true_septic_time_list, identified_pred_sepsis_time, time_grid=np.arange(6, 16),
                            save_dir=None):

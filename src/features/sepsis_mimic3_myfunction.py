@@ -169,10 +169,14 @@ def dataframe_from_definition_discard(path_df, a1=6,a2=3,definition='t_sepsis_mi
     df_merge2[['subject_id', 'hadm_id', 'icustay_id']+static_vars] = df_merge2[['subject_id', 'hadm_id', 'icustay_id']+static_vars].groupby('icustay_id', as_index=False).apply(lambda v: v.ffill())
     
     ### Deleting cencored data after a2
+
     df_merge2=df_merge2[((df_merge2.floored_charttime-df_merge2[definition]).dt.total_seconds()/60/60<a2+1.0)\
                         |(df_merge2[definition].isnull())]
-    
-    print("Size of instances after getting censored data:",df_merge2.deathtime.size)
+
+
+    print("Size of instances after getting censored data:", df_merge2.deathtime.size)
+
+
     
     ### Adding icu stay since intime
     df_merge2['rolling_los_icu'] = (df_merge2['outtime'] - df_merge2['intime']).dt.total_seconds()/60/60
