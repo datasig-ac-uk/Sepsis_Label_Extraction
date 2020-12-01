@@ -24,7 +24,7 @@ numerical_vars = ['heart_rate',
                   'bilirubin_total', 'bun', 'creatinine', 'fibrinogen', 'magnesium',
                   'phosphate', 'platelets', 'ptt', 'tropinin_t', 'tropinin_i', 'wbc',
                   'bicarbonate', 'chloride', 'calcium', 'glucose', 'hematocrit',
-                  'hemoglobin', 'potassium', 'sodium']
+                  'hemoglobin', 'potassium', 'sodium','sofa_total']
 
 flags = ['intubated', 'on_vent']
 identifier = ['subject_id', 'hadm_id', 'icustay_id', 'floored_charttime']
@@ -37,11 +37,13 @@ feature_dict = {'static': static_vars,
                 }
 
 feature_dict_james = {
-    'vitals': ['heart_rate', 'o2sat', 'temp_celcius', 'nbp_sys', 'mean_airway_pressure', 'abp_dias', 'resp_rate'],
+#     'vitals': ['heart_rate', 'o2sat', 'temp_celcius', 'nbp_sys', 'mean_airway_pressure', 'abp_dias', 'resp_rate'], before talk to Lingyi
+    'vitals': ['heart_rate', 'o2sat', 'temp_celcius', 'nbp_sys', 'nbp_mean', 'nbp_dias', 'resp_rate'],
     'laboratory': ['baseexcess', 'bicarbonate', 'ast', 'fio2', 'ph', 'pco2', 'so2', 'bun', 'alkalinephos', 'calcium', \
                    'chloride', 'creatinine', 'bilirubin_direct', 'glucose', 'lactate', 'magnesium', 'phosphate', \
                    'potassium', 'bilirubin_total', 'tropinin_i', 'hematocrit', 'hemoglobin', 'wbc', 'ptt', \
                    'fibrinogen', 'platelets'],
-    'demographics': ['age', 'gender', 'admittime', 'rolling_los_icu'],
+#     'demographics': ['age', 'gender', 'admittime', 'rolling_los_icu'],
     'derived': ['bun_creatinine', 'partial_sofa', 'shock_index']
+#    'derived': ['bun_creatinine', 'sofa_total', 'shock_index']
 }
