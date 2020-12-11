@@ -9,9 +9,9 @@ from matplotlib.patches import Rectangle
 
     
 import sys
-sys.path.insert(0, '../../')
+sys.path.insert(0, '../')
 
-from definitions import *
+import constants
 
 colors_barplot=sns.color_palette()
 colors_auc=sns.color_palette("Dark2")
@@ -116,21 +116,21 @@ def CI_AUC_bootstrapping(n_bootstraps, alpha, y_true, y_pred, rng_seed = 1):
 
 def fprs_tprs_output(labels_list_list,probs_list_list,n_bootstraps=100,alpha=0.95):
 
-    fprs_lists=[[] for kk in range(len(MODELS))]
-    tprs_lists=[[] for kk in range(len(MODELS))]
+    fprs_lists=[[] for kk in range(len(constants.MODELS))]
+    tprs_lists=[[] for kk in range(len(constants.MODELS))]
 
 
-    for i in range(len(MODELS)):
+    for i in range(len(constants.MODELS)):
     
-        fprs_lists[i]=[[] for k in range(len(definitions))]
-        tprs_lists[i]=[[] for k in range(len(definitions))]   
+        fprs_lists[i]=[[] for k in range(len(constants.FEATURES))]
+        tprs_lists[i]=[[] for k in range(len(constants.FEATURES))]   
     
-        for j in range(len(definitions)):
+        for j in range(len(constants.FEATURES)):
         
             CI_results,fprs,tprs=CI_AUC_bootstrapping(n_bootstraps, alpha,labels_list_list[i][j],\
                                                               probs_list_list[i][j],  rng_seed = 1)
         
-            print(MODELS[i],definitions[j],"{:.3f}".format(roc_auc_score(labels_list_list[i][j],\
+            print(constants.MODELS[i],constants.FEATURES[j],"{:.3f}".format(roc_auc_score(labels_list_list[i][j],\
                                                                          probs_list_list[i][j])),\
               "["+"{:.3f}".format(CI_results[0]) +","+"{:.3f}".format(CI_results[1])+"]")
 
@@ -147,14 +147,14 @@ def CI_std_output(fprs_lists,tprs_lists,\
 
 
 
-    error_list=[[] for i in range(len(MODELS))]
+    error_list=[[] for i in range(len(constants.MODELS))]
 
-    for i in range(len(MODELS)):
+    for i in range(len(constants.MODELS)):
 
-        error_list[i]=[[] for k in range(len(definitions))]
+        error_list[i]=[[] for k in range(len(constants.FEATURES))]
     
     
-        for j in range(len(definitions)):
+        for j in range(len(constants.FEATURES)):
             tprs_=[]
         
             for k in range(len(tprs_lists[i][j])):
@@ -179,7 +179,7 @@ def CI_std_output(fprs_lists,tprs_lists,\
 colors_shade=sns.color_palette("Pastel2")
 def auc_subplots(trues_list, probs_list,error_lists,names,\
                  mean_fpr_list=[np.linspace(0, 1, 30+0*i) for i in range(3)],\
-                 fontsize=14,figsize=(15,5), titles=MODELS,\
+                 fontsize=14,figsize=(15,5), titles=constants.MODELS,\
                  colors=[colors_shade[0],colors_shade[2],colors_shade[1]],\
                  colors_line=[colors_auc[0],colors_auc[2],colors_auc[1]],\
                  linestyles=linestyles,lw=2, loc="lower right",save_name=None):
@@ -308,22 +308,22 @@ def patient_level_probability_max(probs):
 
 def fprs_tprs_output_patient_level(labels_list_list,probs_list_list,indices_list_list,n_bootstraps=100,alpha=0.95):
 
-    fprs_lists=[[] for kk in range(len(MODELS))]
-    tprs_lists=[[] for kk in range(len(MODELS))]
+    fprs_lists=[[] for kk in range(len(constants.MODELS))]
+    tprs_lists=[[] for kk in range(len(constants.MODELS))]
 
     
-    probs_list=[[] for kk in range(len(MODELS))]
-    labels_list=[[] for kk in range(len(MODELS))]
+    probs_list=[[] for kk in range(len(constants.MODELS))]
+    labels_list=[[] for kk in range(len(constants.MODELS))]
     
-    for i in range(len(MODELS)):
+    for i in range(len(constants.MODELS)):
     
-        fprs_lists[i]=[[] for k in range(len(definitions))]
-        tprs_lists[i]=[[] for k in range(len(definitions))]   
+        fprs_lists[i]=[[] for k in range(len(constants.FEATURES))]
+        tprs_lists[i]=[[] for k in range(len(constants.FEATURES))]   
         
-        probs_list[i]=[[] for k in range(len(definitions))]
-        labels_list[i]=[[] for k in range(len(definitions))]   
+        probs_list[i]=[[] for k in range(len(constants.FEATURES))]
+        labels_list[i]=[[] for k in range(len(constants.FEATURES))]   
         
-        for j in range(len(definitions)):
+        for j in range(len(constants.FEATURES)):
 
             full_idxs=indices_list_list[i][j]
             par_probs=[patient_level_probability_max(probs_list_list[i][j][full_idxs[k]]) for k in range(len(full_idxs))]
@@ -333,7 +333,7 @@ def fprs_tprs_output_patient_level(labels_list_list,probs_list_list,indices_list
 
             CI_results,fprs,tprs=CI_AUC_bootstrapping(n_bootstraps, alpha, np.array(par_labels), np.array(par_probs),  rng_seed = 1)
         
-            print(MODELS[i],definitions[j],\
+            print(constants.MODELS[i],constants.FEATURES[j],\
                   "{:.3f}".format(roc_auc_score(par_labels,par_probs)),\
                   "["+"{:.3f}".format(CI_results[0]) +","+"{:.3f}".format(CI_results[1])+"]")
 
@@ -350,7 +350,7 @@ def fprs_tprs_output_patient_level(labels_list_list,probs_list_list,indices_list
 
 def recall_specificity_subplots_patient_level(pres_list,tprs_list,names,\
                                               fontsize=14,figsize=(15,5),\
-                                              titles=MODELS, colors=colors_auc,\
+                                              titles=constants.MODELS, colors=colors_auc,\
                                               linestyles=linestyles,\
                                               loc="lower left",lw = 2,\
                                               save_name=None):

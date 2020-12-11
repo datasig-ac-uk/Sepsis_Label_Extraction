@@ -1,14 +1,12 @@
+import sys
+
 import numpy as np
 import pandas as pd
-import random
-import os
-import pickle
 from scipy.stats import iqr
 
-import sys
-sys.path.insert(0, '../../')
-from definitions import *
-from src.features.sepsis_mimic3_myfunction import *
+sys.path.insert(0, '../')
+import constants
+import features.sepsis_mimic3_myfunction as mimic3_myfunc
 
 
 def statistics_gender_mortality(df,variable):
@@ -41,9 +39,9 @@ if __name__ == '__main__':
 
     
     print("Give dataset summary: gender,mortality,age,los, sepsis hour since ICU.")
-    Root_Data=DATA_processed+'blood_culture_data/'
+    Root_Data=constants.DATA_processed+'blood_culture_data/'
     Data_save=Root_Data+'summary/'        
-    create_folder(Data_save)
+    mimic3_myfunc.create_folder(Data_save)
     
     a1,a2=6,0
     genders=[]
@@ -52,7 +50,7 @@ if __name__ == '__main__':
     los=[]
     sepsis_hours=[]
 
-    for x,y in xy_pairs:
+    for x,y in constants.xy_pairs:
 
         if x!=48:
                 df_path='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'
@@ -66,10 +64,10 @@ if __name__ == '__main__':
         los_=[]
         sepsis_hours_=[]
 
-        for definition in definitions:
+        for definition in constants.FEATURES:
         
             print(x,y, definition)
-            df_now=dataframe_from_definition_discard(df_path,a1=a1,a2=a2,definition=definition)
+            df_now = mimic3_myfunc.dataframe_from_definition_discard(df_path,a1=a1,a2=a2,definition=definition)
         
         
             df_non=df_now[np.isnan(df_now.sepsis_hour)]

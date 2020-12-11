@@ -1,24 +1,20 @@
-import numpy as np
-import torch
-from ray.tune.utils import get_pinned_object
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, classification_report, \
-    roc_curve, auc
-import time
-from torch import nn, optim
-
 import sys
+import time
 
-sys.path.insert(0, '../../../')
-
-from definitions import *
-from src.features.scaler import *
-from src.data.dataset import TimeSeriesDataset
-from src.data.functions import torch_ffill
-from src.data.torch_timeseries_dataset import LSTM_Dataset
-from torch.utils.data import DataLoader, TensorDataset
-from src.models.nets import LSTM
-from src.features.sepsis_mimic3_myfunction import *
+import numpy as np
+from ray.tune.utils import get_pinned_object
 from ray import tune
+import torch
+from torch import nn, optim
+from torch.utils.data import DataLoader
+from sklearn.metrics import accuracy_score, roc_curve, auc
+
+sys.path.insert(0, '../../')
+
+import constants
+import features.scaler as scaler
+from data.torch_timeseries_dataset import LSTM_Dataset
+from models.nets import LSTM
 
 
 
@@ -26,14 +22,14 @@ from ray import tune
 def prepared_data_train(ts_dataset, labels, normalize, batch_size, device):
     dataset = ts_dataset
     if normalize:
-        scaler = TrickScaler(scaling='mms').fit(dataset.data)
-        dataset.data = scaler.transform(dataset.data)
+        my_scaler = scaler.TrickScaler(scaling='mms').fit(dataset.data)
+        dataset.data = my_scaler.transform(dataset.data)
     data = torch.FloatTensor(dataset.data.float())
     lengths = torch.FloatTensor(dataset.lengths)
     labels = torch.LongTensor(labels)
     ds = LSTM_Dataset(x=data, y=labels, p=20, lengths=lengths, device=device)
     dl = DataLoader(ds, batch_size=batch_size)
-    return dl, scaler
+    return dl, my_scaler
 
 
 def train_model(model, train_dl, n_epochs, save_dir, loss_func, optimizer):
@@ -121,9 +117,9 @@ def model_cv(config, data_list, device):
         test_labels = torch.cat([labels[i].to(device) for i in test_idxs])
 
         # normalization
-        scaler = TrickScaler(scaling='mms').fit(train_data)
-        train_data = scaler.transform(train_data)
-        test_data = scaler.transform(test_data)
+        my_scaler = scaler.TrickScaler(scaling='mms').fit(train_data)
+        train_data = my_scaler.transform(train_data)
+        test_data = my_scaler.transform(test_data)
 
         # parse the train and test data into LSTM torch dataset
         train_ds = LSTM_Dataset(x=train_data, y=train_labels, p=p, lengths=train_lengths, device=device)
@@ -140,9 +136,9 @@ def model_cv(config, data_list, device):
                      dropout=0).to(device)
 
         train_model(model, train_dl, n_epochs=epochs,
-                    save_dir=MODELS_DIR + '/LSTM_mimic' + 'cv_' + str(i),
+                    save_dir=constants.MODELS_DIR + '/LSTM_mimic' + 'cv_' + str(i),
                     loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=1e-3))
-        model.load_state_dict(torch.load(MODELS_DIR + '/LSTM_mimic' + 'cv_' + str(i),
+        model.load_state_dict(torch.load(constants.MODELS_DIR + '/LSTM_mimic' + 'cv_' + str(i),
                                          map_location=torch.device('cpu')))
         _, _, _, true, preds = eval_model(test_dl, model,None)
         test_true.append(true)
