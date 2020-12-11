@@ -1,19 +1,14 @@
-import pandas as pd
-import numpy as np
+import sys
+
 from lifelines import CoxPHFitter
+import numpy as np
+import pandas as pd
+from ray import tune
+from ray.tune.utils import get_pinned_object
 from sklearn.metrics import roc_curve, auc, accuracy_score
 
-import sys
-sys.path.insert(0, '../../../')
-
-from definitions import *
-from src.features.dicts import *
-from src.features.sepsis_mimic3_myfunction import *
-import ray
-from ray import tune
-from ray.tune.utils import pin_in_object_store, get_pinned_object
-
-
+sys.path.insert(0, '../../')
+import features.dicts as dicts
 
 def Coxph_df(df, features, feature_dict, T, labels,signature=True):
     """
@@ -72,8 +67,8 @@ def Coxph_eval(df, model, T, save_dir=None):
     return auc_score, specificity, accuracy
 
 # feature dictionary for coxph model
-original_features = feature_dict_james['vitals'] + feature_dict_james['laboratory'] \
-                    + feature_dict_james['derived'] + ['age', 'gender', 'hour', 'HospAdmTime']
+original_features = dicts.feature_dict_james['vitals'] + dicts.feature_dict_james['laboratory'] \
+                    + dicts.feature_dict_james['derived'] + ['age', 'gender', 'hour', 'HospAdmTime']
 
 search_space = {
     'regularize': tune.uniform(5e-2, 1e-3),

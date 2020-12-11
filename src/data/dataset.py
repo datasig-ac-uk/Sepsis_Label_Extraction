@@ -1,7 +1,11 @@
-from definitions import *
+import sys
+
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+
+sys.path.insert(0, '../')
+import omni.functions as omni_functions
 
 
 class TimeSeriesDataset(Dataset):
@@ -134,11 +138,11 @@ class TimeSeriesDataset(Dataset):
     def save(self, loc):
         """ Saves data, lengths and columns as a pickle. """
         items = self.data, self.lengths, self.columns
-        save_pickle(items, loc)
+        omni_functions.save_pickle(items, loc)
 
     def load(self, loc):
         """ Reloads data, lengths and columns. """
-        data, lengths, columns = load_pickle(loc)
+        data, lengths, columns = omni_functions.load_pickle(loc)
         self.__init__(data, columns)
         self.lengths = lengths
         return self

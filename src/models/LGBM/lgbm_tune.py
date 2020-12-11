@@ -1,25 +1,17 @@
-import numpy as np
-import pandas as pd
-import random
-import os
-import pickle
+import sys
 
 from lightgbm import LGBMClassifier
 
-import sys
-sys.path.insert(0, '../../../')
-
-
-from definitions import *
-from src.features.sepsis_mimic3_myfunction import *
-from src.models.LGBM.lgbm_functions import *
+sys.path.insert(0, '../../')
+import constants
+import features.sepsis_mimic3_myfunctionas as mimic3_myfunc
+import models.LGBM.lgbm_functions as lgbm_func
 
 
 
 if __name__ == '__main__':
-
         current_data='blood_culture_data/'
-        Root_Data,Model_Dir,_,_,_=folders(current_data,model=MODELS[0])
+        Root_Data,Model_Dir,_,_,_= mimic3_myfunc.folders(current_data,model=constants.MODELS[0])
 
         a1,a2,k=6,0,5
         x,y=24,12
@@ -31,9 +23,6 @@ if __name__ == '__main__':
 
         model=LGBMClassifier(random_state=42)
  
-        for definition in definitions:
-        
-            feature_loading_model_tuning(model, Data_Dir,Model_Dir,definition,\
-                                         a1,grid_parameters,n_iter=n_iter,k=k,save=True)
-                
-
+        for definition in constants.FEATURES:
+            lgbm_func.feature_loading_model_tuning(model, Data_Dir,Model_Dir,definition,\
+                                                   a1,lgbm_func.grid_parameters,n_iter=n_iter,k=k,save=True)

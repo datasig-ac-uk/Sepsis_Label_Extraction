@@ -1,12 +1,14 @@
+import pickle
+import sys
+
 from lightgbm import LGBMClassifier
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, roc_auc_score,roc_curve
-from sklearn import preprocessing
+import numpy as np
+from sklearn.metrics import accuracy_score, roc_auc_score,roc_curve
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
-
-from definitions import *
-from src.features.sepsis_mimic3_myfunction import *
-
 import joblib
+
+sys.path.insert(0, '../../')
+import features.sepsis_mimic3_myfunction as mimic3_myfunc
 
 ################################### LGBM tuning/training ########################################   
 def feature_loading(Data_Dir,definition, a1, k=5,cv=True,save=True):
@@ -17,7 +19,7 @@ def feature_loading(Data_Dir,definition, a1, k=5,cv=True,save=True):
     icustay_ids=np.load(Data_Dir+'icustay_id'+definition[1:]+'.npy')
     if cv:
         tra_patient_indices,tra_full_indices,val_patient_indices,val_full_indices=\
-            cv_pack(icustay_lengths,k=k,definition=definition,path_save=Data_Dir,save=save)
+            mimic3_myfunc.cv_pack(icustay_lengths,k=k,definition=definition,path_save=Data_Dir,save=save)
     
         return current_labels,feature_data,tra_patient_indices,tra_full_indices,val_patient_indices,val_full_indices
 

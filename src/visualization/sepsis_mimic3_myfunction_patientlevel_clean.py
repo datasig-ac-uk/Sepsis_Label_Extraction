@@ -1,14 +1,16 @@
-import numpy as np
-import pandas as pd
-import random
-from sklearn.model_selection import KFold
 import os
 import pickle
+import random
+import sys
 
-from src.features.dicts import *
-from src.features.sepsis_mimic3_myfunction import *
-
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+
+sys.path.insert(0, '../')
+import features.dicts as dicts
+import features.sepsis_mimic3_myfunction as mimic3_myfunc
 
 
 ################## Those for CV #############################
