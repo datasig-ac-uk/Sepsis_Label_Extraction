@@ -46,5 +46,3 @@ if __name__ == '__main__':
     result_df.to_csv(Output_results + "lgbm_cv_results.csv")
 
     mimic3_myfunc.main_result_tables(result_df, Data_save, model='lgbm', purpose='cv')
-
- 
