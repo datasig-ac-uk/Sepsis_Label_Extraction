@@ -1,4 +1,6 @@
 
+
+
 static_vars = ['admission_type', 'admittime',
                'dischtime', 'hospital_expire_flag', 'deathtime', 'intime', 'outtime',
                'age', 'gender', 'ethnicity', 'insurance', 'initial_diagnosis',

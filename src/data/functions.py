@@ -2,6 +2,7 @@ import numpy as np
 import torch
 
 
+
 def torch_ffill(data):
     """ Forward fill for a torch tensor.
 

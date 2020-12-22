@@ -71,8 +71,8 @@ original_features = dicts.feature_dict_james['vitals'] + dicts.feature_dict_jame
                     + dicts.feature_dict_james['derived'] + ['age', 'gender', 'hour', 'HospAdmTime']
 
 search_space = {
-    'regularize': tune.uniform(5e-2, 1e-3),
-    'step_size': tune.uniform(0, 0.5)
+    'regularize': tune.uniform(1e-4, 1e-3),
+    'step_size': tune.uniform(0, 0.2)
 }
 
 def model_cv(config,data,a1):
