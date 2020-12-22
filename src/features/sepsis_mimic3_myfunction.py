@@ -211,9 +211,9 @@ def jamesfeature(df,Data_Dir='./',definition='t_sepsis_min',save=True):
         if save:
             np.save(Data_Dir+'james_features'+definition[1:]+'.npy', james_feature)
 
-    print('Size of james feature for definition', james_feature.shape)
+        print('Size of james feature for definition', james_feature.shape)
 
-    return james_feature
+        return james_feature
 
 
 def get_list(x, m):
