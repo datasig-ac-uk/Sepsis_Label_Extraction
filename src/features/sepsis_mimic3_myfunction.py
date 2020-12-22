@@ -65,7 +65,12 @@ def partial_sofa(df):
     """ Partial reconstruction of the SOFA score from features available in the sepsis dataset. """
     # Init the tensor
 
+
     sofa = np.full([len(df)], np.nan)
+    platelets=np.full([len(df)], np.nan)
+    bilirubin_total=np.full([len(df)], np.nan)
+    maps=np.full([len(df)], np.nan)
+    creatinine=np.full([len(df)], np.nan)
         # Coagulation
     platelets_ =  df['heart_rate']
     
