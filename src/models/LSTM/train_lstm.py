@@ -14,24 +14,29 @@ import omni.functions as omni_functions
 import features.sepsis_mimic3_myfunction as mimic3_myfunc
 
 
-if __name__ == '__main__':
+def train_LSTM(T_list, x_y, definitions, data_folder='blood_only_data/', fake_test=False):
+    """
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-    print(os.environ["CUDA_VISIBLE_DEVICES"])
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    print(device)
-    T_list=[6]
-    for x, y in [ (24, 12)]:
+    :param T_list: (list of int) list of parameter T
+    :param x_y: (list of int)list of sensitivity parameter x and y
+    :param definitions:  (list of str) list of definitions. e.g.['t_suspision','t_sofa','t_sepsis_min']
+    :param data_folder:   (str) folder name specifying
+    :return:
 
-        current_data_folder = 'absolute_values/'
-        Root_Data, Model_Dir, Data_save = mimic3_myfunc.folders(current_data_folder,model='LSTM')
+    """
+    for x, y in x_y:
+        data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
+        Root_Data, Model_Dir, _, _, _ = mimic3_myfunc.folders(data_folder, model='LSTM')
+        config_dir = constants.MODELS_DIR + 'blood_only_data/LSTM/hyperparameter/config'
 
         #     Data_Dir = Root_Data + '/processed/experiments_' + str(x) + '_' + str(y) + '/H3_subset/'
         Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
 
-        for definition in constants.FEATURES:
-            config = omni_functions.load_pickle(constants.MODELS_DIR + 'hyperparameter/LSTM/config' + definition[1:])
-        #         for T in [6]:
+        for definition in definitions:
+            config = omni_functions.load_pickle(config_dir + definition[1:])
+            print(config)
+
+            #         for T in [6]:
             for T in T_list:
                 print('load timeseries dataset')
                 dataset = TimeSeriesDataset().load(Data_Dir + definition[1:] + '_ffill.tsd')
@@ -43,18 +48,28 @@ if __name__ == '__main__':
                 train_dl, scaler = lstm_functions.prepared_data_train(dataset, labels_train, True, 128, device)
 
                 omni_functions.save_pickle(scaler, Model_Dir + 'hyperparameter/scaler' + definition[1:])
-                #             save_pickle(scaler,MODELS_DIR+'/LSTM/hyperparameter/scaler'+definition[1:]+'H3_subset')
 
                 # specify lstm model architecture
 
-                model = LSTM(in_channels=dataset.data.shape[-1], num_layers=1, hidden_channels=config['hidden_channels'],
-                         hidden_1=config['linear_channels'], out_channels=2,
-                         dropout=0).to(device)
+                model = LSTM(in_channels=dataset.data.shape[-1], num_layers=1,
+                             hidden_channels=config['hidden_channels'],
+                             hidden_1=config['linear_channels'], out_channels=2,
+                             dropout=0).to(device)
 
                 lstm_functions.train_model(model, train_dl, n_epochs=config['epochs'],
-                        save_dir=Model_Dir + '_' + str(x) + '_' + str(y) + '_' + str(T)+ definition[1:],
-                        loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=config['lr']))
+                                           save_dir=Model_Dir + '_' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:],
+                                           loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=config['lr']))
 
-#             train_model(model, train_dl, n_epochs=config['epochs'],
-#                     save_dir=MODELS_DIR + '/LSTM/H3_subset/' +definition[2:] +'_'+ str(x) + '_' + str(y) + '_' + str(T),
-#                     loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=config['lr']))
+
+if __name__ == '__main__':
+    os.environ["CUDA_VISIBLE_DEVICES"] = "4"
+    print(os.environ["CUDA_VISIBLE_DEVICES"])
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    print(device)
+    xy_pairs=[(48,24),(12,6),(6,3)]
+    definitions = ['t_sofa','t_suspicion','t_sepsis_min']
+    #train_LSTM(T_list, xy_pairs, definitions, data_folder='blood_only_data/', fake_test=False)
+    xy_pairs = [(24,12)]
+    data_folder_list = ['absolute_values/','strict_exclusion/','all_cultures/','no_gcs/']
+    for data_folder in data_folder_list:
+        train_LSTM(constants.T_list, xy_pairs, definitions, data_folder=data_folder_list, fake_test=False)
