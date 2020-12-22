@@ -66,6 +66,9 @@ def partial_sofa(df):
     # Init the tensor
 
     sofa = np.full([len(df)], np.nan)
+        # Coagulation
+    platelets_ =  df['heart_rate']
+    
     platelets[platelets_ >= 150] = 0
     platelets[(100 <= platelets_) & (platelets_ < 150)] = 1
     platelets[(50 <= platelets_) & (platelets_ < 100)] = 2
