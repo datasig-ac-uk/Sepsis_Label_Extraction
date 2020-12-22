@@ -4,7 +4,7 @@ from lightgbm import LGBMClassifier
 
 sys.path.insert(0, '../../')
 import constants
-import features.sepsis_mimic3_myfunctionas as mimic3_myfunc
+import features.sepsis_mimic3_myfunction as mimic3_myfunc
 import models.LGBM.lgbm_functions as lgbm_func
 
 if __name__ == '__main__':
