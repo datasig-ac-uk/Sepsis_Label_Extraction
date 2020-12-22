@@ -1,20 +1,24 @@
-import numpy as np
 import os
-import time
-import torch
 import sys
 
-from src.visualization.sepsis_mimic3_myfunction_patientlevel_clean import decompose_cms, output_at_metric_level
+import numpy as np
+import pandas as pd
+from sklearn.metrics import auc
+import torch
 
-sys.path.insert(0, '../../../')
+from visualization.main_plots1 import suboptimal_choice_patient
 
-from definitions import *
-from src.models.LSTM.lstm_functions import *
-from src.features.sepsis_mimic3_myfunction import *
-from src.visualization.venn_diagram_plot import *
+sys.path.insert(0, '../../')
+import constants
+from data.dataset import TimeSeriesDataset
+import omni.functions as omni_functions
+import models.LSTM.lstm_functions as lstm_functions
+from models.nets import LSTM
+import features.sepsis_mimic3_myfunction as mimic3_myfunc
+from visualization.sepsis_mimic3_myfunction_patientlevel_clean import decompose_cms, output_at_metric_level
 
 
-def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.arange(10000) / 10000,fake_test=False):
+def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.arange(10000) / 10000, fake_test=False):
     """
     This function compute evaluation on trained CoxPHM model, will save the prediction probability and numerical results
     for both online predictions and patient level predictions in the outputs directoty.
@@ -31,27 +35,28 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
     results = []
     results_patient_level = []
     data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
-    config_dir = MODELS_DIR + 'blood_only_data/LSTM/hyperparameter/config'
-    Root_Data, Model_Dir, Data_save, Output_predictions, Output_results = folders(data_folder, model='LSTM')
+    config_dir = constants.MODELS_DIR + 'blood_only_data/LSTM/hyperparameter/config'
+    Root_Data, Model_Dir, Data_save, Output_predictions, Output_results = mimic3_myfunc.folders(data_folder,
+                                                                                                model='LSTM')
     for x, y in x_y:
 
-        Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) +'/'+ train_test + '/'
+        Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/' + train_test + '/'
 
         #     Save_Dir = DATA_DIR + '/processed/experiments_' + str(x) + '_' + str(y) + '/H3_subset/'
 
         #         for T in [6]:
         for T in T_list:
             for definition in definitions:
-                config = load_pickle(config_dir + definition[1:])
+                config = omni_functions.load_pickle(config_dir + definition[1:])
                 print('load timeseries dataset')
                 dataset = TimeSeriesDataset().load(Data_Dir + definition[1:] + '_ffill.tsd')
 
                 print('load train labels')
                 labels_test = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')
                 # get torch dataloader for lstm
-                scaler = load_pickle(Model_Dir + 'hyperparameter/scaler' + definition[1:])
+                scaler = omni_functions.load_pickle(Model_Dir + 'hyperparameter/scaler' + definition[1:])
                 #               scaler=load_pickle(MODELS_DIR+'/LSTM/hyperparameter/scaler'+definition[1:]+'H3_subset')
-                test_dl = prepared_data_test(dataset, labels_test, True, scaler, 1000, device)
+                test_dl = lstm_functions.prepared_data_test(dataset, labels_test, True, scaler, 1000, device)
 
                 # specify torch model architecture and load trained model
                 model = LSTM(in_channels=dataset.data.shape[-1], num_layers=1,
@@ -62,15 +67,13 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
                 model.load_state_dict(
                     torch.load(Model_Dir + '_' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:],
                                map_location=torch.device('cpu')))
-                # model.load_state_dict(
-                # torch.load(MODELS_DIR + '/LSTM/H3_subset/' +definition[2:] +'_'+ str(x) + '_' + str(y) + '_' + str(T),
-                #          map_location=torch.device('cpu')))
 
-                auc_score, specificity, accuracy, true, preds = eval_model(test_dl, model,
-                                                                           save_dir=Output_predictions + str(
-                                                                               x) + '_' + str(y) + '_'
-                                                                                    + str(T) + definition[
-                                                                                               1:] + '_' + train_test + '.npy')
+                auc_score, specificity, accuracy, true, preds = lstm_functions.eval_model(test_dl, model,
+                                                                                          save_dir=Output_predictions + str(
+                                                                                              x) + '_' + str(y) + '_'
+                                                                                                   + str(
+                                                                                              T) + definition[
+                                                                                                   1:] + '_' + train_test + '.npy')
                 df_sepsis = pd.read_pickle(Data_Dir + definition[1:] + '_dataframe.pkl')
                 preds = np.load(Output_predictions + str(x) + '_' + str(y) + '_'
                                 + str(T) + definition[1:] + '_' + train_test + '.npy')
@@ -102,8 +105,8 @@ if __name__ == '__main__':
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
     data_folder = 'blood_only_data/'
-    #train_test = 'test'
+    # train_test = 'test'
     definitions = ['t_sofa', 't_suspicion', 't_sepsis_min']
     xy_pairs = [(24, 12)]
-    eval_LSTM(T_list, xy_pairs, definitions, data_folder, train_test='test',fake_test=True)
-    eval_LSTM(T_list, xy_pairs, definitions, data_folder, train_test='train', fake_test=True)
+    eval_LSTM(constants.T_list, xy_pairs, definitions, data_folder, train_test='test', fake_test=True)
+    eval_LSTM(constants.T_list, xy_pairs, definitions, data_folder, train_test='train', fake_test=True)
