@@ -10,8 +10,6 @@ from sklearn.metrics import roc_curve, auc, accuracy_score
 sys.path.insert(0, '../../')
 import features.dicts as dicts
 
-
-
 def Coxph_df(df, features, feature_dict, T, labels,signature=True):
     """
     :param df:

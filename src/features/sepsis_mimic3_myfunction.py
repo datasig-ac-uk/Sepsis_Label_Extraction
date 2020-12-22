@@ -20,6 +20,7 @@ def create_folder(path):
     try:
         # Create target directory
         os.makedirs(path)
+
         print("Directory ", path, " created ")
     except FileExistsError:
         print("Directory ", path, " already exists")
@@ -58,19 +59,13 @@ def compute_icu(df_merge2, definition, return_results=False):
         return icu_number, icu_number - nonsepsis_icu_number, (icu_number - nonsepsis_icu_number) / icu_number
 
 
+
+
 def partial_sofa(df):
     """ Partial reconstruction of the SOFA score from features available in the sepsis dataset. """
     # Init the tensor
 
     sofa = np.full([len(df)], np.nan)
-    platelets = np.full([len(df)], np.nan)
-    bilirubin_total = np.full([len(df)], np.nan)
-    maps = np.full([len(df)], np.nan)
-    creatinine = np.full([len(df)], np.nan)
-
-    # Coagulation
-    platelets_ = df['heart_rate']
-
     platelets[platelets_ >= 150] = 0
     platelets[(100 <= platelets_) & (platelets_ < 150)] = 1
     platelets[(50 <= platelets_) & (platelets_ < 100)] = 2
@@ -99,21 +94,24 @@ def partial_sofa(df):
     creatinine[(3.4 < creatinine_) & (creatinine_ <= 4.9)] = 3
     creatinine[creatinine_ > 4.9] = 4
 
+
     sofa = platelets + bilirubin_total + maps + creatinine
 
     return sofa
 
 
 def dataframe_from_definition_discard(path_df, a1=4, a2=3, definition='t_sepsis_min'):
+
     """
         For specific definition among the three, deleting patients who has been diagnosied
         beofre a1 hours in icu and trimming valid patients' data such that all the data after
-        a2 hours after sepsis onset according to definition will be deleted. 
-        
-        
+        a2 hours after sepsis onset according to definition will be deleted.
+
+
     nonsepsis==True: we keep nonsepsis data; otherwsie, we do not keep them
-        
+
     """
+
 
     pd.set_option('display.max_columns', None)
 
@@ -126,16 +124,16 @@ def dataframe_from_definition_discard(path_df, a1=4, a2=3, definition='t_sepsis_
 
     df_sepsis['floored_charttime'] = df_sepsis['charttime'].dt.floor('h')
 
-    df_sepsis = df_sepsis.sort_values(['icustay_id', 'floored_charttime'])
-    print('Initial size:', df_sepsis.deathtime.size)
 
-    ### deleting rows that patients are dead already 
-    df_sepsis = df_sepsis[(df_sepsis['deathtime'] > df_sepsis['charttime']) | df_sepsis.deathtime.isnull()]
+    df_sepsis=df_sepsis.sort_values(['icustay_id','floored_charttime'])
+    print('Initial size:',df_sepsis.deathtime.size)
+
+    ### deleting rows that patients are dead already
+    df_sepsis=df_sepsis[(df_sepsis['deathtime']>df_sepsis['charttime']) |df_sepsis.deathtime.isnull()]
     df_sepsis['gender'] = df_sepsis['gender'].replace(('M', 'F'), (1, 0))
 
     ### Newly added by Lingyi to fill in the gaps
-    df_sepsis_intime = df_sepsis[dicts.identifier + dicts.static_vars].sort_values(['icustay_id', 'floored_charttime']).groupby(
-        ['icustay_id'], as_index=False).first()
+    df_sepsis_intime = df_sepsis[dicts.identifier + dicts.static_vars].sort_values(['icustay_id', 'floored_charttime']).groupby(['icustay_id'], as_index = False).first()
     df_sepsis_intime['floored_intime'] = df_sepsis_intime['intime'].dt.floor('h')
     df_sepsis_intime2 = df_sepsis_intime[df_sepsis_intime['floored_charttime'] > df_sepsis_intime['floored_intime']]
     df_sepsis_intime2.drop(['floored_charttime'], axis=1, inplace=True)
@@ -143,75 +141,75 @@ def dataframe_from_definition_discard(path_df, a1=4, a2=3, definition='t_sepsis_
     df_sepsis = pd.concat([df_sepsis, df_sepsis_intime2], ignore_index=True, sort=False).sort_values(
         ['icustay_id', 'floored_charttime'])
 
+
+
     ### Discarding patients developing sepsis within 4 hour in ICU
-    df_sepsis = df_sepsis[(df_sepsis[definition].between(df_sepsis.intime + pd.Timedelta(hours=4), \
-                                                         df_sepsis.outtime, inclusive=True)) \
-                          | (df_sepsis[definition].isnull())]
+    df_sepsis=df_sepsis[(df_sepsis[definition].between(df_sepsis.intime+pd.Timedelta(hours=4),\
+                                                            df_sepsis.outtime, inclusive=True))\
+                             | (df_sepsis[definition].isnull())]
 
-    print("Size of instances after discarding patients developing sepsis within 4 hour in ICU:",
-          df_sepsis.deathtime.size)
+    print("Size of instances after discarding patients developing sepsis within 4 hour in ICU:",df_sepsis.deathtime.size)
 
-    df_first = df_sepsis[dicts.static_vars + dicts.categorical_vars + dicts.identifier].groupby(by=dicts.identifier, as_index=False).first()
+    df_first = df_sepsis[dicts.static_vars + dicts.categorical_vars + dicts.identifier].groupby(by=dicts.identifier, as_index = False).first()
     df_mean = df_sepsis[dicts.numerical_vars + dicts.identifier].groupby(by=dicts.identifier, as_index=False).mean()
-    df_max = df_sepsis[dicts.flags + dicts.identifier].groupby(by=dicts.identifier, as_index=False).max()
+    df_max = df_sepsis[dicts.flags + dicts.identifier].groupby(by=dicts.identifier, as_index = False).max()
     df_merge = df_first.merge(df_mean, on=dicts.identifier).merge(df_max, on=dicts.identifier)
     df_merge.equals(df_merge.sort_values(dicts.identifier))
-    df_merge.set_index('icustay_id', inplace=True)
+    df_merge.set_index('icustay_id',inplace=True)
 
     ### Resampling
-    df_merge2 = df_merge.groupby(by='icustay_id').apply(lambda x: x.set_index('floored_charttime'). \
-                                                        resample('H').first()).reset_index()
+    df_merge2 = df_merge.groupby(by='icustay_id').apply(lambda x : x.set_index('floored_charttime').\
+                                                       resample('H').first()).reset_index()
 
-    print("Size after averaging hourly measurement and resampling:", df_merge2.deathtime.size)
+    print("Size after averaging hourly measurement and resampling:",df_merge2.deathtime.size)
 
-    df_merge2[['subject_id', 'hadm_id', 'icustay_id'] + dicts.static_vars] = df_merge2[
-        ['subject_id', 'hadm_id', 'icustay_id'] + dicts.static_vars].groupby('icustay_id', as_index=False).apply(
-        lambda v: v.ffill())
+    df_merge2[['subject_id', 'hadm_id', 'icustay_id'] + dicts.static_vars] = df_merge2[['subject_id', 'hadm_id', 'icustay_id'] + dicts.static_vars].groupby('icustay_id', as_index=False).apply(lambda v: v.ffill())
 
     ### Deleting cencored data after a2
-    df_merge2 = df_merge2[
-        ((df_merge2.floored_charttime - df_merge2[definition]).dt.total_seconds() / 60 / 60 < a2 + 1.0) \
-        | (df_merge2[definition].isnull())]
+    df_merge2=df_merge2[((df_merge2.floored_charttime-df_merge2[definition]).dt.total_seconds()/60/60<a2+1.0)\
+                        |(df_merge2[definition].isnull())]
 
-    print("Size of instances after getting censored data:", df_merge2.deathtime.size)
+    print("Size of instances after getting censored data:",df_merge2.deathtime.size)
 
     ### Adding icu stay since intime
-    df_merge2['rolling_los_icu'] = (df_merge2['outtime'] - df_merge2['intime']).dt.total_seconds() / 60 / 60
-    df_merge2['hour'] = (df_merge2['floored_charttime'] - df_merge2['intime']).dt.total_seconds() / 60 / 60
+    df_merge2['rolling_los_icu'] = (df_merge2['outtime'] - df_merge2['intime']).dt.total_seconds()/60/60
+    df_merge2['hour'] = (df_merge2['floored_charttime'] - df_merge2['intime']).dt.total_seconds()/60/60
 
     ### Discarding patients staying less than 4 hour or longer than 20 days
-    df_merge2 = df_merge2[(df_merge2['rolling_los_icu'] <= 20 * 24) & (4.0 <= df_merge2['rolling_los_icu'])]
+    df_merge2=df_merge2[(df_merge2['rolling_los_icu']<=20*24) & (4.0<=df_merge2['rolling_los_icu'])]
 
-    print("Size of instances after discarding patients staying less than 4 hour or longer than 20 days:",
-          df_merge2.deathtime.size)
+    print("Size of instances after discarding patients staying less than 4 hour or longer than 20 days:",df_merge2.deathtime.size)
+
 
     ### Triming the data to icu instances only
     df_merge2 = df_merge2[df_merge2['floored_charttime'] <= df_merge2['outtime']]
     df_merge2 = df_merge2[df_merge2['intime'] <= df_merge2['floored_charttime']]
-    print("After triming the data to icu instances:", df_merge2.deathtime.size)
 
-    icustay_id_to_included_bool = (df_merge2.groupby(['icustay_id']).size() >= 4)
-    icustay_id_to_included = df_merge2.icustay_id.unique()[icustay_id_to_included_bool]
+    print("After triming the data to icu instances:",df_merge2.deathtime.size)
 
-    df_merge2 = df_merge2[df_merge2.icustay_id.isin(icustay_id_to_included)]
+    icustay_id_to_included_bool=(df_merge2.groupby(['icustay_id']).size()>=4)
+    icustay_id_to_included=df_merge2.icustay_id.unique()[icustay_id_to_included_bool]
+
+    df_merge2=df_merge2[df_merge2.icustay_id.isin(icustay_id_to_included)]
 
     ### Mortality check
-    df_merge2['mortality'] = (~df_merge2.deathtime.isnull()).astype(int)
-    df_merge2['sepsis_hour'] = (df_merge2[definition] - df_merge2['intime']).dt.total_seconds() / 60 / 60
+    df_merge2['mortality']=(~df_merge2.deathtime.isnull()).astype(int)
+    df_merge2['sepsis_hour'] = (df_merge2[definition] - df_merge2['intime']).dt.total_seconds()/60/60
 
-    print("Final size:", df_merge2.deathtime.size)
+    print("Final size:",df_merge2.deathtime.size)
 
     return df_merge2
 
+def jamesfeature(df,Data_Dir='./',definition='t_sepsis_min',save=True):
 
-def jamesfeature(df, Data_Dir='./', definition='t_sepsis_min', save=True):
-    df['HospAdmTime'] = (df['admittime'] - df['intime']).dt.total_seconds() / 60 / 60
+        df['HospAdmTime']=(df['admittime'] - df['intime']).dt.total_seconds()/60/60
 
-    print('Finally getting james feature:')
-    james_feature = lgbm_jm_transform(df)
 
-    if save:
-        np.save(Data_Dir + 'james_features' + definition[1:] + '.npy', james_feature)
+        print('Finally getting james feature:')
+        james_feature=lgbm_jm_transform(df)
+
+        if save:
+            np.save(Data_Dir+'james_features'+definition[1:]+'.npy', james_feature)
 
     print('Size of james feature for definition', james_feature.shape)
 
@@ -241,6 +239,7 @@ def signature(datapiece, s=iisignature.prepare(2, 3), \
     else:
 
         return np.asarray([iisignature.sig(datapiece[i, :], order) for i in range(datapiece.shape[0])])
+
 
 
 def lgbm_jm_transform(dataframe1, feature_dict=dicts.feature_dict, \

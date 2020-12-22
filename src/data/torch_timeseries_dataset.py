@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import Dataset
 
 from data.functions import pytorch_rolling
+
 class LSTM_Dataset(Dataset):
     """time series dataset class for generating rolling windows timeseries """
 
