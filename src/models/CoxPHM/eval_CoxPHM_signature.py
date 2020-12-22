@@ -14,7 +14,8 @@ from src.visualization.sepsis_mimic3_myfunction_patientlevel_clean import decomp
 from src.visualization.venn_diagram_plot import *
 
 
-def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature, thresholds=np.arange(10000) / 10000):
+def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
+                thresholds=np.arange(10000) / 10000,fake_test=False):
     """
     This function compute evaluation on trained CoxPHM model, will save the prediction probability and numerical results
     for both online predictions and patient level predictions in the outputs directoty.
@@ -31,9 +32,9 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature, th
     """
     results = []
     results_patient_level = []
-    Root_Data, Model_Dir, Data_save, Output_predictions, Output_results = folders(data_folder,
-                                                                                  model='CoxPHM') if signature \
-        else folders(data_folder, model='CoxPHM_no_sig')
+    model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
+    data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
+    Root_Data, Model_Dir, Data_save, Output_predictions, Output_results = folders(data_folder,model=model)
     for x, y in x_y:
 
         Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/' + train_test + '/'
@@ -51,14 +52,14 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature, th
                 df_coxph = Coxph_df(df_sepsis, features, original_features, T, labels, signature=signature)
 
                 # load trained coxph model
-                cph = load_pickle(Model_Dir + str(x) + '_' + str(y) + '_' + str(T) + definition[1:])
+                cph = load_pickle(Model_Dir + str(x) + '_' + str(y) + '_' + str(T) + definition[1:]+'_'+model)#TODO remove model
 
                 # predict and evalute on test set
                 auc_score, specificity, accuracy = Coxph_eval(df_coxph, cph, T,
                                                               Output_predictions + str(x) + '_' + str(y) + '_'
-                                                              + str(T) + definition[1:]+'_'+train_test + '.npy')
+                                                              + str(T) + definition[1:]+'_'+train_test+'.npy')
                 preds = np.load(Output_predictions + str(x) + '_' + str(y) + '_'
-                                + str(T) + definition[1:] +'_'+train_test+ '.npy')
+                                + str(T) + definition[1:] +'_'+train_test+'.npy')
                 CMs, _, _ = suboptimal_choice_patient(df_sepsis, labels, preds, a1=6, thresholds=thresholds,
                                                       sample_ids=None)
                 tprs, tnrs, fnrs, pres, accs = decompose_cms(CMs)
@@ -74,16 +75,16 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature, th
     results_patient_level_df = pd.DataFrame(results_patient_level,
                                             columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'accuracy'])
 
-    results_patient_level_df.to_csv(Output_results + train_test + '_patient_level_results.csv')
+    results_patient_level_df.to_csv(Output_results + train_test +'_patient_level_results.csv')
     result_df = pd.DataFrame(results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'accuracy'])
-    result_df.to_csv(Output_results + train_test + '_results.csv')
+    result_df.to_csv(Output_results + train_test +'_results.csv')
 
 
 if __name__ == '__main__':
-    results = []
-    results_patient_level = []
-    train_test = 'test'
-    data_folder = 'blood_only_data/'
-    T_list=[6]
-    xy_pairs=[(24,12)]
-    eval_CoxPHM(T_list, xy_pairs, definitions, data_folder, train_test,signature=True)
+    train_test = 'train'
+    x_y = [(24, 12)]
+    T_list = [4, 6, 8, 12]
+    data_folder_list = ['blood_only_data/','no_gcs_/','all_cultures_/','absolute_values_/','strict_exclusion/']
+    for data_folder in data_folder_list:
+        eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature=True,fake_test=True)
+

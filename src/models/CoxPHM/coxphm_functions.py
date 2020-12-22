@@ -77,8 +77,8 @@ original_features = feature_dict_james['vitals'] + feature_dict_james['laborator
                     + feature_dict_james['derived'] + ['age', 'gender', 'hour', 'HospAdmTime']
 
 search_space = {
-    'regularize': tune.uniform(5e-2, 1e-3),
-    'step_size': tune.uniform(0, 0.5)
+    'regularize': tune.uniform(1e-4, 1e-3),
+    'step_size': tune.uniform(0, 0.2)
 }
 
 

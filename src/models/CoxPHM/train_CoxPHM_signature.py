@@ -14,7 +14,11 @@ from src.models.CoxPHM.coxphm_functions import *
 from src.features.sepsis_mimic3_myfunction import *
 
 
+<<<<<<< Updated upstream
 def train_CoxPHM(T_list, x_y, definitions, data_folder,signature):
+=======
+def train_CoxPHM(T_list, x_y, definitions, data_folder,signature,fake_test):
+>>>>>>> Stashed changes
     """
     Training on the CoxPHM model for specified T,x_y and definition parameters, save the trained model in model
     directory
@@ -26,14 +30,24 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder,signature):
     :param signature(bool): True:use the signature features + original features, False: only use original features
     :return: save trained model
     """
+    model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
+    config_dir = MODELS_DIR + 'blood_only_data/CoxPHM/hyperparameter/config'
+    data_folder = 'fake_test1/'+data_folder if fake_test else data_folder
     for x, y in x_y:
+<<<<<<< Updated upstream
         Root_Data, Model_Dir, _ , _, _= folders(data_folder, model='CoxPHM') if signature else \
             folders(data_folder, model='CoxPHM_no_sig')
+=======
+>>>>>>> Stashed changes
 
+        Root_Data, Model_Dir, _, _, _ = folders(data_folder, model=model)
         Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
         for definition in definitions:
-            config = load_pickle(MODELS_DIR + 'hyperparameter/CoxPHM/config' + definition[1:])
+
+            config = load_pickle(config_dir + definition[1:])
+            print(definition,config)
             for T in T_list:
+                print(definition, x, y,T)
                 print('load dataframe and input features')
                 df_sepsis_train = pd.read_pickle(Data_Dir + definition[1:] + '_dataframe.pkl')
                 features_train = np.load(Data_Dir + 'james_features' + definition[1:] + '.npy')
@@ -50,13 +64,25 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder,signature):
                     .fit(df_coxph_train, duration_col='censor_hours', event_col='label',
                          show_progress=True, step_size=config['step_size'])
 
-                save_pickle(cph, Model_Dir + str(x) + '_' + str(y) + '_' + str(T) + definition[1:])
+                save_pickle(cph, Model_Dir + str(x) + '_' + str(y) + '_' + str(T) + definition[1:])  #TODO remove model
 
 
 if __name__ == '__main__':
 
+<<<<<<< Updated upstream
     x_y = [(6, 3), (12, 6), (24, 12), (48, 24)]
     T_list = [4, 6, 8, 12]
     data_folder = 'blood_only_data/'
     train_CoxPHM(T_list,x_y,definitions,data_folder,True)
+=======
+    x_y = [(24, 12)]
+    T_list = [4, 6, 8, 12]
+
+    data_folder_list = ['absolute_values/','strict_exclusion/','blood_only_data/','all_cultures/','no_gcs/']
+    for data_folder in data_folder_list:
+        train_CoxPHM(T_list,x_y,definitions,data_folder,True,fake_test=False)
+
+    x_y=[(48,24),(12,6),(6,3)]
+    train_CoxPHM(T_list, x_y, definitions, 'blood_only_data/', True, fake_test=False)
+>>>>>>> Stashed changes
 
