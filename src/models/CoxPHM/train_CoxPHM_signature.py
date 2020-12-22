@@ -14,31 +14,19 @@ from src.models.CoxPHM.coxphm_functions import *
 from src.features.sepsis_mimic3_myfunction import *
 
 
-<<<<<<< Updated upstream
-def train_CoxPHM(T_list, x_y, definitions, data_folder,signature):
-=======
 def train_CoxPHM(T_list, x_y, definitions, data_folder,signature,fake_test):
->>>>>>> Stashed changes
     """
-    Training on the CoxPHM model for specified T,x_y and definition parameters, save the trained model in model
-    directory
 
     :param T_list(list of int): list of parameter T
     :param x_y(list of int):list of sensitivity parameter x and y
     :param definitions(list of str): list of definitions. e.g.['t_suspision','t_sofa','t_sepsis_min']
     :param data_folder(str): folder name specifying
-    :param signature(bool): True:use the signature features + original features, False: only use original features
-    :return: save trained model
+    :return:
     """
     model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
     config_dir = MODELS_DIR + 'blood_only_data/CoxPHM/hyperparameter/config'
     data_folder = 'fake_test1/'+data_folder if fake_test else data_folder
     for x, y in x_y:
-<<<<<<< Updated upstream
-        Root_Data, Model_Dir, _ , _, _= folders(data_folder, model='CoxPHM') if signature else \
-            folders(data_folder, model='CoxPHM_no_sig')
-=======
->>>>>>> Stashed changes
 
         Root_Data, Model_Dir, _, _, _ = folders(data_folder, model=model)
         Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
@@ -64,17 +52,11 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder,signature,fake_test):
                     .fit(df_coxph_train, duration_col='censor_hours', event_col='label',
                          show_progress=True, step_size=config['step_size'])
 
-                save_pickle(cph, Model_Dir + str(x) + '_' + str(y) + '_' + str(T) + definition[1:])  #TODO remove model
+                save_pickle(cph, Model_Dir + str(x) + '_' + str(y) + '_' + str(T) + definition[1:]+'_'+model)  #TODO remove model
 
 
 if __name__ == '__main__':
 
-<<<<<<< Updated upstream
-    x_y = [(6, 3), (12, 6), (24, 12), (48, 24)]
-    T_list = [4, 6, 8, 12]
-    data_folder = 'blood_only_data/'
-    train_CoxPHM(T_list,x_y,definitions,data_folder,True)
-=======
     x_y = [(24, 12)]
     T_list = [4, 6, 8, 12]
 
@@ -84,5 +66,4 @@ if __name__ == '__main__':
 
     x_y=[(48,24),(12,6),(6,3)]
     train_CoxPHM(T_list, x_y, definitions, 'blood_only_data/', True, fake_test=False)
->>>>>>> Stashed changes
 
