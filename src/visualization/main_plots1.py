@@ -5,8 +5,8 @@ from matplotlib_venn import venn2, venn2_circles, venn2_unweighted
 from matplotlib_venn import venn3, venn3_circles
 import matplotlib.pyplot as plt
 from src.visualization.sepsis_mimic3_myfunction_patientlevel_clean import decompose_confusion
-from src.features.sepsis_mimic3_myfunction import *
-from definitions import *
+import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import constants
 import seaborn as sns
 
 
@@ -157,8 +157,8 @@ def plot_venn(x, y, T, test_metric, metric_thresh, precision, save_dir):
     """
     definitions = ['t_sofa', 't_suspicion', 't_sepsis_min']
     current_data = 'blood_only_data/'
-    Root_Data = DATA_processed + current_data + 'experiments_' + str(x) + '_' + str(y) + '/test/'
-    Output_Data = OUTPUT_DIR + 'predictions/' + current_data
+    Root_Data = constants.DATA_processed + current_data + 'experiments_' + str(x) + '_' + str(y) + '/test/'
+    Output_Data = constants.OUTPUT_DIR + 'predictions/' + current_data
     thresholds = np.arange(precision) / precision
     models = ['LGBM', 'LSTM', 'CoxPHM']
     pred_sepsispatient_sublist = []
@@ -168,7 +168,7 @@ def plot_venn(x, y, T, test_metric, metric_thresh, precision, save_dir):
     for definition in definitions:
         print(definition)
         pred_sepsispatient_sublist = []
-        path_df = DATA_DIR + '/raw/further_split/val_' + str(x) + '_' + str(y) + '.csv'
+        path_df = constants.DATA_DIR + '/raw/further_split/val_' + str(x) + '_' + str(y) + '.csv'
         df_sepsis1 = pd.read_pickle(Root_Data + definition[1:] + '_dataframe.pkl')
         current_label = np.load(Root_Data + 'label' + definition[1:] + '_' + str(T) + '.npy')
         for model in models:
@@ -214,8 +214,8 @@ def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save
     definitions = ['t_sofa', 't_suspicion', 't_sepsis_min']
     models = ['LGBM', 'LSTM', 'CoxPHM']
     current_data = 'blood_only_data/'
-    Root_Data = DATA_processed + 'fake_test/'+current_data + 'experiments_' + str(x) + '_' + str(y) + '/test/'
-    Output_Data = OUTPUT_DIR + 'predictions/fake_test1/' + current_data
+    Root_Data = constants.DATA_processed + 'fake_test/' + current_data + 'experiments_' + str(x) + '_' + str(y) + '/test/'
+    Output_Data = constants.OUTPUT_DIR + 'predictions/fake_test1/' + current_data
     thresholds = np.arange(precision) / precision
 
     if strict_exclusion:
@@ -576,5 +576,5 @@ def proprotion_HBO_line_plot(patient_true_label_list, true_septic_time_list, ide
 
 
 if __name__ == '__main__':
-    plot_venn(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=OUTPUT_DIR + 'plots/')
-    sepsis_onset_time_plots(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=OUTPUT_DIR + 'plots/')
+    plot_venn(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/')
+    sepsis_onset_time_plots(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/')
