@@ -149,7 +149,7 @@ def model_cv(config, data_list, device):
         test_preds.append(preds)
         test_true_full = np.concatenate([test_true[i].reshape(-1, 1) for i in range(len(test_true))])
         test_preds_full = np.concatenate(test_preds)
-    fpr, tpr, thresholds = roc_curve(test_true_full + 1, test_preds_full[:, 1], pos_label=2)
+    fpr, tpr, thresholds = roc_curve(test_true_full + 1, test_preds_full, pos_label=2)
     auc_score = auc(fpr, tpr)
     tune.report(mean_accuracy=auc_score)
 

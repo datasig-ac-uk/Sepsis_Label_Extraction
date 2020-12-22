@@ -11,6 +11,7 @@ from ray import tune
 from ray.tune.utils import pin_in_object_store, get_pinned_object
 from src.features.sepsis_mimic3_myfunction import *
 
+<<<<<<< Updated upstream
 
 def tune_CoxPHM(data_folder, definitions, T=6, x_y=(24, 12), k=5, signature=True):
     """
@@ -31,6 +32,23 @@ def tune_CoxPHM(data_folder, definitions, T=6, x_y=(24, 12), k=5, signature=True
 
     for definition in definitions:
         labels = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')
+=======
+if __name__ == '__main__':
+    current_data = 'blood_only_data/'
+    signature = True
+    model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
+    Root_Data, Model_Dir, _, _, _ = folders(current_data, model=model)
+
+    a1, a2, k = 6, 0, 5
+    x, y = 24, 12
+
+    Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
+
+    print(Data_Dir)
+
+    for definition in definitions:
+        labels = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(a1) + '.npy')
+>>>>>>> Stashed changes
         df = pd.read_pickle(Data_Dir + definition[1:] + '_dataframe.pkl')
         features = np.load(Data_Dir + 'james_features' + definition[1:] + '.npy')
 
@@ -39,7 +57,11 @@ def tune_CoxPHM(data_folder, definitions, T=6, x_y=(24, 12), k=5, signature=True
             cv_pack(icustay_lengths, k=k, definition=definition, path_save=Data_Dir, save=True)
 
         # prepare dataframe for coxph model
+<<<<<<< Updated upstream
         df_coxph = Coxph_df(df, features, original_features, T, labels, signature=False)
+=======
+        df_coxph = Coxph_df(df, features, original_features, a1, labels, signature=False)
+>>>>>>> Stashed changes
         ray.init(num_cpus=5)
         data = pin_in_object_store([df_coxph, tra_full_indices, val_full_indices, k])
         analysis = tune.run(partial(model_cv, data=data, T=T),
