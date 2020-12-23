@@ -90,7 +90,7 @@ def partial_sofa(df):
     bilirubin_total[bilirubin_ > 11.9] = 4
 
     # Cardiovascular
-    map_ = df['mean_airway_pressure']
+    map_ = df['nbp_mean']
     maps[map_ >= 70] = 0
     maps[map_ < 70] = 1
 
@@ -290,7 +290,7 @@ def lgbm_jm_transform(dataframe1, feature_dict=dicts.feature_dict, \
 
     newdata = np.concatenate((newdata1, newdata), axis=1)
 
-    sig_features = ['heart_rate', 'nbp_sys', 'abp_mean'] + dicts.feature_dict_james['derived'][:-1]
+    sig_features = ['heart_rate', 'nbp_sys', 'nbp_mean'] + dicts.feature_dict_james['derived'][:-1]
 
     for j in range(len(sig_features)):
 
