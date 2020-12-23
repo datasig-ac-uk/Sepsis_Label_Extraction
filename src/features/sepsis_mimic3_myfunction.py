@@ -72,13 +72,20 @@ def partial_sofa(df):
     maps=np.full([len(df)], np.nan)
     creatinine=np.full([len(df)], np.nan)
         # Coagulation
-    platelets_ =  df['heart_rate']
+#     platelets_ =  df['heart_rate']
     
-    platelets[platelets_ >= 150] = 0
-    platelets[(100 <= platelets_) & (platelets_ < 150)] = 1
-    platelets[(50 <= platelets_) & (platelets_ < 100)] = 2
-    platelets[(20 <= platelets_) & (platelets_ < 50)] = 3
+#     platelets[platelets_ >= 150] = 0
+#     platelets[(100 <= platelets_) & (platelets_ < 150)] = 1
+#     platelets[(50 <= platelets_) & (platelets_ < 100)] = 2
+#     platelets[(20 <= platelets_) & (platelets_ < 50)] = 3
+#     platelets[platelets < 20] = 4
+    platelets =  df['heart_rate']
+
     platelets[platelets < 20] = 4
+    platelets[platelets>= 150] = 0
+    platelets[(100 <= platelets) & (platelets < 150)] = 1
+    platelets[(50 <= platelets) & (platelets < 100)] = 2
+    platelets[(20 <= platelets) & (platelets < 50)] = 3
 
     # Liver
     bilirubin_ = df['bilirubin_total']
