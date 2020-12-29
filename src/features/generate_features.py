@@ -4,13 +4,7 @@ sys.path.insert(0, '../')
 import constants
 import features.sepsis_mimic3_myfunction as sepsis_mimic3
 
-if __name__ == '__main__':
 
-import sys
-
-sys.path.insert(0, '../')
-import constants
-import features.sepsis_mimic3_myfunction as sepsis_mimic3
 
 if __name__ == '__main__':
 
