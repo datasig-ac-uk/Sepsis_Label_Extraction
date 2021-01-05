@@ -100,13 +100,14 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
 
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-    print(os.environ["CUDA_VISIBLE_DEVICES"])
+    # os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    # print(os.environ["CUDA_VISIBLE_DEVICES"])
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
     data_folder = 'blood_only_data/'
-    # train_test = 'test'
-    definitions = ['t_sofa', 't_suspicion', 't_sepsis_min']
+
+    eval_LSTM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder, train_test='test', fake_test=True)
+    data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
     xy_pairs = [(24, 12)]
-    eval_LSTM(constants.T_list, xy_pairs, definitions, data_folder, train_test='test', fake_test=True)
-    eval_LSTM(constants.T_list, xy_pairs, definitions, data_folder, train_test='train', fake_test=True)
+    for data_folder in data_folder_list:
+        eval_LSTM([6], xy_pairs, constants.FEATURES, data_folder, train_test='test', fake_test=True)
