@@ -84,9 +84,10 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
 
 
 if __name__ == '__main__':
-    train_test = 'train'
-    x_y = [(24, 12)]
-    T_list = [4, 6, 8, 12]
-    data_folder_list = ['blood_only_data/', 'no_gcs_/', 'all_cultures_/', 'absolute_values_/', 'strict_exclusion/']
+    train_test = 'test'
+
+    data_folder = 'blood_only_data/'
+    eval_CoxPHM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder, train_test, signature=True, fake_test=True)
+    data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
     for data_folder in data_folder_list:
-        eval_CoxPHM(T_list, x_y, constants.FEATURES, data_folder, train_test, signature=True, fake_test=True)
+        eval_CoxPHM([6], constants.xy_pairs, constants.FEATURES, data_folder, train_test, signature=True, fake_test=True)
