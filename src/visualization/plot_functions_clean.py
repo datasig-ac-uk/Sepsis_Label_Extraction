@@ -561,6 +561,57 @@ def recall_specificity_subplots_patient_level(pres_list, tprs_list, names, \
 
         plt.show()
 
+def auc_plot_patient_level(fprs,tprs,names,fontsize=14,\
+                            colors=colors_auc,titles=MODELS,\
+                            linestyles=linestyles,lw = 2,\
+                            loc="lower right",save_name=None):
+    
+    """
+        AUC plots in one figure via computed fprs and tprs
+        
+    Input:
+    
+        fprs: fpr list for different sets of data
+        
+                eg, for 2 set of data, [[fpr for data set1],[fpr for data set2]]
+                
+        tprs: tpr list for different sets of data
+        
+                eg, for 2 set of data, [[tpr for data set1],[tpr for data set2]]
+
+            
+        names: curve labels
+        
+        save_name: if None: print figure; else: save to save_name.png
+
+    
+    
+    """
+
+    num=len(fprs)
+    plt.figure()
+    
+    for i in range(num):
+        
+        roc_auc = auc(fprs[i], tprs[i])
+
+        plt.plot(fprs[i], tprs[i], color=colors[i],linestyle=linestyles[i],\
+                 lw=lw, label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
+        
+    plt.plot([0, 1], [0, 1], color='black', lw=lw, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate',fontsize=fontsize)
+    plt.ylabel('True Positive Rate',fontsize=fontsize)
+    plt.legend(loc=loc,fontsize=fontsize-3)
+    plt.xticks(fontsize=fontsize-3)
+    plt.yticks(fontsize=fontsize-3)
+    
+    if save_name is not None:
+        plt.savefig(save_name+'.jpeg',dpi=350)
+    else:
+        
+        plt.show()
 
 ############################ For trajectory level plot ############################
 
