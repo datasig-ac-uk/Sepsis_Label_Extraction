@@ -23,14 +23,15 @@ import visualization.plot_functions as plot_functions
 import visualization.table_functions as table_functions
 
 if __name__ == '__main__':
-
-    print("Collecting results on test set at setting x,y,T=24,12,6 from three models",
+    
+    purpose='test'
+    print("Collecting results on " +purpose+" set at setting x,y,T=24,12,6 from three models",
           constants.MODELS[0], constants.MODELS[1], constants.MODELS[-1])
 
     current_data = 'blood_culture_data/'
     Root_Data = constants.DATA_processed + current_data
 
-    Data_Dir = Root_Data + 'experiments_24_12/test/'
+    Data_Dir = Root_Data + 'experiments_24_12/'+purpose+'/'
     print("The interim results will be collected from ", Data_Dir)
 
     Data_save_plots = Root_Data + 'plots/'
@@ -90,12 +91,12 @@ if __name__ == '__main__':
 
     print("Plotting instance-level aucroc with CI for three models.")
     plot_functions.auc_subplots_errorbars(labels_list_list,probs_list_list,error_list,names=names,\
-                       mean_fpr_list=mean_fpr_list,save_name= Data_save_plots+'auc_plot_instance_level_three_models_test_errorbar_final')
+                       mean_fpr_list=mean_fpr_list,save_name= Data_save_plots+'auc_IC_plot_instance_level_three_models_'+purpose)
 
 
     print("Saving instance-level auc scores for three models.")
     table_functions.instance_level_auc_pd_threemodels(labels_list_list, probs_list_list, \
-                                                       pd_save_name=Data_save_tables + "auc_instance_level_three_models_test")
+                                                       pd_save_name=Data_save_tables + "auc_instance_level_three_models_"+purpose)
 
     ######### Patient level auc plots/tables #################
     print("--------------------------------Patient level now:--------------------------------")
@@ -108,7 +109,7 @@ if __name__ == '__main__':
     error_list_par = plot_functions.CI_std_output(fprs_lists_par, tprs_lists_par, mean_fpr_list=mean_fpr_list)
 
     plot_functions.auc_subplots_errorbars(labels_list_par,probs_list_par,error_list_par,names=names,\
-                           mean_fpr_list=mean_fpr_list,save_name= Data_save_plots+'auc_plot_patient_level_three_models_test_errorbar_final')   
+                           mean_fpr_list=mean_fpr_list,save_name= Data_save_plots+'auc_IC_plot_patient_level_three_models_'+purpose)   
 
 
     print("A different way of getting tprs/fprs for three models.")
@@ -121,26 +122,26 @@ if __name__ == '__main__':
 
     print("Patient level recall-precision plots for three models.")
     plot_functions.recall_specificity_subplots_patient_level(pres_list_list, tprs_list_list, names, \
-                                                             save_name=Data_save_plots + "recall_precision_plot_patient_level_three_models_test")
+                                                             save_name=Data_save_plots + "recall_precision_plot_patient_level_three_models_"+purpose)
 
     print("Saving patient-level auc scores for three models.")
     table_functions.patient_level_auc_pd_threemodels(fprs_list_list, tprs_list_list, for_write=False, \
-                                                     pd_save_name=Data_save_tables + "auc_patient_level_three_models_test")
+                                                     pd_save_name=Data_save_tables + "auc_patient_level_three_models_"+purpose)
 
     print("Saving patient-level specificity at fixed sensitivity level 0.85 for three models.")
     table_functions.patient_level_output_pd_threemodels(fprs_list_list, tprs_list_list, metric_required=[0.85], \
                                                         operator=lambda x: 1 - x, for_write=False, \
-                                                        pd_save_name=Data_save_tables + "specificity_patient_level_three_models_test")
+                                                        pd_save_name=Data_save_tables + "specificity_patient_level_three_models_"+purpose)
 
     print("Saving patient-level accuracy at fixed sensitivity level 0.85 for three models.")
     table_functions.patient_level_output_pd_threemodels(accs_list_list, tprs_list_list, metric_required=[0.85], \
                                                         operator=lambda x: x, for_write=False, \
-                                                        pd_save_name=Data_save_tables + "accuracy_patient_level_three_models_test")
+                                                        pd_save_name=Data_save_tables + "accuracy_patient_level_three_models_"+purpose)
     
     
     print("Now, for each fixed model, and for each of three definitions, producing instance/patient-level auc plots across four different xy pairs.")
     for model in MODELS:
-        patientlevel.auc_plot_xy_pairs(model=model,purpose='test')
+        patientlevel.auc_plot_xy_pairs(model=model,purpose='purpose)
 
 
 
