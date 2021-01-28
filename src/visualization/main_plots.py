@@ -141,7 +141,7 @@ if __name__ == '__main__':
     
     
     print("Now, for each fixed model, and for each of three definitions, producing instance/patient-level auc plots across four different xy pairs.")
-    for model in MODELS:
+    for model in constants.MODELS:
         patientlevel.auc_plot_xy_pairs(model=model,purpose='purpose)
 
 
