@@ -32,7 +32,7 @@ def folders(current_data, model='LGBM'):
     Model_Dir = constants.MODELS_DIR + current_data + model + '/'
     create_folder(Model_Dir)
 
-    Data_save = Root_Data + 'results/'
+#     Data_save = Root_Data + 'results/'
 
     Output_predictions = constants.OUTPUT_DIR + 'predictions/' + current_data + model + '/'
     Output_results = constants.OUTPUT_DIR + 'results/' + current_data + model + '/'
@@ -41,7 +41,7 @@ def folders(current_data, model='LGBM'):
     create_folder(Output_predictions)
     create_folder(Output_results)
 
-    return Root_Data, Model_Dir, Data_save, Output_predictions, Output_results
+    return Root_Data, Model_Dir, Output_predictions, Output_results
 
 
 ################################### Feature extractions     ########################################
