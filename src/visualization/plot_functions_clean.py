@@ -74,7 +74,7 @@ def auc_plot(trues_list, probs_list, names, fontsize=14, \
         plt.show()
 
 def auc_plot_xy_pairs(model=MODELS[0],current_data='blood_culture_data/',\
-                      precision=100,n=100, a1=6,names=['48,24','24,12','12,6','6,3']):
+                      precision=100,n=100, a1=6,names=['48,24','24,12','12,6','6,3'],purpose='test'):
     """
         For each definition and fixed model, producing two AUC plots, one online prediction,one patien-level, across 4 different xy_pairs
 
@@ -113,9 +113,9 @@ def auc_plot_xy_pairs(model=MODELS[0],current_data='blood_culture_data/',\
    
     
         auc_plot(labels_list,probs_list,names=names,\
-                     save_name=Output_results+'auc_plot_instance_level_'+model+definition+'_test') 
+                     save_name=Output_results+'auc_plot_instance_level_'+model+definition+'_'+purpose) 
         auc_plot_patient_level(fprs_list,tprs_list,names=names,\
-                     save_name=Output_results+'auc_plot_patient_level_'+model+definition+'_test') 
+                     save_name=Output_results+'auc_plot_patient_level_'+model+definition+'_'+purpose) 
     
     
 #########################For CI ################################################
