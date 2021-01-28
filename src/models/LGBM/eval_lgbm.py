@@ -37,23 +37,22 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
     for x, y in x_y:
         
                                                                                                 
-        Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/' + purpose + '/'
+        Data_Dir = Root_Data + purpose + '/'
                                                                                                 
         for a1 in T_list:
             for definition in definitions:
                 
                 print(x, y, a1, definition)
                 
-                label= np.load(Data_Dir + 'label' + definition[1:] + '_' + str(a1) + '.npy')
-                feature = np.load(Data_Dir + 'james_features' + definition[1:] + '.npy')
+                label= np.load(Data_Dir + 'label' + '_'+str(x)+'_'+str(y) '_' + str(a1) + definition[1:] + '.npy')
+                feature = np.load(Data_Dir + 'james_features' +'_'+str(x)+'_'+str(y)+ definition[1:]+'.npy')
                 
                 model_dir=Model_Dir+str(x)+'_'+str(y)+'_'+str(a1)+definition[1:]+'.pkl'
                 print('Trained model from dic:',model_dir)
                 preds, prob_preds, auc, specificity, accuracy = lgbm_functions.model_training(model_dir, feature, label)
                 
                                                                                                 
-                np.save(Output_predictions+purpose + '/prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + '_' + definition[
-                                                                                                           1:] + '.npy',
+                np.save(Output_predictions+purpose + '/prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy',
                         prob_preds)
                 
                 results.append([str(x) + ',' + str(y), a1, definition, auc, specificity, accuracy])
