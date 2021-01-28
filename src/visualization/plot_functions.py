@@ -14,7 +14,7 @@ sys.path.insert(0, '../')
 import constants
 
 import src.features.sepsis_mimic3_myfunction as mimic3_myfunc
-import src.visualization.sepsis_mimic3_myfunction_patientlevel_clean as mimic3_myfunc_patientlevel
+import src.visualization.sepsis_mimic3_myfunction_patientlevel as mimic3_myfunc_patientlevel
 
 
 colors_barplot = sns.color_palette()
