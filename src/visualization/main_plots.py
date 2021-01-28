@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     labels_list_list = []
     probs_list_list = []
-    test_indices_list_list = []
+    indices_list_list = []
     icuid_sequence_list_list = []
 
     x, y, a1 = 24, 12, 6
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
         labels_list = []
         probs_list = []
-        test_indices_list = []
+        indices_list = []
         _, _, _, Output_predictions, _ = mimic3_myfunc.folders(current_data, model=model)
 
         for definition in constants.FEATURES:
@@ -70,11 +70,11 @@ if __name__ == '__main__':
 
             labels_list.append(labels_now)
             probs_list.append(probs_now)
-            test_indices_list.append(icustay_fullindices_now)
+            indices_list.append(icustay_fullindices_now)
 
         labels_list_list.append(labels_list)
         probs_list_list.append(probs_list)
-        test_indices_list_list.append(test_indices_list)
+        indices_list_list.append(indices_list)
 
     ######### Instance level auc plot/table #################
     print("--------------------------------Instance level now:--------------------------------")
