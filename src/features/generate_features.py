@@ -11,7 +11,7 @@ if __name__ == '__main__':
  
     purpose='test' ### Otherwise 'train'
         
-    Root_Data, _, _, _,_ = mimic3_myfunc.folders(current_data)
+    Root_Data, _, _,_ = mimic3_myfunc.folders(current_data)
     
     Save_Dir =  Root_Data+purpose+'/'
     
