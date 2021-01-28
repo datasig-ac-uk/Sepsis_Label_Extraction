@@ -36,7 +36,7 @@ if __name__ == '__main__':
                 
                 clf=LGBMClassifier(random_state=42).set_params(**best_paras_)
                 
-                model_dir=Model_Dir+'lgbm_best_paras'+definition[1:]+'_trained_model_fake.pkl'
+                model_dir=Model_Dir+'lgbm_best_paras'+definition[1:]+'_trained_model.pkl'
                 
                 lgbm_func.model_fit_saving(clf,features,labels, model_dir)
 
