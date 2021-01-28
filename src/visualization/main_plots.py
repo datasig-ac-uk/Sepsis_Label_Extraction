@@ -80,6 +80,7 @@ if __name__ == '__main__':
 
     names = ['H1', 'H2', 'H3']
     mean_fpr_list=[np.linspace(0, 1, 30) for i in range(3)]
+    
     print("------------Instance level AUC plots for three models------------")
     print('Now 95% CI:')
     fprs_lists, tprs_lists = plot_functions_clean.fprs_tprs_output(labels_list_list, probs_list_list,
