@@ -24,7 +24,7 @@ import visualization.table_functions_clean as table_functions_clean
 
 if __name__ == '__main__':
 
-    print("Collecting results at setting x,y,T=24,12,6 from three models",
+    print("Collecting results on test set at setting x,y,T=24,12,6 from three models",
           constants.MODELS[0], constants.MODELS[1], constants.MODELS[-1])
 
     current_data = 'blood_culture_data/'
@@ -76,11 +76,11 @@ if __name__ == '__main__':
         test_indices_list_list.append(test_indices_list)
 
     ######### Instance level auc plot/table #################
-    print("Instance level now:")
+    print("--------------------------------Instance level now:--------------------------------")
 
     names = ['H1', 'H2', 'H3']
     mean_fpr_list=[np.linspace(0, 1, 30) for i in range(3)]
-    print("Instance level AUC plots for three models.")
+    print("------------Instance level AUC plots for three models------------")
     print('Now 95% CI:')
     fprs_lists, tprs_lists = plot_functions_clean.fprs_tprs_output(labels_list_list, probs_list_list,
                                                                    n_bootstraps=n_bootstraps)
@@ -97,8 +97,8 @@ if __name__ == '__main__':
                                                             pd_save_name=Data_save_tables + "auc_instance_level_three_models_test")
 
     ######### Patient level auc plots/tables #################
-    print("Patient level now:")
-
+    print("--------------------------------Patient level now:--------------------------------")
+    print('Now 95% CI:')
     fprs_lists_par, tprs_lists_par, labels_list_par, probs_list_par = plot_functions_clean.fprs_tprs_output_patient_level(
         labels_list_list, \
         probs_list_list, \
@@ -135,6 +135,11 @@ if __name__ == '__main__':
     table_functions_clean.patient_level_output_pd_threemodels(accs_list_list, tprs_list_list, metric_required=[0.85], \
                                                               operator=lambda x: x, for_write=False, \
                                                               pd_save_name=Data_save_tables + "accuracy_patient_level_three_models_test")
+    
+    
+    print("Now, for each fixed model, and for each of three definitions, producing instance/patient-level auc plots across four different xy pairs.")
+    for model in MODELS:
+        patientlevel_clean.auc_plot_xy_pairs(model=model,purpose='test')
 
 
 
