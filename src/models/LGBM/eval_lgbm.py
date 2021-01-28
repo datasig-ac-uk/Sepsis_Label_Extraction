@@ -30,7 +30,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
     results = []
     data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
 #     config_dir = constants.MODELS_DIR + 'blood_only_data/LGBM/hyperparameter/config'
-    Root_Data, Model_Dir, Data_save, Output_predictions, Output_results = mimic3_myfunc.folders(data_folder,
+    Root_Data, Model_Dir, Data_save, Output_predictions, Output_results = mimic3_myfunc.folders(data_folder)
     purpose='test'
                                                                                                 
     results = []
