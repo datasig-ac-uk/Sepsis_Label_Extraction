@@ -24,7 +24,8 @@ import visualization.table_functions as table_functions
 
 if __name__ == '__main__':
     
-    purpose='test'
+    purpose='test' ##purpose can be 'test' or 'train'
+    
     print("Collecting results on " +purpose+" set at setting x,y,T=24,12,6 from three models",
           constants.MODELS[0], constants.MODELS[1], constants.MODELS[-1])
 
