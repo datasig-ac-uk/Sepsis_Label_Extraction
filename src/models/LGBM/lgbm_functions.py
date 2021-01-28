@@ -12,11 +12,11 @@ import features.sepsis_mimic3_myfunction as mimic3_myfunc
 
 
 ################################### LGBM tuning/training ########################################
-def feature_loading(Data_Dir, definition, a1, k=5, cv=True, save=True):
-    current_labels = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(a1) + '.npy')
-    feature_data = np.load(Data_Dir + 'james_features' + definition[1:] + '.npy')
-    icustay_lengths = np.load(Data_Dir + 'icustay_lengths' + definition[1:] + '.npy')
-    icustay_ids = np.load(Data_Dir + 'icustay_id' + definition[1:] + '.npy')
+def feature_loading(Data_Dir, definition, a1,x=24,y=12, k=5, cv=True, save=True):
+    current_labels = np.load(Data_Dir + 'label'+ '_' + str(x)+'_'+str(y)+'_'+str(a1) + definition[1:]  + '.npy')
+    feature_data = np.load(Data_Dir + 'james_features'+ '_' + str(x)+'_'+str(y) + definition[1:] + '.npy')
+    icustay_lengths = np.load(Data_Dir + 'icustay_lengths'+ '_' + str(x)+'_'+str(y) + definition[1:] + '.npy')
+    icustay_ids = np.load(Data_Dir + 'icustay_id' + '_' + str(x)+'_'+str(y)+ definition[1:] + '.npy')
     if cv:
         tra_patient_indices, tra_full_indices, val_patient_indices, val_full_indices = \
             mimic3_myfunc.cv_pack(icustay_lengths, k=k, definition=definition, path_save=Data_Dir, save=save)
@@ -148,11 +148,13 @@ def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, par
     return best_params_
 
 
-def feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition, a1, grid_parameters, n_iter=1000, k=5,
+def feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition, a1, grid_parameters, x=24,y=12, n_iter=1000, k=5,
                                  n_jobs=-1, scoring='roc_auc', save=True):
     current_labels, feature_data, _, tra_full_indices, _, val_full_indices = feature_loading(Data_Dir, \
                                                                                              definition, \
                                                                                              a1, \
+                                                                                             x=x,\
+                                                                                             y=y,\
                                                                                              k=k, \
                                                                                              save=save)
 
@@ -163,7 +165,7 @@ def feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition, a1, gri
         pickle.dump(lgbm_best_paras_, file)
 
 
-def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1, k=5, save=False):
+def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1,x=24,y=12, k=5, save=False):
     """
 
         features loading and model validating altogether for different culture
@@ -173,6 +175,8 @@ def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1, k=5, s
     current_labels, feature_data, _, tra_full_indices, _, val_full_indices = feature_loading(Data_Dir, \
                                                                                              definition, \
                                                                                              a1, \
+                                                                                             x=x,\
+                                                                                             y=y,\
                                                                                              k=5, \
                                                                                              save=save)
 
