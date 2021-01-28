@@ -217,7 +217,7 @@ def jamesfeature(df,Data_Dir='./',definition='t_sepsis_min',x=24,y=12,save=True)
         james_feature=lgbm_jm_transform(df)
 
         if save:
-            np.save(Data_Dir+'james_features'+'_'+str(x)+'_'+str(y)+definition[1:]+'.npy', james_feature)
+            np.save(Data_Dir+'james_features_'+str(x)+'_'+str(y)+definition[1:]+'.npy', james_feature)
 
         print('Size of james feature for definition', james_feature.shape)
 
@@ -375,11 +375,11 @@ def featureset_generator(path_df, Save_Dir, x=24, y=12, a2=0, T_list=constants.T
 
         print('save ICU Ids for data set')
         icuid_sequence = df_sepsis1.icustay_id.unique()
-        np.save(Save_Dir + 'icustay_id' +'_'+str(x)+'_'+str(y) + definition[1:]+'.npy', icuid_sequence)
+        np.save(Save_Dir + 'icustay_id_'+str(x)+'_'+str(y) + definition[1:]+'.npy', icuid_sequence)
 
         print('save ICU lengths for data set')
         icustay_lengths = list(df_sepsis1.groupby('icustay_id').size())
-        np.save(Save_Dir + 'icustay_lengths'  +'_'+str(x)+'_'+str(y) + definition[1:]+ '.npy', icustay_lengths)
+        np.save(Save_Dir + 'icustay_lengths_' +str(x)+'_'+str(y) + definition[1:]+ '.npy', icustay_lengths)
 
         print('save processed dataframe for lstm model')
         df_sepsis1.to_pickle(Save_Dir + definition[1:] + '_dataframe.pkl')
@@ -390,7 +390,7 @@ def featureset_generator(path_df, Save_Dir, x=24, y=12, a2=0, T_list=constants.T
         print('generate and save timeseries dataset for LSTM model input')
         dataset = timeseriesdataset_generator(icustay_lengths, features)
 
-        dataset.save(Save_Dir +'_'+str(x)+'_'+str(y) + definition[1:]+ '_ffill.tsd')
+        dataset.save(Save_Dir +str(x)+'_'+str(y) + definition[1:]+ '_ffill.tsd')
 
         print('gengerate and save labels')
         for T in T_list:
@@ -451,8 +451,8 @@ def dataframe_cv_pack(df_sepsis, k=5, x=24,y=12,definition='t_sepsis_min', path_
     """
     if not save:
 
-        icustay_lengths = np.load(path_save + 'icustay_lengths' +'_'+str(x)+'_'+str(y)+ definition[1:] + '.npy')
-        shuffled_indices = np.load(path_save + 'shuffled_indices'+'_'+str(x)+'_'+str(y) + definition[1:] + '.npy')
+        icustay_lengths = np.load(path_save + 'icustay_lengths_'+str(x)+'_'+str(y)+ definition[1:] + '.npy')
+        shuffled_indices = np.load(path_save + 'shuffled_indices_'+str(x)+'_'+str(y) + definition[1:] + '.npy')
         total_indices = len(shuffled_indices)
 
     else:
@@ -460,12 +460,12 @@ def dataframe_cv_pack(df_sepsis, k=5, x=24,y=12,definition='t_sepsis_min', path_
         total_indices = len(icustay_id)
 
         icustay_lengths = list(df_sepsis.groupby('icustay_id').size())
-        np.save(path_save + 'icustay_lengths' +'_'+str(x)+'_'+str(y) + definition[1:]+ '.npy', icustay_lengths)
+        np.save(path_save + 'icustay_lengths_'+str(x)+'_'+str(y) + definition[1:]+ '.npy', icustay_lengths)
 
         shuffled_indices = np.arange(total_indices)
         random.seed(42)
         random.shuffle(shuffled_indices)
-        np.save(path_save + 'shuffled_indices' +'_'+str(x)+'_'+str(y) + definition[1:]+ '.npy', shuffled_indices)
+        np.save(path_save + 'shuffled_indices_'+str(x)+'_'+str(y) + definition[1:]+ '.npy', shuffled_indices)
 
     # Getting the full indices
     icustay_fullindices = patient_idx(icustay_lengths)
@@ -491,7 +491,7 @@ def cv_pack(icustay_lengths, k=5, definition='t_sepsis_min',x=24,y=12, path_save
     """
     if not save:
 
-        shuffled_indices = np.load(path_save + 'shuffled_indices' +'_'+str(x)+'_'+str(y) + definition[1:]+ '.npy')
+        shuffled_indices = np.load(path_save + 'shuffled_indices_'+str(x)+'_'+str(y) + definition[1:]+ '.npy')
         total_indices = len(shuffled_indices)
 
     else:
@@ -499,7 +499,7 @@ def cv_pack(icustay_lengths, k=5, definition='t_sepsis_min',x=24,y=12, path_save
         shuffled_indices = np.arange(total_indices)
         random.seed(42)
         random.shuffle(shuffled_indices)
-        np.save(path_save + 'shuffled_indices' +'_'+str(x)+'_'+str(y) + definition[1:]+ '.npy', shuffled_indices)
+        np.save(path_save + 'shuffled_indices_'+str(x)+'_'+str(y) + definition[1:]+ '.npy', shuffled_indices)
 
     # Getting the full indices
     icustay_fullindices = patient_idx(icustay_lengths)
@@ -524,13 +524,13 @@ def icu_lengths(df_sepsis, definition='t_sepsis_min',x=24,y=12, path_save='./', 
     """
     if not save:
 
-        icustay_lengths = np.load(path_save + 'icustay_lengths' +'_'+str(x)+'_'+str(y) + definition[1:]+ '.npy')
+        icustay_lengths = np.load(path_save + 'icustay_lengths_'+str(x)+'_'+str(y) + definition[1:]+ '.npy')
 
     else:
         icustay_id = sorted(list(df_sepsis.icustay_id.unique()))
         total_indices = len(icustay_id)
         icustay_lengths = list(df_sepsis.groupby('icustay_id').size())
-        np.save(path_save + 'icustay_lengths'+'_'+str(x)+'_'+str(y) + definition[1:]+'.npy', icustay_lengths)
+        np.save(path_save + 'icustay_lengths_'+str(x)+'_'+str(y) + definition[1:]+'.npy', icustay_lengths)
 
     return icustay_lengths
 
@@ -595,7 +595,7 @@ def labels_generator(df, a1=6, x=24,y=12, Data_Dir='./', definition='t_sepsis_mi
     a = list((df[definition] - df.floored_charttime).dt.total_seconds() / 60 / 60 <= a1)
     label = np.array([int(a[i]) for i in range(len(a))])
     if save:
-        np.save(Data_Dir + 'label' + '_'+str(x)+'_'+str(y)+'_' + str(a1)  + definition[1:]+ '.npy', label)
+        np.save(Data_Dir + 'label_'+str(x)+'_'+str(y)+'_' + str(a1)  + definition[1:]+ '.npy', label)
     print('length of label', len(label))
 
     return label
