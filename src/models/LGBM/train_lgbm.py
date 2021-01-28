@@ -19,7 +19,7 @@ if __name__ == '__main__':
     a2,k=0,5
     x,y,a1=24,12,6
     current_data='blood_culture_data/'
-    Root_Data, Model_Dir, _, _, _ = mimic3_myfunc.folders(current_data, model='LGBM')
+    Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(current_data, model='LGBM')
 
  
     train_Dir=Root_Data+'train/'
