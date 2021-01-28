@@ -15,7 +15,7 @@ if __name__ == '__main__':
     x, y = 24, 12
     n_iter = 500
 
-    Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/cv/'
+    Data_Dir = Root_Data  + 'train/'
 
     print(Data_Dir)
 
