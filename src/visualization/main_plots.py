@@ -31,14 +31,16 @@ if __name__ == '__main__':
 
     current_data = 'blood_culture_data/'
     Root_Data = constants.DATA_processed + current_data
+    Root_Data, _, Output_predictions, Output_results=folders(current_data, model='LGBM')
+    
+    Data_Dir = Root_Data +purpose+'/'
+    print("Labels will be collected from ", Data_Dir)
+    print("The interim results will be collected from ", Output_predictions + purpose)
 
-    Data_Dir = Root_Data + 'experiments_24_12/'+purpose+'/'
-    print("The interim results will be collected from ", Data_Dir)
-
-    Data_save_plots = Root_Data + 'plots/'
+    Data_save_plots = Output_results+ purpose+'/plots/'
     mimic3_myfunc.create_folder(Data_save_plots)
 
-    Data_save_tables = Root_Data + 'tables/'
+    Data_save_tables = Output_results + purpose+ '/tables/'
     mimic3_myfunc.create_folder(Data_save_tables)
 
     labels_list_list = []
@@ -61,12 +63,11 @@ if __name__ == '__main__':
         _, _, _, Output_predictions, _ = mimic3_myfunc.folders(current_data, model=model)
 
         for definition in constants.FEATURES:
-            labels_now = np.load(Data_Dir + 'label' + definition[1:] + '_6.npy')
+            labels_now = np.load(Data_Dir + 'label_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] '.npy')
             probs_now = np.load(
-                Output_predictions + 'prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + '_' + definition[
-                                                                                                   1:] + '.npy')
+                Output_predictions + purpose+'/prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy')
 
-            icu_lengths_now = np.load(Data_Dir + 'icustay_lengths' + definition[1:] + '.npy')
+            icu_lengths_now = np.load(Data_Dir + 'icustay_lengths_' + str(x) + '_' + str(y) + definition[1:]+ '.npy')
             icustay_fullindices_now = patientlevel.patient_idx(icu_lengths_now)
 
             labels_list.append(labels_now)
@@ -83,19 +84,19 @@ if __name__ == '__main__':
     names = ['H1', 'H2', 'H3']
     mean_fpr_list=[np.linspace(0, 1, 30) for i in range(3)]
     
-    print("------------Instance level AUC plots for three models------------")
+    print("----------- AUC plots from three models for real-time classification------------")
     print('Now 95% CI:')
     fprs_lists, tprs_lists = plot_functions.fprs_tprs_output(labels_list_list, probs_list_list,
                                                              n_bootstraps=n_bootstraps)
 
     error_list = plot_functions.CI_std_output(fprs_lists, tprs_lists, mean_fpr_list=mean_fpr_list)
 
-    print("Plotting instance-level aucroc with CI for three models.")
+    print("Plotting aucroc with CI from three models from real-time classification.")
     plot_functions.auc_subplots_errorbars(labels_list_list,probs_list_list,error_list,names=names,\
                        mean_fpr_list=mean_fpr_list,save_name= Data_save_plots+'auc_IC_plot_instance_level_three_models_'+purpose)
 
 
-    print("Saving instance-level auc scores for three models.")
+    print("Saving auc scores from three models for real-time classification.")
     table_functions.instance_level_auc_pd_threemodels(labels_list_list, probs_list_list, \
                                                        pd_save_name=Data_save_tables + "auc_instance_level_three_models_"+purpose)
 
