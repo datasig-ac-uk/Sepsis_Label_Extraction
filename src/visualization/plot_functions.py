@@ -73,8 +73,8 @@ def auc_plot(trues_list, probs_list, names, fontsize=14, \
     else:
         plt.show()
 
-def auc_plot_xy_pairs(model=MODELS[0],current_data='blood_culture_data/',\
-                      precision=100,n=100, a1=6,names=['48,24','24,12','12,6','6,3'],purpose='test'):
+def auc_plot_xy_pairs(model=constants.MODELS[0],current_data='blood_culture_data/',\
+                      precision=100, n=100, a1=6,names=['48,24','24,12','12,6','6,3'],purpose='test'):
     """
         For each definition and fixed model, producing two AUC plots, one online prediction,one patien-level, across 4 different xy_pairs
 
@@ -83,17 +83,17 @@ def auc_plot_xy_pairs(model=MODELS[0],current_data='blood_culture_data/',\
     Root_Data,_,_,Output_predictions,Output_results=mimic3_myfunc.folders(current_data,model=model)
 
     
-    for definition in definitions:
+    for definition in constants.FEATURES:
 
         labels_list=[]
         probs_list=[]
         tprs_list=[]
         fprs_list=[]
         
-        for x,y in xy_pairs:
+        for x,y in constants.xy_pairs:
     
             print(definition,x,y,model)
-            Data_Dir = Root_Data + 'experiments_24_12/test/'
+            Data_Dir = Root_Data + 'experiments_'+str(x)+'_'+str(y)+'/'+purpose+'/'
         
         
             labels_now=np.load(Data_Dir+'label'+definition[1:]+'_'+str(x)+'_'+str(y)+'_'+str(a1)+'.npy')
