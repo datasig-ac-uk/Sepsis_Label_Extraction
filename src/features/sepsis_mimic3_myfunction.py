@@ -208,7 +208,7 @@ def dataframe_from_definition_discard(path_df, a1=4, a2=3, definition='t_sepsis_
 
     return df_merge2
 
-def jamesfeature(df,Data_Dir='./',definition='t_sepsis_min',save=True):
+def jamesfeature(df,Data_Dir='./',definition='t_sepsis_min',x=24,y=12,save=True):
 
         df['HospAdmTime']=(df['admittime'] - df['intime']).dt.total_seconds()/60/60
 
@@ -217,7 +217,7 @@ def jamesfeature(df,Data_Dir='./',definition='t_sepsis_min',save=True):
         james_feature=lgbm_jm_transform(df)
 
         if save:
-            np.save(Data_Dir+'james_features'+definition[1:]+'.npy', james_feature)
+            np.save(Data_Dir+'james_features'+definition[1:]+'_'+str(x)+'_'+str(y)'.npy', james_feature)
 
         print('Size of james feature for definition', james_feature.shape)
 
@@ -385,7 +385,7 @@ def featureset_generator(path_df, Save_Dir, x=24, y=12, a2=0, T_list=constants.T
         df_sepsis1.to_pickle(Save_Dir + definition[1:] + '_dataframe.pkl')
 
         print('generate and save input features')
-        features = jamesfeature(df_sepsis1, Data_Dir=Save_Dir, definition=definition)
+        features = jamesfeature(df_sepsis1, Data_Dir=Save_Dir, x=x,y=y,definition=definition)
 
         print('generate and save timeseries dataset for LSTM model input')
         dataset = timeseriesdataset_generator(icustay_lengths, features)
@@ -524,7 +524,7 @@ def icu_lengths(df_sepsis, definition='t_sepsis_min',x=24,y=12, path_save='./', 
     """
     if not save:
 
-        icustay_lengths = np.load(path_save + 'icustay_lengths' + definition[1:] + '.npy')
+        icustay_lengths = np.load(path_save + 'icustay_lengths' + definition[1:] +'_'+str(x)+'_'+str(y)+ '.npy')
 
     else:
         icustay_id = sorted(list(df_sepsis.icustay_id.unique()))
