@@ -30,22 +30,21 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
     results = []
     data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
 #     config_dir = constants.MODELS_DIR + 'blood_only_data/LGBM/hyperparameter/config'
-    Root_Data, Model_Dir, Data_save, Output_predictions, Output_results = mimic3_myfunc.folders(data_folder)
+    Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(data_folder)
     purpose='test'
-                                                                                                
+    Data_Dir = Root_Data + purpose + '/'                                                                              
+    
     results = []
     for x, y in x_y:
         
-                                                                                                
-        Data_Dir = Root_Data + purpose + '/'
-                                                                                                
+                                                                                                                                                                                        
         for a1 in T_list:
             for definition in definitions:
                 
                 print(x, y, a1, definition)
                 
-                label= np.load(Data_Dir + 'label' + '_'+str(x)+'_'+str(y) '_' + str(a1) + definition[1:] + '.npy')
-                feature = np.load(Data_Dir + 'james_features' +'_'+str(x)+'_'+str(y)+ definition[1:]+'.npy')
+                label= np.load(Data_Dir + 'label_' +str(x)+'_'+str(y) '_' + str(a1) + definition[1:] + '.npy')
+                feature = np.load(Data_Dir + 'james_features_'+str(x)+'_'+str(y)+ definition[1:]+'.npy')
                 
                 model_dir=Model_Dir+str(x)+'_'+str(y)+'_'+str(a1)+definition[1:]+'.pkl'
                 print('Trained model from dic:',model_dir)
