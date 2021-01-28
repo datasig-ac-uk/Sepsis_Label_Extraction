@@ -98,7 +98,7 @@ def auc_plot_xy_pairs(model=constants.MODELS[0],current_data='blood_culture_data
         
             labels_now=np.load(Data_Dir+'label'+definition[1:]+'_'+str(x)+'_'+str(y)+'_'+str(a1)+'.npy')
     
-            probs_now=np.load(Output_predictions+'prob_preds_'+str(x)+'_'+str(y)+'_'+str(a1)+'_'+definition[1:]+'.npy')
+            probs_now=np.load(Output_predictions+purpose+'/prob_preds_'+str(x)+'_'+str(y)+'_'+str(a1)+'_'+definition[1:]+'.npy')
     
             icu_lengths_now=np.load(Data_Dir+'icustay_lengths'+definition[1:]+'_'+str(x)+'_'+str(y)+'.npy')        
     
