@@ -22,7 +22,13 @@ if __name__ == '__main__':
       if purpose=='test':
         path_df = '/scratch/mimiciii/training_data/further_split/val_{}_{}.csv'.format(x, y)        
       elif purpose=='train':
-        path_df = '/scratch/mimiciii/training_data/further_split/train_{}_{}.csv'.format(x, y)    
+         
+        #path_df = '/scratch/mimiciii/training_data/further_split/train_{}_{}.csv'.format(x, y)          
+        if x!=48:
+                path_df_cv='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'
+        else:
+               path_df_cv='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20.csv'
+
       else:
         raise TypeError("purpose not recognised!")
  
