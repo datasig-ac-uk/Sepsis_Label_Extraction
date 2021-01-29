@@ -113,9 +113,9 @@ def auc_plot_xy_pairs(model=constants.MODELS[0],current_data='blood_culture_data
    
     
         auc_plot(labels_list,probs_list,names=names,\
-                     save_name=Output_results+'auc_plot_instance_level_'+model+definition+'_'+purpose) 
+                     save_name=Output_results+'auc_plot_instance_level_'+model+definition[1:]+'_'+purpose) 
         auc_plot_patient_level(fprs_list,tprs_list,names=names,\
-                     save_name=Output_results+'auc_plot_patient_level_'+model+definition+'_'+purpose) 
+                     save_name=Output_results+'auc_plot_patient_level_'+model+definition[1:]+'_'+purpose) 
     
     
 #########################For CI ################################################
