@@ -9,7 +9,7 @@ if __name__ == '__main__':
     
     current_data='blood_culture_data/'
  
-    purpose='test' ### Otherwise 'train'
+    purpose='train' ### Otherwise 'train'
         
     Root_Data, _, _,_ = mimic3_myfunc.folders(current_data)
     
@@ -17,24 +17,25 @@ if __name__ == '__main__':
     
     for x,y in xy_pairs:
     
-      a2 = 0
+        a2 = 0
         
-      if purpose=='test':
-        path_df = '/scratch/mimiciii/training_data/further_split/val_{}_{}.csv'.format(x, y)        
-      elif purpose=='train':
+        if purpose=='test':
+            path_df = '/scratch/mimiciii/training_data/further_split/val_{}_{}.csv'.format(x, y)  
+            
+        elif purpose=='train':
          
         #path_df = '/scratch/mimiciii/training_data/further_split/train_{}_{}.csv'.format(x, y)          
-        if x!=48:
-                path_df_cv='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'
-        else:
-               path_df_cv='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20.csv'
+            if x!=48:
+                  path_df_cv='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'
+            else:
+                  path_df_cv='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20.csv'
 
-      else:
-        raise TypeError("purpose not recognised!")
+        else:
+            raise TypeError("purpose not recognised!")
  
-      print('generate '+purpose+' features for sensitity {}_{} definition'.format(x, y))
+        print('generate '+purpose+' features for sensitity {}_{} definition'.format(x, y))
     
-      mimic3_myfunc.featureset_generator(path_df, Save_Dir, x=x, y=y, a2=a2, definitions=constants.FEATURES, T_list=constants.T_list)
+        mimic3_myfunc.featureset_generator(path_df, Save_Dir, x=x, y=y, a2=a2, definitions=constants.FEATURES, T_list=constants.T_list)
 
 
 """
