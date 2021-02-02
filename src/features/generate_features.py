@@ -15,11 +15,12 @@ if __name__ == '__main__':
     
     Save_Dir =  Root_Data+purpose+'/'
     
-    for x,y in xy_pairs:
+    a2=0
     
-        a2 = 0
-        
+    for x,y in constants.xy_pairs:
+
         if purpose=='test':
+            
             path_df = '/scratch/mimiciii/training_data/further_split/val_{}_{}.csv'.format(x, y)  
             
         elif purpose=='train':
