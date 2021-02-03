@@ -19,10 +19,10 @@ if __name__ == '__main__':
     a2,k=0,5
     x,y,a1=24,12,6
     current_data='blood_culture_data/'
-    Root_Data, Model_Dir, _, _, _ = mimic3_myfunc.folders(current_data, model='LGBM')
+    Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(current_data, model='LGBM')
 
  
-    train_Dir=Root_Data+'experiments_'+str(x)+'_'+str(y)+'/cv/'
+    train_Dir=Root_Data+'train/'
 
     for definition in constants.FEATURES:
         
@@ -36,7 +36,7 @@ if __name__ == '__main__':
                 
                 clf=LGBMClassifier(random_state=42).set_params(**best_paras_)
                 
-                model_dir=Model_Dir+'lgbm_best_paras'+definition[1:]+'_trained_model_fake.pkl'
+                model_dir=Model_Dir+'lgbm_best_paras'+definition[1:]+'_trained_model.pkl'
                 
                 lgbm_func.model_fit_saving(clf,features,labels, model_dir)
 

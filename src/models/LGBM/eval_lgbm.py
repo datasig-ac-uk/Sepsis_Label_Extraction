@@ -1,59 +1,93 @@
-import pickle
+import os
 import sys
 
-from lightgbm import LGBMClassifier
 import numpy as np
 import pandas as pd
+from sklearn.metrics import auc
 
 sys.path.insert(0, '../../')
 import constants
+from data.dataset import TimeSeriesDataset
+import omni.functions as omni_functions
+
 import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import visualization.sepsis_mimic3_myfunction_patientlevel import mimic3_myfunc_patientlevel
 import models.LGBM.lgbm_functions as lgbm_functions
+
+def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', thresholds=np.arange(10000) / 10000, fake_test=False):
+    """
+    This function compute evaluation on trained CoxPHM model, will save the prediction probability and numerical results
+    for both online predictions and patient level predictions in the outputs directoty.
+    :param T_list :(list of int) list of parameter T
+    :param x_y:(list of int)list of sensitivity parameter x and y
+    :param definitions:(list of str) list of definitions. e.g.['t_suspision','t_sofa','t_sepsis_min']
+    :param data_folder:(str) folder name specifying
+    :param train_test:(bool)True: evaluate the model on train set, False: evaluate the model on test set
+    :param thresholds:(np array) A discretized array of probability thresholds for patient level evaluation
+    :return: save prediction probability of online predictions, and save the results
+              (auc/specificity/accuracy) for both online predictions and patient level predictions
+    """
+    results = []
+    data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
+#     config_dir = constants.MODELS_DIR + 'blood_only_data/LGBM/hyperparameter/config'
+    Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(data_folder)
+    purpose='test'
+    Data_Dir = Root_Data + purpose + '/'                                                                              
+    
+    results = []
+    for x, y in x_y:
+        
+                                                                                                                                                                                        
+        for a1 in T_list:
+            for definition in definitions:
+                
+                print(x, y, a1, definition)
+                
+                label= np.load(Data_Dir + 'label_' +str(x)+'_'+str(y) '_' + str(a1) + definition[1:] + '.npy')
+                feature = np.load(Data_Dir + 'james_features_'+str(x)+'_'+str(y)+ definition[1:]+'.npy')
+                
+                model_dir=Model_Dir+str(x)+'_'+str(y)+'_'+str(a1)+definition[1:]+'.pkl'
+                print('Trained model from dic:',model_dir)
+                preds, prob_preds, auc, specificity, accuracy = lgbm_functions.model_training(model_dir, feature, label)
+                
+                                                                                                
+                np.save(Output_predictions+purpose + '/prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy',
+                        prob_preds)
+                
+                results.append([str(x) + ',' + str(y), a1, definition, auc, specificity, accuracy])
+                   
+                ############Patient level now ###############                                                                               
+                                                                                                
+                df_sepsis = pd.read_pickle(Data_Dir + definition[1:] + '_dataframe.pkl')                                                                              
+                CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient(df_sepsis, label, prob_preds, a1=6, thresholds=thresholds,
+                                                      sample_ids=None)     
+                                                                                                
+                tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
+
+                results_patient_level.append(
+                    [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(tnrs, tprs, metric_required=[0.85])),
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, tprs, metric_required=[0.85]))])
+                                                                                                
+                ############################################  
+    result_df = pd.DataFrame(results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'accuracy'])
+    result_df.to_csv(Output_predictions + purpose +'/lgbm_test_results.csv')
+    ############Patient level now ############### 
+
+    results_patient_level_df = pd.DataFrame(results_patient_level,
+                                            columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'accuracy'])
+
+    results_patient_level_df.to_csv(Output_results +  'lgbm_'+purpose+'_patient_level_results.csv')
+    ############################################ 
+
 
 if __name__ == '__main__':
 
-    a2, k = 0, 5
-    x, y = 24, 12
 
-    current_data = 'blood_culture_data/'
-    Root_Data, Model_Dir, _, Output_predictions, Output_results = mimic3_myfunc.folders(current_data,
-                                                                                        model=constants.MODELS[0])
+    data_folder = 'blood_only_data/'
 
-    results = []
-    for x, y in constants.xy_pairs:
-        Data_Dir_train = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
-        Data_Dir_test = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/test/'
-
-        for a1 in constants.T_list:
-
-            for definition in constants.FEATURES:
-                print(x, y, a1, definition)
-
-                label_train = np.load(Data_Dir_train + 'label' + definition[1:] + '_' + str(a1) + '.npy')
-                feature_train = np.load(Data_Dir_train + 'james_features' + definition[1:] + '.npy')
-
-                label_test = np.load(Data_Dir_test + 'label' + definition[1:] + '_' + str(a1) + '.npy')
-                feature_test = np.load(Data_Dir_test + 'james_features' + definition[1:] + '.npy')
-
-                with open(Model_Dir + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
-                    best_paras_ = pickle.load(file)
-
-                clf = LGBMClassifier(random_state=42).set_params(**best_paras_)
-
-                _, prob_preds_test, auc, specificity, accuracy = lgbm_functions.model_training(clf, feature_train,
-                                                                                               feature_test,
-                                                                                               label_train, label_test)
-
-                np.save(Output_predictions + 'prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + '_' + definition[
-                                                                                                           1:] + '.npy',
-                        prob_preds_test)
-                results.append([str(x) + ',' + str(y), a1, definition, auc, specificity, accuracy])
-
-    result_df = pd.DataFrame(results, columns=['x,y', 'a1', 'definition', 'auc', 'speciticity', 'accuracy'])
-    result_df.to_csv(Output_predictions + 'lgbm_test_results.csv')
-
-    mimic3_myfunc.main_result_tables(result_df, Output_results, model='lgbm', purpose='test')
-
-        
-
- 
+    eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder, fake_test=False)
+    data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
+    xy_pairs = [(24, 12)]
+    for data_folder in data_folder_list:
+        eval_LSTM([6], xy_pairs, constants.FEATURES, data_folder, fake_test=False)

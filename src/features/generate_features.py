@@ -2,12 +2,41 @@ import sys
 
 sys.path.insert(0, '../')
 import constants
-import features.sepsis_mimic3_myfunction as sepsis_mimic3
-
-
+import features.sepsis_mimic3_myfunction as mimic3_myfunc
 
 if __name__ == '__main__':
+   
+    
+    current_data='blood_culture_data/'
+ 
+    purpose='train' ### Otherwise 'train'
+        
+    Root_Data, _, _,_ = mimic3_myfunc.folders(current_data)
+    
+    Save_Dir =  Root_Data+purpose+'/'
+    
+    a2=0
+    
+    for x,y in constants.xy_pairs:
 
+        if purpose=='test':
+            
+            path_df = '/scratch/mimiciii/training_data/further_split/val_{}_{}.csv'.format(x, y)  
+            
+        elif purpose=='train':
+         
+        #path_df = '/scratch/mimiciii/training_data/further_split/train_{}_{}.csv'.format(x, y)          
+            if x!=48:
+                  path_df='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20_sensitivity_'+str(x)+'_'+str(y)+'.csv'
+            else:
+                  path_df='/scratch/mimiciii/training_data/metavision_sepsis_blood_only_data_08_10_20.csv'
+
+        else:
+            raise TypeError("purpose not recognised!")
+ 
+        print('generate '+purpose+' features for sensitity {}_{} definition'.format(x, y))
+    
+        mimic3_myfunc.featureset_generator(path_df, Save_Dir, x=x, y=y, a2=a2, definitions=constants.FEATURES, T_list=constants.T_list)
 
     a2 = 0
     # generate features for all x,y and T  for blood only data
