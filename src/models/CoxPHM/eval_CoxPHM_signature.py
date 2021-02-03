@@ -8,8 +8,8 @@ import constants
 import models.CoxPHM.coxphm_functions as coxphm_functions
 import omni.functions as omni_functions
 import features.sepsis_mimic3_myfunction as mimic3_myfunc
-from src.visualization.sepsis_mimic3_myfunction_patientlevel_clean import decompose_cms, output_at_metric_level
-from visualization.main_plots1 import suboptimal_choice_patient
+from src.visualization.sepsis_mimic3_myfunction_patientlevel import decompose_cms, output_at_metric_level
+from visualization.plot_functions import suboptimal_choice_patient
 
 
 def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
