@@ -58,10 +58,11 @@ if __name__ == '__main__':
     x_y = [(24, 12)]
     T_list = [4, 6, 8, 12]
 
-    data_folder_list = ['absolute_values/','strict_exclusion/','blood_only_data/','all_cultures/','no_gcs/']
+    data_folder_list = ['no_gcs/','strict_exclusion/','all_cultures/','absolute_values/']
     for data_folder in data_folder_list:
         train_CoxPHM(T_list,x_y,constants.FEATURES,data_folder,True,fake_test=False)
-
+    """
     x_y=[(48,24),(12,6),(6,3)]
     train_CoxPHM(T_list, x_y, constants.FEATURES, 'blood_only_data/', True, fake_test=False)
+    """
 
