@@ -163,6 +163,70 @@ def patient_level_performance(val_preds, labels_true, val_full_indices, a1=6):
     return confusion_matrix(true_septic_perpatient, preds_septic_perpatient), \
            sepsis_time_difference, preds_septic_perpatient
 
+def patient_level_pred(df, true_labels, pred_labels, T, sample_ids=None, cohort='full'):
+    """
+    :param df :(dataframe) test dataframe
+    :param true_labels :(array) array of true labels on test data
+    :param pred_labels : (array) array of predicted labels on test data
+    :param T: (int) left censor time
+    :param sample_ids: (array) array of patient ids to take subset of patients, None if we use the whole set.
+    :return: patient_true_label: (array) true labels at patient level
+             patient_pred_label: (array) predicted labels at patient level
+             CM : confusion matrix on the patient level prediction
+             pred_septic_time :(array) predicted sepsis time for each patient
+             true_septic_time: (array) true sepsis time for each patient
+    """
+    # construct data frame to store labels and predictions
+    data = {'id': df['icustay_id'].values, 'labels': true_labels, 'preds': pred_labels}
+    df_pred = pd.DataFrame.from_dict(data)
+    if sample_ids is not None:
+        df_pred = df_pred.loc[df_pred['id'].isin(sample_ids)]
+    df_pred['rolling_hours'] = np.ones(df_pred.shape[0])
+    df_pred['rolling_hours'] = df_pred.groupby('id')['rolling_hours'].cumsum()
+    patient_icustay = df_pred.groupby('id')['rolling_hours'].max()
+    patient_true_label = df_pred.groupby('id')['labels'].max()
+    patient_pred_label = df_pred.groupby('id')['preds'].max()
+
+    # get the predicted septic time and true septic time
+    pred_septic_time = df_pred[df_pred['preds'] == 1].groupby('id')['rolling_hours'].min() - 1
+    true_septic_time = df_pred[df_pred['labels'] == 1].groupby('id')['rolling_hours'].max() - 1
+    ids = 0
+    if cohort == 'correct_predicted':
+        ids = df_pred[(df_pred['preds'] == 1) & (df_pred['labels'] == 1)]['id'].unique()
+        df_pred1 = df_pred.loc[df_pred['id'].isin(ids)]
+        pred_septic_time = df_pred1[df_pred1['preds'] == 1].groupby('id')['rolling_hours'].min() - 1
+        true_septic_time = df_pred1[df_pred1['labels'] == 1].groupby('id')['rolling_hours'].min() - 1 + T
+
+    return patient_true_label, patient_pred_label.values, \
+           confusion_matrix(patient_true_label, patient_pred_label), \
+           pred_septic_time, true_septic_time, ids, patient_icustay
+
+def suboptimal_choice_patient_df(df, labels_true, prob_preds, a1=6, thresholds=np.arange(100)[1:-20] / 100,
+                              sample_ids=None):
+    """
+        Finding suboptimal solution by through different threshold for probability
+        Outputs:
+          1) a list of accuracy at different threshold
+          2) 3) a list of mean and std for error in predicted time to sepsis at different threshold
+                    (given that this patient having at least one predicted label 1)
+          4)a list of confusion matrices at different threshold
+          5)a list of the recognised ratio of septic patients in different bin of time to sepsis, namely, [>0,>6,>18], at different threshold
+    """
+
+    CMs = []
+    patient_pred_label_list = []
+    pred_septic_time_list = []
+    for thred in thresholds:
+        pred_labels = (prob_preds >= thred).astype('int')
+
+        _, patient_pred_label, CM, pred_septic_time, _, _, _ = patient_level_pred(df, labels_true, pred_labels, a1,
+                                                                                  sample_ids)
+
+        CMs.append(CM)
+        patient_pred_label_list.append(patient_pred_label)
+        pred_septic_time_list.append(pred_septic_time)
+
+    return CMs, patient_pred_label_list, pred_septic_time_list
 
 def suboptimal_choice_patient(labels_true, prob_preds, val_full_indices, \
                               a1=6, n=10, precision=100, discard=-1):
