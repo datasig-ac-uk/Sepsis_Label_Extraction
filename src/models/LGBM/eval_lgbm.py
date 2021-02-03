@@ -11,7 +11,7 @@ from data.dataset import TimeSeriesDataset
 import omni.functions as omni_functions
 
 import features.sepsis_mimic3_myfunction as mimic3_myfunc
-import visualization.sepsis_mimic3_myfunction_patientlevel import mimic3_myfunc_patientlevel
+import visualization.sepsis_mimic3_myfunction_patientlevel as mimic3_myfunc_patientlevel
 import models.LGBM.lgbm_functions as lgbm_functions
 
 def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', thresholds=np.arange(10000) / 10000, fake_test=False):
@@ -31,7 +31,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
     data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
 #     config_dir = constants.MODELS_DIR + 'blood_only_data/LGBM/hyperparameter/config'
     Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(data_folder)
-    purpose='test'
+    purpose=train_test
     Data_Dir = Root_Data + purpose + '/'                                                                              
     
     results = []
@@ -43,24 +43,22 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
                 
                 print(x, y, a1, definition)
                 
-                label= np.load(Data_Dir + 'label_' +str(x)+'_'+str(y) '_' + str(a1) + definition[1:] + '.npy')
+                label= np.load(Data_Dir + 'label_' +str(x)+'_'+str(y) +'_' + str(a1) + definition[1:] + '.npy')
                 feature = np.load(Data_Dir + 'james_features_'+str(x)+'_'+str(y)+ definition[1:]+'.npy')
                 
                 model_dir=Model_Dir+str(x)+'_'+str(y)+'_'+str(a1)+definition[1:]+'.pkl'
                 print('Trained model from dic:',model_dir)
                 preds, prob_preds, auc, specificity, accuracy = lgbm_functions.model_training(model_dir, feature, label)
                 
-                                                                                                
-                np.save(Output_predictions+purpose + '/prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy',
-                        prob_preds)
+                mimic3_myfunc.create_folder(Output_predictions+purpose)                                                                        
+                np.save(Output_predictions+purpose + '/prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy',prob_preds)
                 
                 results.append([str(x) + ',' + str(y), a1, definition, auc, specificity, accuracy])
                    
                 ############Patient level now ###############                                                                               
                                                                                                 
                 df_sepsis = pd.read_pickle(Data_Dir + definition[1:] + '_dataframe.pkl')                                                                              
-                CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient(df_sepsis, label, prob_preds, a1=6, thresholds=thresholds,
-                                                      sample_ids=None)     
+                CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(df_sepsis, label, prob_preds, a1=a1, thresholds=thresholds,sample_ids=None)     
                                                                                                 
                 tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
 
@@ -84,10 +82,10 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
 if __name__ == '__main__':
 
 
-    data_folder = 'blood_only_data/'
+    data_folder = 'blood_culture_data/'
 
-    eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder, fake_test=False)
-    data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
-    xy_pairs = [(24, 12)]
-    for data_folder in data_folder_list:
-        eval_LSTM([6], xy_pairs, constants.FEATURES, data_folder, fake_test=False)
+    eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder,train_test='train',  fake_test=False)
+#     data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
+#     xy_pairs = [(24, 12)]
+#     for data_folder in data_folder_list:
+#         eval_LSTM([6], xy_pairs, constants.FEATURES, data_folder, fake_test=False)
