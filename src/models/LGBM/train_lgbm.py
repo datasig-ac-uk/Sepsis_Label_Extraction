@@ -17,15 +17,15 @@ import models.LGBM.lgbm_functions as lgbm_func
 if __name__ == '__main__':
     
     a2,k=0,5
-    x,y,a1=24,12,6
     current_data='blood_culture_data/'
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(current_data, model='LGBM')
 
  
     train_Dir=Root_Data+'train/'
-
-    for definition in constants.FEATURES:
-        
+    for x,y in constants.xy_pairs:
+        for definition in constants.FEATURES:
+            for a1 in constants.T_list:        
+                
                 print(x,y,a1,definition)
                 labels,features,icustay_lengths, icustay_ids = lgbm_func.feature_loading(train_Dir,definition,\
                                                                                          a1,k=k, cv=False)
@@ -36,7 +36,7 @@ if __name__ == '__main__':
                 
                 clf=LGBMClassifier(random_state=42).set_params(**best_paras_)
                 
-                model_dir=Model_Dir+'lgbm_best_paras'+definition[1:]+'_trained_model.pkl'
+                model_dir=Model_Dir+str(x)+'_'+str(y)+'_'+str(a1)+definition[1:]+'.pkl'
                 
                 lgbm_func.model_fit_saving(clf,features,labels, model_dir)
 
