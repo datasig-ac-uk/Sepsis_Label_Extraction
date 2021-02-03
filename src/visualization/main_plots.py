@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     current_data = 'blood_culture_data/'
     Root_Data = constants.DATA_processed + current_data
-    Root_Data, _, Output_predictions, Output_results=folders(current_data, model='LGBM')
+    Root_Data, _, Output_predictions, Output_results= mimic3_myfunc.folders(current_data, model='LGBM')
     
     Data_Dir = Root_Data +purpose+'/'
     print("Labels will be collected from ", Data_Dir)
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         _, _, _, Output_predictions, _ = mimic3_myfunc.folders(current_data, model=model)
 
         for definition in constants.FEATURES:
-            labels_now = np.load(Data_Dir + 'label_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] '.npy')
+            labels_now = np.load(Data_Dir + 'label_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:]+ '.npy')
             probs_now = np.load(
                 Output_predictions + purpose+'/prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy')
 
@@ -143,7 +143,14 @@ if __name__ == '__main__':
     
     print("Now, for each fixed model, and for each of three definitions, producing instance/patient-level auc plots across four different xy pairs.")
     for model in constants.MODELS:
-        patientlevel.auc_plot_xy_pairs(model=model,purpose='purpose)
+        patientlevel.auc_plot_xy_pairs(model=model,purpose='purpose')
+
+    purpose='test'
+    plot_functions.auc_plots(definition_list=constants.FEATURES,model_list=constants.MODELS,save_dir=constants.OUTPUT_DIR + 'plots/',T=6,train_test=purpose)
+    print('produce sepsis onset time plots')
+    plot_functions.sepsis_onset_time_plots(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/',
+                                strict_exclusion=False)
+
 
 
 

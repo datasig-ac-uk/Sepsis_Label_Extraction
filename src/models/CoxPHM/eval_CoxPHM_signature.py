@@ -8,12 +8,12 @@ import constants
 import models.CoxPHM.coxphm_functions as coxphm_functions
 import omni.functions as omni_functions
 import features.sepsis_mimic3_myfunction as mimic3_myfunc
-from src.visualization.sepsis_mimic3_myfunction_patientlevel_clean import decompose_cms, output_at_metric_level
-from visualization.main_plots1 import suboptimal_choice_patient
+from src.visualization.sepsis_mimic3_myfunction_patientlevel import decompose_cms, output_at_metric_level
+from visualization.plot_functions import suboptimal_choice_patient
 
 
 def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
-                thresholds=np.arange(10000) / 10000, fake_test=False):
+                thresholds=np.arange(1000) / 1000, fake_test=False):
     """
     This function compute evaluation on trained CoxPHM model, will save the prediction probability and numerical results
     for both online predictions and patient level predictions in the outputs directoty.
@@ -66,6 +66,7 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
                 CMs, _, _ = suboptimal_choice_patient(df_sepsis, labels, preds, a1=6, thresholds=thresholds,
                                                       sample_ids=None)
                 tprs, tnrs, fnrs, pres, accs = decompose_cms(CMs)
+                print(output_at_metric_level(tnrs, tprs, metric_required=[0.85]))
 
                 results_patient_level.append(
                     [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
@@ -84,10 +85,11 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
 
 
 if __name__ == '__main__':
-    train_test = 'test'
+    train_test = 'train'
 
-    data_folder = 'blood_only_data/'
-    eval_CoxPHM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder, train_test, signature=True, fake_test=True)
+    #data_folder = 'blood_only_data/'
+    #eval_CoxPHM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder, train_test, signature=True, fake_test=False)
+
     data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
     for data_folder in data_folder_list:
-        eval_CoxPHM([6], constants.xy_pairs, constants.FEATURES, data_folder, train_test, signature=True, fake_test=True)
+        eval_CoxPHM([6], [(24, 12)], constants.FEATURES, data_folder, train_test, signature=True, fake_test=False)

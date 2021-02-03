@@ -66,10 +66,11 @@ if __name__ == '__main__':
     print(os.environ["CUDA_VISIBLE_DEVICES"])
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
-    xy_pairs=[(48,24),(12,6),(6,3)]
+
     definitions = ['t_sofa','t_suspicion','t_sepsis_min']
-    #train_LSTM(T_list, xy_pairs, definitions, data_folder='blood_only_data/', fake_test=False)
+    #train_LSTM(constants.T_list, xy_pairs, definitions, data_folder='blood_only_data/', fake_test=False)
+
     xy_pairs = [(24,12)]
     data_folder_list = ['absolute_values/','strict_exclusion/','all_cultures/','no_gcs/']
     for data_folder in data_folder_list:
-        train_LSTM(constants.T_list, xy_pairs, definitions, data_folder=data_folder_list, fake_test=False)
+        train_LSTM([6], xy_pairs, definitions, data_folder=data_folder_list, fake_test=False)
