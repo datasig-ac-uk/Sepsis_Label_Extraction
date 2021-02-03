@@ -22,6 +22,10 @@ var/
 *.egg
 /venv
 
+#folders
+data/
+models/
+outputs/
 
 # Installer logs
 pip-log.txt

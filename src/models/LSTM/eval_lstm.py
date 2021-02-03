@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.metrics import auc
 import torch
 
-from visualization.main_plots1 import suboptimal_choice_patient
+from visualization.plot_functions import suboptimal_choice_patient
 
 sys.path.insert(0, '../../')
 import constants
@@ -15,7 +15,7 @@ import omni.functions as omni_functions
 import models.LSTM.lstm_functions as lstm_functions
 from models.nets import LSTM
 import features.sepsis_mimic3_myfunction as mimic3_myfunc
-from visualization.sepsis_mimic3_myfunction_patientlevel_clean import decompose_cms, output_at_metric_level
+from visualization.sepsis_mimic3_myfunction_patientlevel import decompose_cms, output_at_metric_level
 
 
 def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.arange(10000) / 10000, fake_test=False):
@@ -100,14 +100,15 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
 
 
 if __name__ == '__main__':
-    # os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     # print(os.environ["CUDA_VISIBLE_DEVICES"])
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
-    data_folder = 'blood_only_data/'
+    #data_folder = 'blood_only_data/'
 
-    eval_LSTM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder, train_test='test', fake_test=True)
+    #eval_LSTM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder, train_test='train', fake_test=False)
+
     data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
     xy_pairs = [(24, 12)]
     for data_folder in data_folder_list:
-        eval_LSTM([6], xy_pairs, constants.FEATURES, data_folder, train_test='test', fake_test=True)
+        eval_LSTM([6], xy_pairs, constants.FEATURES, data_folder, train_test='train', fake_test=False)
