@@ -8,7 +8,7 @@ from src.visualization.sepsis_mimic3_myfunction_patientlevel_clean import decomp
 import features.sepsis_mimic3_myfunction as mimic3_myfunc
 import constants
 import seaborn as sns
-
+from visualization.plot_functions_clean import auc_plot
 
 def patient_level_pred(df, true_labels, pred_labels, T, sample_ids=None, cohort='full'):
     """
@@ -214,8 +214,8 @@ def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save
     definitions = ['t_sofa', 't_suspicion', 't_sepsis_min']
     models = ['LGBM', 'LSTM', 'CoxPHM']
     current_data = 'blood_only_data/'
-    Root_Data = constants.DATA_processed + 'fake_test/' + current_data + 'experiments_' + str(x) + '_' + str(y) + '/test/'
-    Output_Data = constants.OUTPUT_DIR + 'predictions/fake_test1/' + current_data
+    Root_Data = constants.DATA_processed  + current_data + 'experiments_' + str(x) + '_' + str(y) + '/test/'
+    Output_Data = constants.OUTPUT_DIR + 'predictions/' + current_data
     thresholds = np.arange(precision) / precision
 
     if strict_exclusion:
@@ -238,7 +238,7 @@ def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save
         current_label = np.load(Root_Data + 'label' + definition[1:] + '_' + str(T) + '.npy')
         for model in models:
             prob_preds = np.load(
-                Output_Data + model + '/' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
+                Output_Data + model + '/' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:]+'_test' + '.npy')
 
             CMs, patient_pred_label_list, pred_septic_time_list = suboptimal_choice_patient(df_sepsis1, current_label,
                                                                                             prob_preds, a1=6,
@@ -265,8 +265,8 @@ def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save
     time_difference_dist_definitions(true_septic_time_list, identified_pred_sepsis_time,
                                      time_grid=[0, 6, 12, 18, 24, 30, 36, 42, 48], save_dir=save_dir)
 
-    median_time_difference(true_septic_time_list, identified_pred_sepsis_time, time_grid=np.arange(6, 16),
-                           save_dir=save_dir)
+    #median_time_difference(true_septic_time_list, identified_pred_sepsis_time, time_grid=np.arange(6, 16),
+              #             save_dir=save_dir)
     median_time_difference_interval(true_septic_time_list, identified_pred_sepsis_time,
                                     time_grid=[(4, 6), (6, 8), (8, 10), (10, 12),
                                                (12, 14), (14, 300)], save_dir=save_dir)
@@ -575,6 +575,7 @@ def proprotion_HBO_line_plot(patient_true_label_list, true_septic_time_list, ide
     return pd.DataFrame.from_dict(data_dict1)
 
 
+
 if __name__ == '__main__':
-    plot_venn(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/')
-    sepsis_onset_time_plots(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/')
+    #plot_venn(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/')
+    sepsis_onset_time_plots(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/',strict_exclusion=False)
