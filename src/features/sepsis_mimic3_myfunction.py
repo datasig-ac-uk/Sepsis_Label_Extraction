@@ -382,7 +382,7 @@ def featureset_generator(path_df, Save_Dir, x=24, y=12, a2=0, T_list=constants.T
         np.save(Save_Dir + 'icustay_lengths_' +str(x)+'_'+str(y) + definition[1:]+ '.npy', icustay_lengths)
 
         print('save processed dataframe for lstm model')
-        df_sepsis1.to_pickle(Save_Dir + definition[1:] + '_dataframe.pkl')
+        df_sepsis1.to_pickle(Save_Dir + +str(x)+'_'+str(y) +definition[1:] + '_dataframe.pkl')
 
         print('generate and save input features')
         features = jamesfeature(df_sepsis1, Data_Dir=Save_Dir, x=x,y=y,definition=definition)
