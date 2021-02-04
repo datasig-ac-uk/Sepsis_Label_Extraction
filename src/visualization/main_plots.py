@@ -144,9 +144,11 @@ if __name__ == '__main__':
     print("Now, for each fixed model, and for each of three definitions, producing instance/patient-level auc plots across four different xy pairs.")
     for model in constants.MODELS:
         patientlevel.auc_plot_xy_pairs(model=model,purpose='purpose')
-######################################  To produce FIgure 5,6  ###################################
+        
+######################################  To produce AUC FIgures of LSTM/COXPHM ###################################
     purpose='test'
     plot_functions.auc_plots(definition_list=constants.FEATURES,model_list=constants.MODELS,save_dir=constants.OUTPUT_DIR + 'plots/',T=6,train_test=purpose)
+######################################  To produce FIgure 5,6  ###################################
     print('produce sepsis onset time plots')
     plot_functions.sepsis_onset_time_plots(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/',
                                 strict_exclusion=False)
