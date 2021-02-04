@@ -77,7 +77,7 @@ if __name__ == '__main__':
         labels_list_list.append(labels_list)
         probs_list_list.append(probs_list)
         indices_list_list.append(indices_list)
-
+######################################  To produce FIgure 4, F.1, F.2 ###################################
     ######### Instance level auc plot/table #################
     print("--------------------------------Instance level now:--------------------------------")
 
@@ -140,11 +140,11 @@ if __name__ == '__main__':
                                                         operator=lambda x: x, for_write=False, \
                                                         pd_save_name=Data_save_tables + "accuracy_patient_level_three_models_"+purpose)
     
-    
+######################################  To produce FIgure 7,8 ###################################    
     print("Now, for each fixed model, and for each of three definitions, producing instance/patient-level auc plots across four different xy pairs.")
     for model in constants.MODELS:
         patientlevel.auc_plot_xy_pairs(model=model,purpose='purpose')
-
+######################################  To produce FIgure 5,6  ###################################
     purpose='test'
     plot_functions.auc_plots(definition_list=constants.FEATURES,model_list=constants.MODELS,save_dir=constants.OUTPUT_DIR + 'plots/',T=6,train_test=purpose)
     print('produce sepsis onset time plots')
