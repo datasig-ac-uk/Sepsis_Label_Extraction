@@ -8,7 +8,7 @@ import features.sepsis_mimic3_myfunction as mimic3_myfunc
 import models.LGBM.lgbm_functions as lgbm_func
 
 if __name__ == '__main__':
-    current_data = 'blood_culture_data/'
+    current_data = 'blood_only/'
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(current_data, model=constants.MODELS[0])
 
     a1, a2, k = 6, 0, 5
