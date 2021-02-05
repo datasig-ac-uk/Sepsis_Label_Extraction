@@ -27,7 +27,7 @@ def create_folder(path):
 
 
 def folders(current_data, model='LGBM'):
-    Root_Data = constants.DATA_processed + current_data
+    Root_Data = constants.DATA_processed + current_data+'/'
 
     Model_Dir = constants.MODELS_DIR + current_data + model + '/'
     create_folder(Model_Dir)
