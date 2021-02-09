@@ -64,10 +64,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
                 CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(df_sepsis, label, prob_preds, a1=a1, thresholds=thresholds,sample_ids=None)     
                                                                                                 
                 tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
-                print(1-tnrs)
-                print(tprs)
-                print
-                print(auc(1 - tnrs, tprs))
+
                 results_patient_level.append(
                     [str(x) + ',' + str(y), a1, definition, "{:.3f}".format(metrics.auc(1 - tnrs, tprs)),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(tnrs, tprs, metric_required=[0.85])),
