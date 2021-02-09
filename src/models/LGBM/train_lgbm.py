@@ -17,7 +17,7 @@ import models.LGBM.lgbm_functions as lgbm_func
 if __name__ == '__main__':
     
     a2,k=0,5
-    current_data='blood_culture_data/'
+    current_data='blood_only/'
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(current_data, model='LGBM')
 
  
