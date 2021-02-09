@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
     data_folder = 'blood_only/'
 
-    eval_LGBM(constants.T_list[2:3], constants.xy_pairs[1:2], constants.FEATURES[:1], data_folder,train_test='train',  fake_test=False)
+    eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder,train_test='train',  fake_test=False)
 #     data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
 #     xy_pairs = [(24, 12)]
 #     for data_folder in data_folder_list:
