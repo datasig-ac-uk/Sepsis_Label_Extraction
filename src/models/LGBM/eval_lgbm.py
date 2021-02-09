@@ -3,7 +3,8 @@ import sys
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import auc
+from sklearn import metrics
+
 
 sys.path.insert(0, '../../')
 import constants
@@ -28,13 +29,15 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
               (auc/specificity/accuracy) for both online predictions and patient level predictions
     """
     results = []
+    results_patient_level= []
+    
     data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
 #     config_dir = constants.MODELS_DIR + 'blood_only_data/LGBM/hyperparameter/config'
     Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(data_folder)
     purpose=train_test
     Data_Dir = Root_Data + purpose + '/'                                                                              
     
-    results = []
+    
     for x, y in x_y:
         
                                                                                                                                                                                         
@@ -54,16 +57,19 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
                 np.save(Output_predictions+purpose + '/prob_preds_' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy',prob_preds)
                 
                 results.append([str(x) + ',' + str(y), a1, definition, auc, specificity, accuracy])
-                   
+              
                 ############Patient level now ###############                                                                               
                                                                                                 
-                df_sepsis = pd.read_pickle(Data_Dir + definition[1:] + '_dataframe.pkl')                                                                              
+                df_sepsis = pd.read_pickle(Data_Dir + str(x) + '_' + str(y)+definition[1:] + '_dataframe.pkl')                                                                              
                 CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(df_sepsis, label, prob_preds, a1=a1, thresholds=thresholds,sample_ids=None)     
                                                                                                 
                 tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
-
+                print(1-tnrs)
+                print(tprs)
+                print
+                print(auc(1 - tnrs, tprs))
                 results_patient_level.append(
-                    [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
+                    [str(x) + ',' + str(y), a1, definition, "{:.3f}".format(metrics.auc(1 - tnrs, tprs)),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(tnrs, tprs, metric_required=[0.85])),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, tprs, metric_required=[0.85]))])
                                                                                                 
@@ -82,9 +88,9 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
 if __name__ == '__main__':
 
 
-    data_folder = 'blood_culture_data/'
+    data_folder = 'blood_only/'
 
-    eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder,train_test='train',  fake_test=False)
+    eval_LGBM(constants.T_list[2:3], constants.xy_pairs[1:2], constants.FEATURES[:1], data_folder,train_test='train',  fake_test=False)
 #     data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
 #     xy_pairs = [(24, 12)]
 #     for data_folder in data_folder_list:
