@@ -29,7 +29,7 @@ if __name__ == '__main__':
     print("Collecting results on " +purpose+" set at setting x,y,T=24,12,6 from three models",
           constants.MODELS[0], constants.MODELS[1], constants.MODELS[-1])
 
-    current_data = 'blood_culture_data/'
+    current_data = 'blood_only/'
     Root_Data = constants.DATA_processed + current_data
     Root_Data, _, Output_predictions, Output_results= mimic3_myfunc.folders(current_data, model='LGBM')
     
