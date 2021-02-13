@@ -72,7 +72,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
                                                                                                 
                 ############################################  
     result_df = pd.DataFrame(results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'accuracy'])
-    result_df.to_csv(Output_predictions + purpose +'/lgbm_test_results.csv')
+    result_df.to_csv(Output_predictions + purpose +'/lgbm_'+purpose+'_results.csv')
     ############Patient level now ############### 
 
     results_patient_level_df = pd.DataFrame(results_patient_level,
