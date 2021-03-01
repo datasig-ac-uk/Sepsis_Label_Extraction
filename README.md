@@ -1,7 +1,14 @@
-Mimic3_Sepsis_Label_Extraction
+Variation of sepsis-III definitions influencespredictive performance of machine learning
 ==============================
 
-A short description of the project.
+We consider the effects of variations in onset definition on performance of models for early sepsis detection. 
+
+Data
+------------
+
+Data is extracted from the MIMIC-III database.
+Sepsis was identified from the coincident occurrence of organ dysfunction and blood cultures within an appropriate time-frame.
+
 
 Project Organization
 ------------
