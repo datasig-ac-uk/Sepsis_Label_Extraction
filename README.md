@@ -5,8 +5,8 @@ We consider the effects of variations in onset definition on performance of mode
 
 Data
 ------------
-
 Data is extracted from the MIMIC-III database.
+
 
 
 
@@ -71,3 +71,19 @@ Create a new environment and run
 ```
 pip install -r requirements.txt
 ```
+Raw Data  
+------------
+You may indicate where the raw data is stored by making changes to 'MIMIC_DATA_DIRS' in 'src/constants.py' 
+
+
+Feature extraction and model tuning/evaluation (LGBM for example)
+------------
+
+```
+python3 src/features/generate_features.py
+python src/models/LGBM/lgbm_tune.py
+python src/models/LGBM/train_lgbm.py
+python src/models/LGBM/eval_lgbm.py
+
+```
+
