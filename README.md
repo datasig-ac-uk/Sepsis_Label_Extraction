@@ -67,3 +67,8 @@ Project Organization
 Enviroment Setup
 ------------
 
+Create a new environment and run
+```
+pip install -r requirements.txt
+
+```
