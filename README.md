@@ -86,7 +86,7 @@ python src/models/LGBM/train_lgbm.py
 python src/models/LGBM/eval_lgbm.py
 ```
 
-Illustration (LGBM for example)
+Illustration
 ------------
 ```
 src/visualization/main_plots.py 
