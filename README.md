@@ -1,13 +1,13 @@
 Variation of sepsis-III definitions influencespredictive performance of machine learning
 ==============================
 
-We consider the effects of variations in onset definition on performance of models for early sepsis detection. 
+We consider the effects of variations in onset definition on performance of models for early sepsis detection, namely, LGBM, LSTM and Cox proportional-harzard models. 
 
 Data
 ------------
 
 Data is extracted from the MIMIC-III database.
-Sepsis was identified from the coincident occurrence of organ dysfunction and blood cultures within an appropriate time-frame.
+
 
 
 Project Organization
@@ -62,3 +62,8 @@ Project Organization
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+
+Enviroment Setup
+------------
+
