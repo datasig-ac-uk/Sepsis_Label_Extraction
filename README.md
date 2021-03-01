@@ -81,13 +81,13 @@ Feature extraction and model tuning/evaluation (LGBM for example)
 
 ```
 python3 src/features/generate_features.py
-python src/models/LGBM/lgbm_tune.py
-python src/models/LGBM/train_lgbm.py
-python src/models/LGBM/eval_lgbm.py
+python3 src/models/LGBM/lgbm_tune.py
+python3 src/models/LGBM/train_lgbm.py
+python3 src/models/LGBM/eval_lgbm.py
 ```
 
 Illustration
 ------------
 ```
-src/visualization/main_plots.py 
+python3 src/visualization/main_plots.py 
 ```
