@@ -1,4 +1,4 @@
-Variation of sepsis-III definitions influencespredictive performance of machine learning
+Variation of sepsis-III definitions influences predictive performance of machine learning
 ==============================
 
 We consider the effects of variations in onset definition on performance of models for early sepsis detection, namely, LGBM, LSTM and Cox proportional-harzard models. 
@@ -84,7 +84,7 @@ python3 src/features/generate_features.py
 ```
 This commmand will generate list of features which are required for model implementaion and the they will be saved in data/processed.   
 
-model tuning/training/evaluation 
+Model tuning/training/evaluation 
 ------------
 run the main.py script in src/models with two arguments: model:'LGMB','LSTM','CoxPHM' and process:'train','tune','eval', e.g. For train a LGBM model:
 ```
