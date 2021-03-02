@@ -81,13 +81,23 @@ Feature extraction and model tuning/evaluation (LGBM for example)
 
 ```
 python3 src/features/generate_features.py
-python3 src/models/LGBM/lgbm_tune.py
-python3 src/models/LGBM/train_lgbm.py
-python3 src/models/LGBM/eval_lgbm.py
 ```
+This commmand will generate list of features which are required for model implementaion and the they will be saved in data/processed.   
 
-Illustration
+model tuning/training/evaluation 
 ------------
+run the main.py script in src/models with two arguments: model:'LGMB','LSTM','CoxPHM' and process:'train','tune','eval', e.g. For train a LGBM model:
+```
+python3 src/models/main.py --model 'LGBM' --process 'train'
+```
+Hyperparameter tuning, model training and evaluation should be done in sequence as follows:
+1. Running the tuning step will compute and save the optimised hyperparameter for later use on model training and evaluation.
+2. Then model is trained and saved in /model/ directory for later use on evaluation.
+3. Evaluation will produce numerical results and predictions, which are saved in outputs/results and outputs/predictions respectively. 
+
+Illustration 
+------------
+In order to reproduce all the plots in the paper, run the following command after obtaining all predictions from model evaluation step.   
 ```
 python3 src/visualization/main_plots.py 
 ```
