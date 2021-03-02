@@ -9,7 +9,7 @@ sys.path.insert(0, '../../')
 import constants
 from data.dataset import TimeSeriesDataset
 from models.nets import LSTM
-import models.LSTM.lstm_functions as lstm_functions
+import models.LSTM.LSTM_functions as lstm_functions
 import omni.functions as omni_functions
 import features.sepsis_mimic3_myfunction as mimic3_myfunc
 
