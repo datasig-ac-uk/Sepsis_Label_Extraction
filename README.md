@@ -76,7 +76,7 @@ Raw Data
 You may indicate where the raw data is stored by making changes to `MIMIC_DATA_DIRS` in `src/constants.py`.
 
 
-Feature extraction and model tuning/evaluation (LGBM for example)
+Feature extraction
 ------------
 
 ```
