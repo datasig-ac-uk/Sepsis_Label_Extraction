@@ -17,17 +17,18 @@ def features_wrapper(data_list, x_y_list, purpose):
     for current_data in data_list:
         root_dir, _, _, _ = mimic3_myfunc.folders(current_data)
         save_dir = root_dir + purpose + '/'
+        path_prefix = constants.MIMIC_DATA_DIRS[current_data][purpose]
                     
         for x, y in x_y_list:
             if purpose == 'test':
                 #TODO ask Lingyi to about the file name of the test data
-                path_df = constants.MIMIC_DATA_DIRS[current_data] + '_08_10_20_sensitivity_' + str(x) + '_' + str(y) + '.csv'
+                path_df = path_prefix + '_08_10_20_sensitivity_' + str(x) + '_' + str(y) + '.csv'
 
             elif purpose == 'train':
                 if x==48:
-                    path_df = constants.MIMIC_DATA_DIRS[current_data] +  '_08_10_20.csv'
+                    path_df = path_prefix + '_08_10_20.csv'
                 else:
-                    path_df = constants.MIMIC_DATA_DIRS[current_data] + '_08_10_20_sensitivity_' + str(x) + '_' + str(y) + '.csv'
+                    path_df = path_prefix + '_08_10_20_sensitivity_' + str(x) + '_' + str(y) + '.csv'
             else:
                 raise TypeError("purpose not recognised!")
 
