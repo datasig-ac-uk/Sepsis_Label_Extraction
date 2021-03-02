@@ -13,7 +13,7 @@ import omni.functions as omni_functions
 
 import features.sepsis_mimic3_myfunction as mimic3_myfunc
 import visualization.sepsis_mimic3_myfunction_patientlevel as mimic3_myfunc_patientlevel
-import models.LGBM.lgbm_functions as lgbm_functions
+import models.LGBM.LGBM_functions as lgbm_functions
 
 def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', thresholds=np.arange(10000) / 10000, fake_test=False):
     """
