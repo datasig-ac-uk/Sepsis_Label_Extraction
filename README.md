@@ -1,7 +1,7 @@
 Variation of sepsis-III definitions influences predictive performance of machine learning
 ==============================
 
-We consider the effects of variations in onset definition on performance of models for early sepsis detection, namely, LGBM, LSTM and Cox proportional-harzard models. 
+We consider the effects of variations in onset definition on performance of three representative models, i.e. Light gradient boosting machine (LGBM), Long short term memory (LSTM) and Cox proportional-harzard models (CoxPHM) for early sepsis detection. 
 
 Data
 ------------
