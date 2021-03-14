@@ -493,7 +493,7 @@ def auc_subplots_errorbars(trues_list, probs_list, error_lists, names, \
         mean_tpr = np.interp(mean_fpr_list[i], fpr, tpr)
         plt.plot(mean_fpr_list[i], mean_tpr, color=colors_line[i], \
                  #                     lw=lw,linestyle=linestyles[i],label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
-                 lw=lw, linestyle=linestyles[i], label=names[i] + ' (area = %0.2f)' % roc_auc)
+                 lw=lw, linestyle=linestyles[i], label='ROC curve for ' +names[i] + ' (area = %0.2f)' % roc_auc)
 
         #         plt.errorbar(mean_fpr_list[i], mean_tpr, error_lists[-1][i], color=colors[i],\
         #                     lw=lw,linestyle=linestyles[i],label='ROC curve for '+names[i] +' (area = %0.2f)' % roc_auc)
