@@ -1,4 +1,9 @@
 /* 
+
+This code is almost identical to pivoted-sofa-mod.sql, the only difference here is that we are no longer adding the GCS/CNS component of the SOFA score onto the total (it is still being computed, just not being added to SOFA_24hours in the score_final table).
+
+The rationale for this is that there are difference practices for unconscious/ventilated patients. If different people recording data on the same patient has systematic differences, this may cause an artificial increase in SOFA scores.
+
 This is also adapted from the version in the repository MIT-LCP, written by Alistair Johnson. We use a couple of amended tables here.
 
 We are using forward filled values for the labs.
@@ -45,8 +50,8 @@ The following is a description of SOFA by Alistair (with a couple of changes to 
 -- Note:
 --  The score is calculated for only adult ICU patients,
 
-  DROP TABLE IF EXISTS pivoted_sofa_mod CASCADE;
-CREATE TABLE pivoted_sofa_mod AS
+  DROP TABLE IF EXISTS pivoted_sofa_nogcs CASCADE;
+CREATE TABLE pivoted_sofa_nogcs AS
 
     -- generate a row for every hour the patient was in the ICU
    
@@ -340,7 +345,8 @@ CREATE TABLE pivoted_sofa_mod AS
                      + COALESCE(MAX(coagulation) OVER W, 0)
                      + COALESCE(MAX(liver) OVER W, 0)
                      + COALESCE(MAX(cardiovascular) OVER W, 0)
-                     + COALESCE(MAX(cns) OVER W, 0)
+                  -- We are not using the CNS component in this sensitivity analysis 
+                  -- + COALESCE(MAX(cns) OVER W, 0)
                      + COALESCE(MAX(renal) OVER W, 0)
                   )::SMALLINT
                  AS SOFA_24hours

@@ -9,3 +9,7 @@
 .read pivoted-sofa-mod.sql
 
 .read extracted_data.sql
+
+.read sepsis-time-all.sql
+.read sepsis-time-abs.sql
+.read sepsis-time-nogcs.sql
