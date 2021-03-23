@@ -1,12 +1,21 @@
 /*
+This script is almost identical to extracted_data.sql. We are joining together the other views that we have created (e.g. for the labs data and the vitals data)
+It combines this with some demographic information about the patient
+We also take ventilation information about a patient to label the times when they get ventilation (we have a vent flag for when they are on ventilation)
+
+The difference here is that we use the version of the sofa view that does not use the cns component in the total score (pivoted_sofa_nogcs). We still include the row of CNS score for interest, though this can be removed if none of the methods are using the derived sofa scores.
+
+*/
+
+/*
 This query creates the final pivoted table. It does so by joining together the other views that we have created (e.g. for the labs data and the vitals data)
 It combines this with some demographic information about the patient
 We also take ventilation information about a patient to label the times when they get ventilation (we have a vent flag for when they are on ventilation)
 
 */
 
-  DROP TABLE IF EXISTS extracted_data CASCADE;
-CREATE TABLE extracted_data AS
+  DROP TABLE IF EXISTS extracted_data_nogcs CASCADE;
+CREATE TABLE extracted_data_nogcs AS
 
        -- collect the demographic information of each patient
   WITH patient_info AS
@@ -128,7 +137,7 @@ CREATE TABLE extracted_data AS
                 , MAX(cns_24hours) AS cns_24hours
                 , MAX(renal_24hours) AS renal_24hours
                 , MAX(sofa_24hours) AS sofa_24hours
-           FROM pivoted_sofa_mod 
+           FROM pivoted_sofa_nogcs
           GROUP BY icustay_id, starttime, endtime
           ORDER BY icustay_id, starttime   
         )
