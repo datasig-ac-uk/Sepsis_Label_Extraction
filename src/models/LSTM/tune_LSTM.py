@@ -23,19 +23,19 @@ if __name__ == '__main__':
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
 
-    current_data = 'blood_only_data/'
-    Root_Data, Model_Dir, _, _, _ = mimic3_myfunc.folders(current_data, model='LSTM')
+    current_data = 'blood_only/'
+    Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(current_data, model='LSTM')
     print(Model_Dir)
-    a1, a2, k = 6, 0, 5
+    T, a2, k = 6, 0, 5
     x, y = 24, 12
 
-    Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
+    Data_Dir = Root_Data  +'train' + '/'
     definitions = ['t_sepsis_min']
     print(Data_Dir)
 
     for definition in definitions:
-        labels = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(a1) + '.npy')
-        dataset = TimeSeriesDataset().load(Data_Dir + definition[1:] + '_ffill.tsd')
+        labels = np.load(Data_Dir + 'label'+'_'+str(x)+'_'+str(y)+'_'+str(T) + definition[1:] + '.npy')
+        dataset = TimeSeriesDataset().load(Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_ffill.tsd')
         icustay_lengths = np.load(Data_Dir + 'icustay_lengths' + definition[1:] + '.npy')
 
         tra_patient_indices, tra_full_indices, val_patient_indices, val_full_indices = \

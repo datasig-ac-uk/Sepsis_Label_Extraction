@@ -14,8 +14,8 @@ sys.path.insert(0, '../')
 import constants
 
 import src.features.mimic3_function as mimic3_myfunc
-import src.visualization.sepsis_mimic3_myfunction_patientlevel as mimic3_myfunc_patientlevel
-from src.visualization.sepsis_mimic3_myfunction_patientlevel import decompose_confusion
+import src.visualization.patientlevel_function as mimic3_myfunc_patientlevel
+from src.visualization.patientlevel_function import decompose_confusion
 
 colors_barplot = sns.color_palette()
 colors_auc = sns.color_palette("Dark2")
@@ -986,20 +986,14 @@ def plot_venn(x, y, T, test_metric, metric_thresh, precision, save_dir):
     plt.savefig(save_dir + 'Venn_diagram_compare_models' + '.png')
 
 
-def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save_dir, strict_exclusion=False):
+def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save_dir):
     definitions = ['t_sofa', 't_suspicion', 't_sepsis_min']
     models = ['LGBM', 'LSTM', 'CoxPHM']
-    current_data = 'blood_only_data/'
-    Root_Data = constants.DATA_processed + current_data + 'experiments_' + str(x) + '_' + str(y) + '/test/'
-    Output_Data = constants.OUTPUT_DIR + 'predictions/' + current_data
+    current_data = 'blood_only/'
+    Root_Data, _,_,_ = mimic3_myfunc.folders(current_data)
+    Data_Dir = Root_Data  + '/test/'
     thresholds = np.arange(precision) / precision
-
-    if strict_exclusion:
-        df_sepsis1 = pd.read_pickle(Root_Data + '_sepsis_min' + '_dataframe.pkl')
-        sample_ids = df_sepsis1['icustay_id'].unique()
-    else:
-        sample_ids = None
-
+    sample_ids = None
     true_septic_time_list = []
     pred_septic_time_sublists = []
     ids_list = []
@@ -1007,16 +1001,17 @@ def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save
     patient_icustay_list = []
     septic_los_list = []
     for definition in definitions:
-        df_sepsis1 = pd.read_pickle(Root_Data + definition[1:] + '_dataframe.pkl')
+        df_sepsis1 = pd.read_pickle(Data_Dir +str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
         septic_los_list.append(
             df_sepsis1.loc[df_sepsis1['sepsis_hour'].notnull()].groupby(
                 'icustay_id').rolling_los_icu.max().astype(
                 'int'))
-        current_label = np.load(Root_Data + 'label' + definition[1:] + '_' + str(T) + '.npy')
+        current_label = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')
         for model in models:
-            prob_preds = np.load(
-                Output_Data + model + '/' + str(x) + '_' + str(y) + '_' + str(T) + definition[
-                                                                                   1:] + '_test' + '.npy')
+            _,_,Output_predictions, Output_results = mimic3_myfunc.folders(current_data,
+                                                                       model=model)
+            prob_preds = np.load(Output_predictions + str(x) + '_' + str(y) + '_'+ str(T) +
+                                 definition[1:] + '_' + 'test' + '.npy')
 
             CMs, patient_pred_label_list, pred_septic_time_list = suboptimal_choice_patient(df_sepsis1,
                                                                                             current_label,
@@ -1477,8 +1472,8 @@ def proprotion_HBO_line_plot(patient_true_label_list, true_septic_time_list, ide
 
 
 def auc_plots(definition_list, model_list, save_dir=constants.OUTPUT_DIR + 'plots/', T=6, train_test='test'):
-    precision, n, a1 = 100, 100, 6
-    current_data = 'blood_only_data/'
+    precision, n= 100, 100
+    current_data = 'blood_only/'
 
     Output_Data = constants.OUTPUT_DIR + 'predictions/' + current_data
     # mimic3_myfunc.create_folder(Data_save)
@@ -1490,10 +1485,9 @@ def auc_plots(definition_list, model_list, save_dir=constants.OUTPUT_DIR + 'plot
             fprs_list = []
             for x, y in constants.xy_pairs:
                 print(definition, x, y, model)
-                Data_Dir = constants.DATA_processed + current_data + 'experiments_' + str(x) + '_' + str(
-                    y) + '/' + train_test + '/'
+                Data_Dir = constants.DATA_processed + current_data  + train_test + '/'
 
-                labels_now = np.load(Data_Dir + 'label' + definition[1:] + '_6.npy')
+                labels_now = np.load(Data_Dir + 'label'+'_'+str(x)+'_'+str(y)+'_'+str(T) + definition[1:] + '.npy')
 
                 if model == 'LSTM' or model == 'CoxPHM':
                     probs_now = np.load(
@@ -1510,7 +1504,7 @@ def auc_plots(definition_list, model_list, save_dir=constants.OUTPUT_DIR + 'plot
 
                 tpr, fpr = mimic3_myfunc_patientlevel.patient_level_auc(labels_now, probs_now,
                                                                         icustay_fullindices_now,
-                                                                        precision, n=n, a1=a1)
+                                                                        precision, n=n, a1=T)
 
                 labels_list.append(labels_now)
                 probs_list.append(probs_now)

@@ -12,7 +12,7 @@ from data.dataset import TimeSeriesDataset
 import omni.functions as omni_functions
 
 import features.mimic3_function as mimic3_myfunc
-import visualization.sepsis_mimic3_myfunction_patientlevel as mimic3_myfunc_patientlevel
+import visualization.patientlevel_function as mimic3_myfunc_patientlevel
 import models.LGBM.LGBM_functions as lgbm_functions
 
 def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', thresholds=np.arange(10000) / 10000, fake_test=False):

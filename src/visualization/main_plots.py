@@ -18,7 +18,7 @@ sys.path.insert(0, '../')
 import constants
 
 import features.mimic3_function as mimic3_myfunc
-import visualization.sepsis_mimic3_myfunction_patientlevel as patientlevel
+import visualization.patientlevel_function as patientlevel
 import visualization.plot_functions as plot_functions
 import visualization.table_functions as table_functions
 
@@ -150,8 +150,7 @@ if __name__ == '__main__':
     plot_functions.auc_plots(definition_list=constants.FEATURES,model_list=constants.MODELS,save_dir=constants.OUTPUT_DIR + 'plots/',T=6,train_test=purpose)
 ######################################  To produce FIgure 5,6  ###################################
     print('produce sepsis onset time plots')
-    plot_functions.sepsis_onset_time_plots(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/',
-                                strict_exclusion=False)
+    plot_functions.sepsis_onset_time_plots(24, 12, 6, 'sensitivity', 0.85, 2000, save_dir=constants.OUTPUT_DIR + 'plots/')
 
 
 
