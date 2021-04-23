@@ -8,7 +8,7 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 import joblib
 
 sys.path.insert(0, '../../')
-import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import features.mimic3_function as mimic3_myfunc
 
 
 ################################### LGBM tuning/training ########################################

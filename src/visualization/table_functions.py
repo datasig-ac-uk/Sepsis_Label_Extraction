@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score, roc_curve, auc
 
 sys.path.insert(0, '../')
-import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import features.mimic3_function as mimic3_myfunc
 from visualization.sepsis_mimic3_myfunction_patientlevel import output_at_metric_level
 
 import constants

@@ -2,7 +2,7 @@ import sys
 
 sys.path.insert(0, '../')
 import constants
-import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import features.mimic3_function as mimic3_myfunc
 def features_wrapper(data_list, x_y_list, purpose):
     """
 
@@ -41,7 +41,7 @@ def features_wrapper(data_list, x_y_list, purpose):
 
 if __name__ == '__main__':
     #TODO ask yue to chekc if this feature_wrapper could work on her side
-    data_list=['blood_only']
+    data_list=['other_cultures']
     features_wrapper(data_list,constants.xy_pairs, purpose='train')
     #other exclusion rules
     data_list=constants.exclusion_rules[1:]

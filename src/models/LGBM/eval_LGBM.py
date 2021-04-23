@@ -11,7 +11,7 @@ import constants
 from data.dataset import TimeSeriesDataset
 import omni.functions as omni_functions
 
-import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import features.mimic3_function as mimic3_myfunc
 import visualization.sepsis_mimic3_myfunction_patientlevel as mimic3_myfunc_patientlevel
 import models.LGBM.LGBM_functions as lgbm_functions
 

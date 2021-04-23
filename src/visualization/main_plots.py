@@ -17,7 +17,7 @@ sys.path.insert(0, '../')
 
 import constants
 
-import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import features.mimic3_function as mimic3_myfunc
 import visualization.sepsis_mimic3_myfunction_patientlevel as patientlevel
 import visualization.plot_functions as plot_functions
 import visualization.table_functions as table_functions

@@ -12,7 +12,7 @@ import constants
 sys.path.insert(0, '../../')
 import omni.functions as omni_functions
 import models.CoxPHM.coxphm_functions as coxphm_functions
-import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import features.mimic3_function as mimic3_myfunc
 
 if __name__ == '__main__':
     current_data = 'blood_only_data/'
