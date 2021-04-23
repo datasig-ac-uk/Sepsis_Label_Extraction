@@ -13,7 +13,7 @@ sys.path.insert(0, '../')
 
 import constants
 
-import src.features.sepsis_mimic3_myfunction as mimic3_myfunc
+import src.features.mimic3_function as mimic3_myfunc
 import src.visualization.sepsis_mimic3_myfunction_patientlevel as mimic3_myfunc_patientlevel
 from src.visualization.sepsis_mimic3_myfunction_patientlevel import decompose_confusion
 

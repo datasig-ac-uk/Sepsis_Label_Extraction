@@ -11,7 +11,7 @@ from data.dataset import TimeSeriesDataset
 from models.nets import LSTM
 import models.LSTM.LSTM_functions as lstm_functions
 import omni.functions as omni_functions
-import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import features.mimic3_function as mimic3_myfunc
 
 
 def train_LSTM(T_list, x_y, definitions, data_folder='blood_only_data/', fake_test=False):
@@ -26,7 +26,7 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only_data/', fake_te
     """
     for x, y in x_y:
         data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
-        Root_Data, Model_Dir, _, _, _ = mimic3_myfunc.folders(data_folder, model='LSTM')
+        Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(data_folder, model='LSTM')
         config_dir = constants.MODELS_DIR + 'blood_only_data/LSTM/hyperparameter/config'
 
         #     Data_Dir = Root_Data + '/processed/experiments_' + str(x) + '_' + str(y) + '/H3_subset/'
@@ -39,10 +39,10 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only_data/', fake_te
             #         for T in [6]:
             for T in T_list:
                 print('load timeseries dataset')
-                dataset = TimeSeriesDataset().load(Data_Dir + definition[1:] + '_ffill.tsd')
+                dataset = TimeSeriesDataset().load(Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_ffill.tsd')
 
                 print('load train labels')
-                labels_train = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')
+                labels_train = np.load(Data_Dir + 'label'+'_'+str(x)+'_'+str(y)+'_'+str(T) + definition[1:] + '.npy')
 
                 # get torch dataloader for lstm
                 train_dl, scaler = lstm_functions.prepared_data_train(dataset, labels_train, True, 128, device)
@@ -62,7 +62,7 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only_data/', fake_te
 
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "4"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     print(os.environ["CUDA_VISIBLE_DEVICES"])
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
@@ -71,6 +71,6 @@ if __name__ == '__main__':
     #train_LSTM(constants.T_list, xy_pairs, definitions, data_folder='blood_only_data/', fake_test=False)
 
     xy_pairs = [(24,12)]
-    data_folder_list = ['absolute_values/','strict_exclusion/','all_cultures/','no_gcs/']
+    data_folder_list = ['other_cultures/']
     for data_folder in data_folder_list:
-        train_LSTM([6], xy_pairs, definitions, data_folder=data_folder_list, fake_test=False)
+        train_LSTM([6], xy_pairs, definitions, data_folder=data_folder, fake_test=False)

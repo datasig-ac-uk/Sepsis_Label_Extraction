@@ -10,7 +10,7 @@ from sklearn.metrics import confusion_matrix, classification_report, accuracy_sc
 
 sys.path.insert(0, '../')
 import features.dicts as dicts
-import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import features.mimic3_function as mimic3_myfunc
 
 
 ################## Those for CV #############################

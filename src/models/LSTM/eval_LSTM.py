@@ -14,7 +14,7 @@ from data.dataset import TimeSeriesDataset
 import omni.functions as omni_functions
 import models.LSTM.LSTM_functions as lstm_functions
 from models.nets import LSTM
-import features.sepsis_mimic3_myfunction as mimic3_myfunc
+import features.mimic3_function as mimic3_myfunc
 from visualization.sepsis_mimic3_myfunction_patientlevel import decompose_cms, output_at_metric_level
 
 
