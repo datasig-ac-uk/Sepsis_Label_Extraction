@@ -20,18 +20,19 @@ T_list = [12, 8, 6, 4]
 
 MODELS = ['LGBM', 'LSTM', 'CoxPHM']
 models = ['lgbm', 'lstm', 'coxph']
-exclusion_rules = ['blood_only','no_gcs','all_cultures','absolute_values','strict_exclusion']
+exclusion_rules = ['blood_only','no_gcs','all_cultures','absolute_values','other_cultures','strict_exclusion']
 
 MIMIC_DATA_DIRS = {}
-MIMIC_DATA_DIRS['strict_exclusion'] = {'train': DATA_DIR+'raw/train/metavision_sepsis_blood_only_data',
-                                       'test': DATA_DIR + 'raw/test/metavision_sepsis_blood_only_data'}
+MIMIC_DATA_DIRS['strict_exclusion'] = {'train': DATA_DIR+'raw/train/blood_only',
+                                       'test': DATA_DIR + 'raw/test/blood_only'}
 MIMIC_DATA_DIRS['blood_only'] = MIMIC_DATA_DIRS['strict_exclusion']
 
-MIMIC_DATA_DIRS['no_gcs'] = {'train': DATA_DIR+'raw/train/additional_experiments/no_gcs',
+MIMIC_DATA_DIRS['no_gcs'] = {'train': DATA_DIR+'raw/train/no_gcs',
                              'test': DATA_DIR + 'raw/test/no_gcs'}
-
-MIMIC_DATA_DIRS['all_cultures'] = {'train': DATA_DIR+'raw/train/additional_experiments/all_cultures',
+MIMIC_DATA_DIRS['other_cultures'] = {'train': DATA_DIR+'raw/train/other_cultures',
+                                     'test': DATA_DIR + 'raw/test/other_cultures'}
+MIMIC_DATA_DIRS['all_cultures'] = {'train': DATA_DIR+'raw/train/all_cultures',
                                    'test': DATA_DIR + 'raw/test/all_cultures'}
 
-MIMIC_DATA_DIRS['absolute_values'] = {'train': DATA_DIR+'raw/train/additional_experiments/absolute_values',
+MIMIC_DATA_DIRS['absolute_values'] = {'train': DATA_DIR+'raw/train/absolute_values',
                                       'test': DATA_DIR + 'raw/test/absolute_values'}

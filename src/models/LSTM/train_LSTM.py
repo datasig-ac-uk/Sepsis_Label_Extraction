@@ -27,10 +27,10 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only_data/', fake_te
     for x, y in x_y:
         data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
         Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(data_folder, model='LSTM')
-        config_dir = constants.MODELS_DIR + 'blood_only_data/LSTM/hyperparameter/config'
+        config_dir = constants.MODELS_DIR + 'blood_only/LSTM/hyperparameter/config'
 
         #     Data_Dir = Root_Data + '/processed/experiments_' + str(x) + '_' + str(y) + '/H3_subset/'
-        Data_Dir = Root_Data + 'experiments_' + str(x) + '_' + str(y) + '/train/'
+        Data_Dir = Root_Data  + 'train' + '/'
 
         for definition in definitions:
             config = omni_functions.load_pickle(config_dir + definition[1:])
@@ -67,10 +67,11 @@ if __name__ == '__main__':
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
 
-    definitions = ['t_sofa','t_suspicion','t_sepsis_min']
-    #train_LSTM(constants.T_list, xy_pairs, definitions, data_folder='blood_only_data/', fake_test=False)
-
-    xy_pairs = [(24,12)]
-    data_folder_list = ['other_cultures/']
+    T_list = constants.T_list[2]
+    data_folder = constants.exclusion_rules[:1]
+    x_y = constants.xy_pairs
+    train_LSTM(T_list,x_y,constants.FEATURES,data_folder,fake_test=False)
+    x_y = [(24, 12)]
+    data_folder_list = constants.exclusion_rules[1:]
     for data_folder in data_folder_list:
-        train_LSTM([6], xy_pairs, definitions, data_folder=data_folder, fake_test=False)
+        train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
