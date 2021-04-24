@@ -1,3 +1,4 @@
+import features.mimic3_function as mimic3_myfunc
 import pickle
 import sys
 
@@ -8,18 +9,22 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 import joblib
 
 sys.path.insert(0, '../../')
-import features.mimic3_function as mimic3_myfunc
 
 
 ################################### LGBM tuning/training ########################################
-def feature_loading(Data_Dir, definition, a1,x=24,y=12, k=5, cv=True, save=True):
-    current_labels = np.load(Data_Dir + 'label'+ '_' + str(x)+'_'+str(y)+'_'+str(a1) + definition[1:]  + '.npy')
-    feature_data = np.load(Data_Dir + 'james_features'+ '_' + str(x)+'_'+str(y) + definition[1:] + '.npy')
-    icustay_lengths = np.load(Data_Dir + 'icustay_lengths'+ '_' + str(x)+'_'+str(y) + definition[1:] + '.npy')
-    icustay_ids = np.load(Data_Dir + 'icustay_id' + '_' + str(x)+'_'+str(y)+ definition[1:] + '.npy')
+def feature_loading(Data_Dir, definition, a1, x=24, y=12, k=5, cv=True, save=True):
+    current_labels = np.load(Data_Dir + 'label' + '_' +
+                             str(x)+'_'+str(y)+'_'+str(a1) + definition[1:] + '.npy')
+    feature_data = np.load(Data_Dir + 'james_features' +
+                           '_' + str(x)+'_'+str(y) + definition[1:] + '.npy')
+    icustay_lengths = np.load(
+        Data_Dir + 'icustay_lengths' + '_' + str(x)+'_'+str(y) + definition[1:] + '.npy')
+    icustay_ids = np.load(Data_Dir + 'icustay_id' + '_' +
+                          str(x)+'_'+str(y) + definition[1:] + '.npy')
     if cv:
         tra_patient_indices, tra_full_indices, val_patient_indices, val_full_indices = \
-            mimic3_myfunc.cv_pack(icustay_lengths, k=k, definition=definition, path_save=Data_Dir, save=save)
+            mimic3_myfunc.cv_pack(
+                icustay_lengths, k=k, definition=definition, path_save=Data_Dir, save=save)
 
         return current_labels, feature_data, tra_patient_indices, tra_full_indices, val_patient_indices, val_full_indices
 
@@ -76,13 +81,15 @@ def model_validation(model, dataset, labels, tra_full_indices, val_full_indices)
     fpr, tpr, thresholds = roc_curve(labels_true, prob_preds, pos_label=1)
     index = np.where(tpr >= 0.85)[0][0]
 
-    tra_preds = np.append(tra_preds, (prob_preds >= thresholds[index]).astype('int'))
-    print('auc and sepcificity', roc_auc_score(labels_true, prob_preds), 1 - fpr[index])
+    tra_preds = np.append(
+        tra_preds, (prob_preds >= thresholds[index]).astype('int'))
+    print('auc and sepcificity', roc_auc_score(
+        labels_true, prob_preds), 1 - fpr[index])
     print('accuracy', accuracy_score(labels_true, tra_preds))
 
     return tra_preds, prob_preds, labels_true, \
-           roc_auc_score(labels_true, prob_preds), \
-           1 - fpr[index], accuracy_score(labels_true, tra_preds)
+        roc_auc_score(labels_true, prob_preds), \
+        1 - fpr[index], accuracy_score(labels_true, tra_preds)
 
 
 grid_parameters = {  # LightGBM
@@ -101,7 +108,7 @@ grid_parameters = {  # LightGBM
     'min_child_weight': np.arange(30) + 20}
 
 
-def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, param_grid, \
+def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, param_grid,
                  grid=False, n_iter=100, n_jobs=-1, scoring='roc_auc', verbose=2):
     """
 
@@ -123,23 +130,24 @@ def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, par
 
     k = len(tra_full_indices)
 
-    cv = [[np.concatenate(tra_full_indices[i]), np.concatenate(val_full_indices[i])] for i in range(k)]
+    cv = [[np.concatenate(tra_full_indices[i]), np.concatenate(
+        val_full_indices[i])] for i in range(k)]
 
     if grid:
-        gs = GridSearchCV(estimator=model, \
-                          param_grid=param_grid, \
-                          n_jobs=n_jobs, \
-                          cv=cv, \
-                          scoring=scoring, \
+        gs = GridSearchCV(estimator=model,
+                          param_grid=param_grid,
+                          n_jobs=n_jobs,
+                          cv=cv,
+                          scoring=scoring,
                           verbose=verbose)
     else:
 
-        gs = RandomizedSearchCV(model, \
-                                param_grid, \
-                                n_jobs=n_jobs, \
-                                n_iter=n_iter, \
-                                cv=cv, \
-                                scoring=scoring, \
+        gs = RandomizedSearchCV(model,
+                                param_grid,
+                                n_jobs=n_jobs,
+                                n_iter=n_iter,
+                                cv=cv,
+                                scoring=scoring,
                                 verbose=verbose)
 
     fitted_model = gs.fit(X=dataset, y=labels)
@@ -148,36 +156,36 @@ def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, par
     return best_params_
 
 
-def feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition, a1, grid_parameters, x=24,y=12, n_iter=1000, k=5,
+def feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition, a1, grid_parameters, x=24, y=12, n_iter=1000, k=5,
                                  n_jobs=-1, scoring='roc_auc', save=True):
-    current_labels, feature_data, _, tra_full_indices, _, val_full_indices = feature_loading(Data_Dir, \
-                                                                                             definition, \
-                                                                                             a1, \
-                                                                                             x=x,\
-                                                                                             y=y,\
-                                                                                             k=k, \
+    current_labels, feature_data, _, tra_full_indices, _, val_full_indices = feature_loading(Data_Dir,
+                                                                                             definition,
+                                                                                             a1,
+                                                                                             x=x,
+                                                                                             y=y,
+                                                                                             k=k,
                                                                                              save=save)
 
-    lgbm_best_paras_ = model_tuning(model, feature_data, current_labels, tra_full_indices, \
+    lgbm_best_paras_ = model_tuning(model, feature_data, current_labels, tra_full_indices,
                                     val_full_indices, grid_parameters, n_iter=n_iter, n_jobs=n_jobs)
 
     with open(Model_Dir + 'lgbm_best_paras' + definition[1:] + '.pkl', 'wb') as file:
         pickle.dump(lgbm_best_paras_, file)
 
 
-def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1,x=24,y=12, k=5, save=False):
+def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1, x=24, y=12, k=5, save=False):
     """
 
         features loading and model validating altogether for different culture
 
     """
 
-    current_labels, feature_data, _, tra_full_indices, _, val_full_indices = feature_loading(Data_Dir, \
-                                                                                             definition, \
-                                                                                             a1, \
-                                                                                             x=x,\
-                                                                                             y=y,\
-                                                                                             k=5, \
+    current_labels, feature_data, _, tra_full_indices, _, val_full_indices = feature_loading(Data_Dir,
+                                                                                             definition,
+                                                                                             a1,
+                                                                                             x=x,
+                                                                                             y=y,
+                                                                                             k=5,
                                                                                              save=save)
 
     with open(Model_Dir + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
@@ -185,9 +193,9 @@ def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1,x=24,y=
 
     clf = LGBMClassifier(random_state=42).set_params(**best_paras_)
 
-    _, prob_preds, _, auc, specificity, accuracy = model_validation(clf, feature_data, \
-                                                                    current_labels, \
-                                                                    tra_full_indices, \
+    _, prob_preds, _, auc, specificity, accuracy = model_validation(clf, feature_data,
+                                                                    current_labels,
+                                                                    tra_full_indices,
                                                                     val_full_indices)
 
     return prob_preds, auc, specificity, accuracy
@@ -260,11 +268,12 @@ def model_training(model_dir, test_set, test_labels):
     index = np.where(tpr >= 0.85)[0][0]
     test_preds = np.array((prob_preds_test >= thresholds[index]).astype('int'))
 
-    print('auc and sepcificity', roc_auc_score(test_labels, prob_preds_test), 1 - fpr[index])
+    print('auc and sepcificity', roc_auc_score(
+        test_labels, prob_preds_test), 1 - fpr[index])
     print('accuracy', accuracy_score(test_labels, test_preds))
 
     return test_preds, prob_preds_test, roc_auc_score(test_labels, prob_preds_test), \
-           1 - fpr[index], accuracy_score(test_labels, test_preds)
+        1 - fpr[index], accuracy_score(test_labels, test_preds)
 
 
 def model_fit_saving(model, train_set, train_labels, save_name):
@@ -281,10 +290,3 @@ def model_fit_saving(model, train_set, train_labels, save_name):
 
     model.fit(X=train_set, y=train_labels)
     joblib.dump(model, save_name)
-
-
-
-
-
-
-

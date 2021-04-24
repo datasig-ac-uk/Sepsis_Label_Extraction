@@ -18,6 +18,7 @@ class TrickScaler(BaseEstimator, TransformerMixin):
     function converts the tensor onto shape [N * L, C], scales the columns according to the specified method and then
     converts back onto shape [N, L, C].
     """
+
     def __init__(self, scaling):
         # Setup scaling
         self.scaling = scaling
@@ -30,7 +31,8 @@ class TrickScaler(BaseEstimator, TransformerMixin):
         elif (scaling is None) or (scaling is False):
             scaler = NullTransformer()
         else:
-            raise NotImplementedError('Not implemented scaling method {}'.format(scaling))
+            raise NotImplementedError(
+                'Not implemented scaling method {}'.format(scaling))
 
         self.scaler = scaler
 
@@ -49,4 +51,4 @@ class TrickScaler(BaseEstimator, TransformerMixin):
         return torch.Tensor(self._untrick(X_tfm, X.shape))
 
 
-scaler=TrickScaler(scaling='mms')
+scaler = TrickScaler(scaling='mms')

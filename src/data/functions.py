@@ -2,7 +2,6 @@ import numpy as np
 import torch
 
 
-
 def torch_ffill(data):
     """ Forward fill for a torch tensor.
 
@@ -19,7 +18,8 @@ def torch_ffill(data):
         out = arr[np.arange(idx.shape[0])[:, None], idx]
         return out
 
-    data_ffilled = torch.Tensor([ffill2d(x.numpy().T) for x in data]).transpose(1, 2)
+    data_ffilled = torch.Tensor([ffill2d(x.numpy().T)
+                                for x in data]).transpose(1, 2)
     return data_ffilled
 
 
@@ -51,4 +51,3 @@ def pytorch_rolling(x, dimension, window_size, step_size=1, return_same_size=Tru
     unfolded = x.unfold(dimension, window_size, step_size)
 
     return unfolded
-
