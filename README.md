@@ -12,6 +12,7 @@ TODO list:
 - [ ] connection between database code and analysis code: one line command output the all pivot csv files in /data/raw/.
 - [ ] edit readme, probably move the database readme to the main readme.
 - [ ] final check analysis code compatibility
+- [ ] bash script to download all existing models to model directory.
 - [ ] code cleaning: delete all unnecessary codes, code linting, code commenting.
 - [ ] add the notebook
 
@@ -20,6 +21,10 @@ TODO list:
 Create a new environment and run
 ```
 pip install -r requirements.txt
+```
+Export PYTHONPATH
+```
+source pathonpath.sh
 ```
 Raw Data  
 ------------
@@ -30,7 +35,7 @@ Feature extraction
 ------------
 
 ```
-python3 src/features/generate_features.py
+python3 features/generate_features.py
 ```
 This commmand will generate list of features which are required for model implementaion and the they will be saved in data/processed.   
 
@@ -38,7 +43,7 @@ Model tuning/training/evaluation
 ------------
 run the main.py script in src/models with two arguments: model:'LGMB','LSTM','CoxPHM' and process:'train','tune','eval', e.g. For train a LGBM model:
 ```
-python3 src/models/main.py --model 'LGBM' --process 'train'
+python3 models/main.py --model 'LGBM' --process 'train'
 ```
 Hyperparameter tuning, model training and evaluation should be done in sequence as follows:
 1. Running the tuning step will compute and save the optimised hyperparameter for later use on model training and evaluation.
@@ -49,5 +54,5 @@ Illustration
 ------------
 In order to reproduce all the plots in the paper, run the following command after obtaining all predictions from model evaluation step.   
 ```
-python3 src/visualization/main_plots.py 
+python3 visualization/main_plots.py
 ```

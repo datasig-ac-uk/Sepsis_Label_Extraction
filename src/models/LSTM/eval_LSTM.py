@@ -106,7 +106,7 @@ if __name__ == '__main__':
     print(device)
     train_test = 'test'
     T_list = constants.T_list[2]
-    data_folder = constants.exclusion_rules[:1]
+    data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
     eval_LSTM(T_list,x_y,constants.FEATURES,data_folder,train_test,fake_test=False)
     x_y = [(24, 12)]
