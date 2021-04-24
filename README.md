@@ -13,7 +13,7 @@ TODO list:
 - [ ] edit readme, probably move the database readme to the main readme.
 - [ ] final check analysis code compatibility
 - [ ] bash script to download all existing models to model directory.
-- [ ] code cleaning: delete all unnecessary codes, code linting, code commenting.
+- [x] code cleaning: delete all unnecessary codes, code linting, code commenting.
 - [ ] add the notebook
 
 ------------

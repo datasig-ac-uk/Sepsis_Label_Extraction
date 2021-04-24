@@ -1,3 +1,10 @@
+from visualization.patientlevel_function import decompose_cms, output_at_metric_level
+import features.mimic3_function as mimic3_myfunc
+from models.nets import LSTM
+import models.LSTM.LSTM_functions as lstm_functions
+import omni.functions as omni_functions
+from data.dataset import TimeSeriesDataset
+import constants
 import os
 import sys
 
@@ -9,13 +16,6 @@ import torch
 from visualization.plot_functions import suboptimal_choice_patient
 
 sys.path.insert(0, '../../')
-import constants
-from data.dataset import TimeSeriesDataset
-import omni.functions as omni_functions
-import models.LSTM.LSTM_functions as lstm_functions
-from models.nets import LSTM
-import features.mimic3_function as mimic3_myfunc
-from visualization.patientlevel_function import decompose_cms, output_at_metric_level
 
 
 def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.arange(10000) / 10000, fake_test=False):
@@ -37,26 +37,31 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
     data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
     config_dir = constants.MODELS_DIR + 'blood_only/LSTM/hyperparameter/config'
     Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(data_folder,
-                                                                                                model='LSTM')
+                                                                                     model='LSTM')
     for x, y in x_y:
 
-        Data_Dir = Root_Data  + train_test + '/'
+        Data_Dir = Root_Data + train_test + '/'
 
         #     Save_Dir = DATA_DIR + '/processed/experiments_' + str(x) + '_' + str(y) + '/H3_subset/'
 
         #         for T in [6]:
         for T in T_list:
             for definition in definitions:
-                config = omni_functions.load_pickle(config_dir + definition[1:])
+                config = omni_functions.load_pickle(
+                    config_dir + definition[1:])
                 print('load timeseries dataset')
-                dataset = TimeSeriesDataset().load(Data_Dir + definition[1:] + '_ffill.tsd')
+                dataset = TimeSeriesDataset().load(
+                    Data_Dir + definition[1:] + '_ffill.tsd')
 
                 print('load train labels')
-                labels_test = np.load(Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')
+                labels_test = np.load(
+                    Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')
                 # get torch dataloader for lstm
-                scaler = omni_functions.load_pickle(Model_Dir + 'hyperparameter/scaler' + definition[1:])
+                scaler = omni_functions.load_pickle(
+                    Model_Dir + 'hyperparameter/scaler' + definition[1:])
                 #               scaler=load_pickle(MODELS_DIR+'/LSTM/hyperparameter/scaler'+definition[1:]+'H3_subset')
-                test_dl = lstm_functions.prepared_data_test(dataset, labels_test, True, scaler, 1000, device)
+                test_dl = lstm_functions.prepared_data_test(
+                    dataset, labels_test, True, scaler, 1000, device)
 
                 # specify torch model architecture and load trained model
                 model = LSTM(in_channels=dataset.data.shape[-1], num_layers=1,
@@ -73,8 +78,9 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
                                                                                               x) + '_' + str(y) + '_'
                                                                                                    + str(
                                                                                               T) + definition[
-                                                                                                   1:] + '_' + train_test + '.npy')
-                df_sepsis = pd.read_pickle(Data_Dir + definition[1:] + '_dataframe.pkl')
+                                                                                              1:] + '_' + train_test + '.npy')
+                df_sepsis = pd.read_pickle(
+                    Data_Dir + definition[1:] + '_dataframe.pkl')
                 preds = np.load(Output_predictions + str(x) + '_' + str(y) + '_'
                                 + str(T) + definition[1:] + '_' + train_test + '.npy')
                 CMs, _, _ = suboptimal_choice_patient(df_sepsis, true, preds, a1=6, thresholds=thresholds,
@@ -83,33 +89,40 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
 
                 results_patient_level.append(
                     [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
-                     "{:.3f}".format(output_at_metric_level(tnrs, tprs, metric_required=[0.85])),
+                     "{:.3f}".format(output_at_metric_level(
+                         tnrs, tprs, metric_required=[0.85])),
                      "{:.3f}".format(output_at_metric_level(accs, tprs, metric_required=[0.85]))])
 
                 # auc_score, specificity, accuracy = eval_model(test_dl, model,
                 #                                             save_dir=None)
-                results.append([str(x) + ',' + str(y), T, definition, auc_score, specificity, accuracy])
+                results.append([str(x) + ',' + str(y), T,
+                               definition, auc_score, specificity, accuracy])
             # save numerical results
 
     results_patient_level_df = pd.DataFrame(results_patient_level,
                                             columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'accuracy'])
 
-    results_patient_level_df.to_csv(Output_results + train_test + '_patient_level_results.csv')
-    result_df = pd.DataFrame(results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'accuracy'])
+    results_patient_level_df.to_csv(
+        Output_results + train_test + '_patient_level_results.csv')
+    result_df = pd.DataFrame(
+        results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'accuracy'])
     result_df.to_csv(Output_results + train_test + '_results.csv')
 
 
 if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     print(os.environ["CUDA_VISIBLE_DEVICES"])
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device(
+        'cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
     train_test = 'test'
     T_list = constants.T_list[2]
     data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
-    eval_LSTM(T_list,x_y,constants.FEATURES,data_folder,train_test,fake_test=False)
+    eval_LSTM(T_list, x_y, constants.FEATURES,
+              data_folder, train_test, fake_test=False)
     x_y = [(24, 12)]
     data_folder_list = constants.exclusion_rules[1:]
     for data_folder in data_folder_list:
-        eval_LSTM(T_list,x_y,constants.FEATURES,data_folder,train_test,fake_test=False)
+        eval_LSTM(T_list, x_y, constants.FEATURES,
+                  data_folder, train_test, fake_test=False)

@@ -1,3 +1,7 @@
+from models.nets import LSTM
+from data.torch_timeseries_dataset import LSTM_Dataset
+import features.scaler as scaler
+import constants
 import sys
 import time
 
@@ -10,13 +14,6 @@ from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score, roc_curve, auc
 
 sys.path.insert(0, '../../')
-
-import constants
-import features.scaler as scaler
-from data.torch_timeseries_dataset import LSTM_Dataset
-from models.nets import LSTM
-
-
 
 
 def prepared_data_train(ts_dataset, labels, normalize, batch_size, device):
@@ -74,10 +71,11 @@ def eval_model(test_dl, model, save_dir):
             test_y.append(y.view(-1))
             test_preds.append(torch.nn.functional.softmax(model(x), dim=1))
 
-    tfm = lambda x: torch.cat(x).cpu().detach().numpy()
+    def tfm(x): return torch.cat(x).cpu().detach().numpy()
     test_preds = tfm(test_preds)
     test_true = tfm(test_y)
-    fpr, tpr, thresholds = roc_curve(test_true + 1, test_preds[:, 1], pos_label=2)
+    fpr, tpr, thresholds = roc_curve(
+        test_true + 1, test_preds[:, 1], pos_label=2)
     index = np.where(tpr >= 0.85)[0][0]
     specificity = 1 - fpr[index]
     auc_score = auc(fpr, tpr)
@@ -91,14 +89,14 @@ def eval_model(test_dl, model, save_dir):
     accuracy = accuracy_score(test_true, test_pred_labels)
     print('accuracy=', accuracy)
 
-    return auc_score, specificity, accuracy, test_true, test_preds[:,1]
+    return auc_score, specificity, accuracy, test_true, test_preds[:, 1]
 
 
 def model_cv(config, data_list, device):
     ts_dataset, labels, train_patient_indices, train_full_indices, test_patient_indices, \
-    test_full_indices, k = get_pinned_object(data_list)
+        test_full_indices, k = get_pinned_object(data_list)
     p, hidden_channels, linear_channels, epochs = config["p"], config["hidden_channels"], \
-                                                  config["linear_channels"], config["epochs"]
+        config["linear_channels"], config["epochs"]
     test_true, test_preds = [], []
     data = torch.FloatTensor(ts_dataset.data.float())
     lengths = torch.FloatTensor(ts_dataset.lengths)
@@ -122,8 +120,10 @@ def model_cv(config, data_list, device):
         test_data = my_scaler.transform(test_data)
 
         # parse the train and test data into LSTM torch dataset
-        train_ds = LSTM_Dataset(x=train_data, y=train_labels, p=p, lengths=train_lengths, device=device)
-        test_ds = LSTM_Dataset(x=test_data, y=test_labels, p=p, lengths=test_lengths, device=device)
+        train_ds = LSTM_Dataset(
+            x=train_data, y=train_labels, p=p, lengths=train_lengths, device=device)
+        test_ds = LSTM_Dataset(x=test_data, y=test_labels,
+                               p=p, lengths=test_lengths, device=device)
         del train_data, train_labels, train_lengths, test_lengths, test_data, test_labels
         torch.cuda.empty_cache()
 
@@ -136,16 +136,19 @@ def model_cv(config, data_list, device):
                      dropout=0).to(device)
 
         train_model(model, train_dl, n_epochs=epochs,
-                    save_dir=constants.MODELS_DIR + '/LSTM_mimic' + 'cv_' + str(i),
+                    save_dir=constants.MODELS_DIR +
+                    '/LSTM_mimic' + 'cv_' + str(i),
                     loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=1e-3))
         model.load_state_dict(torch.load(constants.MODELS_DIR + '/LSTM_mimic' + 'cv_' + str(i),
                                          map_location=torch.device('cpu')))
-        _, _, _, true, preds = eval_model(test_dl, model,None)
+        _, _, _, true, preds = eval_model(test_dl, model, None)
         test_true.append(true)
         test_preds.append(preds)
-    test_true_full = np.concatenate([test_true[i].reshape(-1, 1) for i in range(len(test_true))])
+    test_true_full = np.concatenate(
+        [test_true[i].reshape(-1, 1) for i in range(len(test_true))])
     test_preds_full = np.concatenate(test_preds)
-    fpr, tpr, thresholds = roc_curve(test_true_full + 1, test_preds_full, pos_label=2)
+    fpr, tpr, thresholds = roc_curve(
+        test_true_full + 1, test_preds_full, pos_label=2)
     auc_score = auc(fpr, tpr)
     tune.report(mean_accuracy=auc_score)
 

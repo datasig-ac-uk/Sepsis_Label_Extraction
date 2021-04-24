@@ -1,5 +1,6 @@
 import os
-import dill, pickle
+import dill
+import pickle
 from multiprocessing import Pool, cpu_count
 from joblib import Parallel, delayed
 import json
@@ -49,6 +50,7 @@ def load_pickle(filename):
             obj = pickle.load(file)
     return obj
 
+
 def _create_folder_if_not_exist(filename):
     """ Makes a folder if the folder component of the filename does not already exist. """
     os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -75,7 +77,8 @@ def basic_parallel_loop(func, *args, parallel=True):
 
     """
     if parallel is True:
-        results = Parallel(n_jobs=cpu_count())(delayed(func)(*a) for a in args[0])
+        results = Parallel(n_jobs=cpu_count())(
+            delayed(func)(*a) for a in args[0])
     else:
         results = []
         for a in args[0]:
@@ -96,6 +99,6 @@ def groupby_apply_parallel(grouped_df, func, *args):
         dataframe: The dataframe after application of the function.
     """
     with Pool(cpu_count()) as p:
-        return_list = p.starmap(func, [(group, *args) for name, group in grouped_df])
+        return_list = p.starmap(func, [(group, *args)
+                                for name, group in grouped_df])
     return pd.concat(return_list)
-

@@ -1,3 +1,5 @@
+import features.mimic3_function as mimic3_myfunc
+import features.dicts as dicts
 import os
 import pickle
 import random
@@ -9,8 +11,6 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
 sys.path.insert(0, '../')
-import features.dicts as dicts
-import features.mimic3_function as mimic3_myfunc
 
 
 ################## Those for CV #############################
@@ -53,24 +53,30 @@ def probs_extraction(prob_preds, labels, val_full_indices, a1=6):
         current_length = np.concatenate(val_full_indices[i]).shape[0]
         current_patient_num = len(val_full_indices[i])
 
-        current_length_perpatient = np.array([len(val_full_indices[i][j]) for j in range(current_patient_num)])
-        length_perpatient = np.append(length_perpatient, current_length_perpatient)
+        current_length_perpatient = np.array(
+            [len(val_full_indices[i][j]) for j in range(current_patient_num)])
+        length_perpatient = np.append(
+            length_perpatient, current_length_perpatient)
 
-        current_length_cumsum = np.insert(np.cumsum(np.array(current_length_perpatient)), 0, 0)
+        current_length_cumsum = np.insert(
+            np.cumsum(np.array(current_length_perpatient)), 0, 0)
         current_fullindices = [int(tt) + np.arange(current_length_perpatient[j]) + current_length_cumsum[j] for j in
                                range(current_patient_num)]
 
         tt += current_length
 
-        prob_preds_list_current = [prob_preds[current_fullindices[j]] for j in range(current_patient_num)]
+        prob_preds_list_current = [
+            prob_preds[current_fullindices[j]] for j in range(current_patient_num)]
         prob_preds_list = prob_preds_list + prob_preds_list_current
 
-        labels_list_current = [labels[val_full_indices[i][j]] for j in range(current_patient_num)]
+        labels_list_current = [labels[val_full_indices[i][j]]
+                               for j in range(current_patient_num)]
         labels_list = labels_list + labels_list_current
 
         current_true_septic_perpatient = np.array(
             [int(len(np.where(labels[val_full_indices[i][j]] > 0)[0]) > 0) for j in range(current_patient_num)])
-        true_septic_perpatient = np.append(true_septic_perpatient, current_true_septic_perpatient)
+        true_septic_perpatient = np.append(
+            true_septic_perpatient, current_true_septic_perpatient)
 
     return prob_preds_list, labels_list, true_septic_perpatient
 
@@ -128,9 +134,11 @@ def patient_level_performance(val_preds, labels_true, val_full_indices, a1=6):
 
         current_patient_num = len(val_full_indices[i])
 
-        current_length_perpatient = np.array([len(val_full_indices[i][j]) for j in range(current_patient_num)])
+        current_length_perpatient = np.array(
+            [len(val_full_indices[i][j]) for j in range(current_patient_num)])
 
-        current_length_cumsum = np.insert(np.cumsum(np.array(current_length_perpatient)), 0, 0)
+        current_length_cumsum = np.insert(
+            np.cumsum(np.array(current_length_perpatient)), 0, 0)
 
         current_fullindices = [int(tt) + np.arange(current_length_perpatient[j]) + current_length_cumsum[j] for j in
                                range(current_patient_num)]
@@ -139,29 +147,34 @@ def patient_level_performance(val_preds, labels_true, val_full_indices, a1=6):
 
         current_preds_septic_perpatient = np.array(
             [int(len(np.where(val_preds[current_fullindices[j]] > 0)[0]) > 0) for j in range(current_patient_num)])
-        preds_septic_perpatient = np.append(preds_septic_perpatient, current_preds_septic_perpatient)
+        preds_septic_perpatient = np.append(
+            preds_septic_perpatient, current_preds_septic_perpatient)
 
         current_true_septic_perpatient = np.array(
             [int(len(np.where(labels_true[current_fullindices[j]] > 0)[0]) > 0) for j in range(current_patient_num)])
-        true_septic_perpatient = np.append(true_septic_perpatient, current_true_septic_perpatient)
+        true_septic_perpatient = np.append(
+            true_septic_perpatient, current_true_septic_perpatient)
 
         current_preds_septic_time_perpatient = np.array(
-            [np.where(val_preds[current_fullindices[j]] > 0)[0][0] for j in range(current_patient_num) \
-             if current_true_septic_perpatient[j] != 0 and \
+            [np.where(val_preds[current_fullindices[j]] > 0)[0][0] for j in range(current_patient_num)
+             if current_true_septic_perpatient[j] != 0 and
              len(np.where(val_preds[current_fullindices[j]] > 0)[0]) != 0])
-        preds_septic_time_perpatient = np.append(preds_septic_time_perpatient, current_preds_septic_time_perpatient)
+        preds_septic_time_perpatient = np.append(
+            preds_septic_time_perpatient, current_preds_septic_time_perpatient)
 
         current_true_septic_time_perpatient = np.array(
-            [np.where(labels_true[current_fullindices[j]] > 0)[0][0] for j in range(current_patient_num) \
-             if current_true_septic_perpatient[j] != 0 and \
+            [np.where(labels_true[current_fullindices[j]] > 0)[0][0] for j in range(current_patient_num)
+             if current_true_septic_perpatient[j] != 0 and
              len(np.where(val_preds[current_fullindices[j]] > 0)[0]) != 0])
-        true_septic_time_perpatient = np.append(true_septic_time_perpatient, current_true_septic_time_perpatient)
+        true_septic_time_perpatient = np.append(
+            true_septic_time_perpatient, current_true_septic_time_perpatient)
 
     true_septic_time_perpatient += a1
     sepsis_time_difference = true_septic_time_perpatient - preds_septic_time_perpatient
 
     return confusion_matrix(true_septic_perpatient, preds_septic_perpatient), \
-           sepsis_time_difference, preds_septic_perpatient
+        sepsis_time_difference, preds_septic_perpatient
+
 
 def patient_level_pred(df, true_labels, pred_labels, T, sample_ids=None, cohort='full'):
     """
@@ -177,7 +190,8 @@ def patient_level_pred(df, true_labels, pred_labels, T, sample_ids=None, cohort=
              true_septic_time: (array) true sepsis time for each patient
     """
     # construct data frame to store labels and predictions
-    data = {'id': df['icustay_id'].values, 'labels': true_labels, 'preds': pred_labels}
+    data = {'id': df['icustay_id'].values,
+            'labels': true_labels, 'preds': pred_labels}
     df_pred = pd.DataFrame.from_dict(data)
     if sample_ids is not None:
         df_pred = df_pred.loc[df_pred['id'].isin(sample_ids)]
@@ -188,21 +202,27 @@ def patient_level_pred(df, true_labels, pred_labels, T, sample_ids=None, cohort=
     patient_pred_label = df_pred.groupby('id')['preds'].max()
 
     # get the predicted septic time and true septic time
-    pred_septic_time = df_pred[df_pred['preds'] == 1].groupby('id')['rolling_hours'].min() - 1
-    true_septic_time = df_pred[df_pred['labels'] == 1].groupby('id')['rolling_hours'].max() - 1
+    pred_septic_time = df_pred[df_pred['preds'] == 1].groupby('id')[
+        'rolling_hours'].min() - 1
+    true_septic_time = df_pred[df_pred['labels'] ==
+                               1].groupby('id')['rolling_hours'].max() - 1
     ids = 0
     if cohort == 'correct_predicted':
-        ids = df_pred[(df_pred['preds'] == 1) & (df_pred['labels'] == 1)]['id'].unique()
+        ids = df_pred[(df_pred['preds'] == 1) & (
+            df_pred['labels'] == 1)]['id'].unique()
         df_pred1 = df_pred.loc[df_pred['id'].isin(ids)]
-        pred_septic_time = df_pred1[df_pred1['preds'] == 1].groupby('id')['rolling_hours'].min() - 1
-        true_septic_time = df_pred1[df_pred1['labels'] == 1].groupby('id')['rolling_hours'].min() - 1 + T
+        pred_septic_time = df_pred1[df_pred1['preds'] == 1].groupby('id')[
+            'rolling_hours'].min() - 1
+        true_septic_time = df_pred1[df_pred1['labels'] == 1].groupby(
+            'id')['rolling_hours'].min() - 1 + T
 
     return patient_true_label, patient_pred_label.values, \
-           confusion_matrix(patient_true_label, patient_pred_label), \
-           pred_septic_time, true_septic_time, ids, patient_icustay
+        confusion_matrix(patient_true_label, patient_pred_label), \
+        pred_septic_time, true_septic_time, ids, patient_icustay
+
 
 def suboptimal_choice_patient_df(df, labels_true, prob_preds, a1=6, thresholds=np.arange(100)[1:-20] / 100,
-                              sample_ids=None):
+                                 sample_ids=None):
     """
         Finding suboptimal solution by through different threshold for probability
         Outputs:
@@ -228,7 +248,8 @@ def suboptimal_choice_patient_df(df, labels_true, prob_preds, a1=6, thresholds=n
 
     return CMs, patient_pred_label_list, pred_septic_time_list
 
-def suboptimal_choice_patient(labels_true, prob_preds, val_full_indices, \
+
+def suboptimal_choice_patient(labels_true, prob_preds, val_full_indices,
                               a1=6, n=10, precision=100, discard=-1):
     """
 
@@ -251,7 +272,7 @@ def suboptimal_choice_patient(labels_true, prob_preds, val_full_indices, \
 
     """
 
-    ## setting a sequence of thresholds
+    # setting a sequence of thresholds
 
     thresholds = np.arange(precision * n)[:discard * n] / precision / n
 
@@ -262,9 +283,9 @@ def suboptimal_choice_patient(labels_true, prob_preds, val_full_indices, \
     for thred in thresholds:
         val_preds = (prob_preds >= thred).astype('int')
 
-        CM, sepsis_time_difference, preds_septic_perpatient = patient_level_performance(val_preds, \
-                                                                                        labels_true, \
-                                                                                        val_full_indices, \
+        CM, sepsis_time_difference, preds_septic_perpatient = patient_level_performance(val_preds,
+                                                                                        labels_true,
+                                                                                        val_full_indices,
                                                                                         a1=a1)
         CMs.append(CM)
         time_difference_list.append(sepsis_time_difference)
@@ -282,9 +303,11 @@ def patient_idx(icustay_lengths):
 
     """
 
-    icustay_lengths_cumsum = np.insert(np.cumsum(np.array(icustay_lengths)), 0, 0)
+    icustay_lengths_cumsum = np.insert(
+        np.cumsum(np.array(icustay_lengths)), 0, 0)
     total_indices = len(icustay_lengths)
-    icustay_fullindices = [np.arange(icustay_lengths[i]) + icustay_lengths_cumsum[i] for i in range(total_indices)]
+    icustay_fullindices = [np.arange(
+        icustay_lengths[i]) + icustay_lengths_cumsum[i] for i in range(total_indices)]
 
     return icustay_fullindices
 
@@ -316,7 +339,8 @@ def patient_level_test_performance(test_preds, labels_true, test_full_indices, i
     instance_length = np.concatenate(test_full_indices).shape[0]
     patient_length = len(test_full_indices)
 
-    icu_lengths = np.array([len(test_full_indices[i]) for i in range(patient_length)])
+    icu_lengths = np.array([len(test_full_indices[i])
+                           for i in range(patient_length)])
 
     preds_septic_perpatient = np.array(
         [int(len(np.where(test_preds[test_full_indices[j]] > 0)[0]) > 0) for j in range(patient_length)])
@@ -324,11 +348,11 @@ def patient_level_test_performance(test_preds, labels_true, test_full_indices, i
     true_septic_perpatient = np.array(
         [int(len(np.where(labels_true[test_full_indices[j]] > 0)[0]) > 0) for j in range(patient_length)])
     preds_septic_time_perpatient = np.array(
-        [len(np.where(test_preds[test_full_indices[j]] == 0)[0]) for j in range(patient_length) \
+        [len(np.where(test_preds[test_full_indices[j]] == 0)[0]) for j in range(patient_length)
          if true_septic_perpatient[j] != 0 and len(np.where(test_preds[test_full_indices[j]] > 0)[0]) != 0])
 
     true_septic_time_perpatient = np.array(
-        [len(np.where(labels_true[test_full_indices[j]] == 0)[0]) for j in range(patient_length) \
+        [len(np.where(labels_true[test_full_indices[j]] == 0)[0]) for j in range(patient_length)
          if true_septic_perpatient[j] != 0 and len(np.where(test_preds[test_full_indices[j]] > 0)[0]) != 0])
 
     true_septic_time_perpatient = true_septic_time_perpatient + a1
@@ -336,19 +360,19 @@ def patient_level_test_performance(test_preds, labels_true, test_full_indices, i
     sepsis_time_difference = true_septic_time_perpatient - preds_septic_time_perpatient
 
     if icuid_seq is not None:
-        icuid_seq_preds_septic = np.array([icuid_seq[j] for j in range(patient_length) \
-                                           if true_septic_perpatient[j] != 0 and \
+        icuid_seq_preds_septic = np.array([icuid_seq[j] for j in range(patient_length)
+                                           if true_septic_perpatient[j] != 0 and
                                            len(np.where(test_preds[test_full_indices[j]] > 0)[0]) != 0])
 
         return confusion_matrix(true_septic_perpatient, preds_septic_perpatient), \
-               sepsis_time_difference, icuid_seq_preds_septic, preds_septic_perpatient
+            sepsis_time_difference, icuid_seq_preds_septic, preds_septic_perpatient
     else:
 
         return confusion_matrix(true_septic_perpatient, preds_septic_perpatient), \
-               sepsis_time_difference, preds_septic_perpatient
+            sepsis_time_difference, preds_septic_perpatient
 
 
-def suboptimal_choice_patient_test(labels_true, prob_preds, test_full_indices, \
+def suboptimal_choice_patient_test(labels_true, prob_preds, test_full_indices,
                                    icuid_seq=None, a1=6, n=10, precision=100, discard=-1):
     """
 
@@ -367,7 +391,7 @@ def suboptimal_choice_patient_test(labels_true, prob_preds, test_full_indices, \
 
 
     """
-    ## setting a sequence of thresholds
+    # setting a sequence of thresholds
 
     thresholds = np.arange(precision * n)[:discard * n] / precision / n
 
@@ -381,16 +405,16 @@ def suboptimal_choice_patient_test(labels_true, prob_preds, test_full_indices, \
         test_preds = (prob_preds >= thred).astype('int')
         if icuid_seq != None:
             CM, sepsis_time_difference, \
-            icuid_seq_preds_septic, preds_septic_perpatient = patient_level_test_performance(test_preds, \
-                                                                                             labels_true, \
-                                                                                             test_full_indices, \
-                                                                                             icuid_seq, \
-                                                                                             a1=a1)
+                icuid_seq_preds_septic, preds_septic_perpatient = patient_level_test_performance(test_preds,
+                                                                                                 labels_true,
+                                                                                                 test_full_indices,
+                                                                                                 icuid_seq,
+                                                                                                 a1=a1)
         else:
             CM, sepsis_time_difference, \
-            preds_septic_perpatient = patient_level_test_performance(test_preds, labels_true, \
-                                                                     test_full_indices, \
-                                                                     icuid_seq=icuid_seq, a1=a1)
+                preds_septic_perpatient = patient_level_test_performance(test_preds, labels_true,
+                                                                         test_full_indices,
+                                                                         icuid_seq=icuid_seq, a1=a1)
 
         CMs.append(CM)
         time_difference_list.append(sepsis_time_difference)
@@ -462,7 +486,8 @@ def patient_level_auc(labels_true, probs_preds, full_indices, precision, n=10, d
     for thresh in thresholds:
         preds = (probs_preds >= thresh).astype('int')
 
-        CM, _, _ = patient_level_test_performance(preds, labels_true, full_indices, a1=a1)
+        CM, _, _ = patient_level_test_performance(
+            preds, labels_true, full_indices, a1=a1)
 
         CMs.append(CM)
 
@@ -537,11 +562,12 @@ def output_at_metric_level(somelist, metric_data, metric_required=[0.80, 0.85]):
         return output
 
 
-def patient_level_main_outputs_threemodels(labels_list_list, probs_list_list, \
-                                           test_indices_list_list, \
-                                           icuid_sequence_list_list=None, \
-                                           models=['lgbm', 'lstm', 'coxph'], \
-                                           definitions=['t_sofa', 't_suspicion', 't_sepsis_min'], \
+def patient_level_main_outputs_threemodels(labels_list_list, probs_list_list,
+                                           test_indices_list_list,
+                                           icuid_sequence_list_list=None,
+                                           models=['lgbm', 'lstm', 'coxph'],
+                                           definitions=[
+                                               't_sofa', 't_suspicion', 't_sepsis_min'],
                                            n=10, a1=6, precision=100):
     """
 
@@ -570,28 +596,29 @@ def patient_level_main_outputs_threemodels(labels_list_list, probs_list_list, \
     """
 
     tprs_list_list, fprs_list_list, fnrs_list_list, \
-    pres_list_list, accs_list_list, \
-    time_list_list, icuid_seq_list_list = [], [], [], [], [], [], []
+        pres_list_list, accs_list_list, \
+        time_list_list, icuid_seq_list_list = [], [], [], [], [], [], []
 
     for model in range(len(models)):
 
-        tprs_list, fprs_list, fnrs_list, pres_list, accs_list, time_list, icuid_seq_list = [], [], [], [], [], [], []
+        tprs_list, fprs_list, fnrs_list, pres_list, accs_list, time_list, icuid_seq_list = [
+        ], [], [], [], [], [], []
 
         for defi in range(len(definitions)):
 
             if icuid_sequence_list_list != None:
-                CMs, time_differences, icuid_seq, _ = suboptimal_choice_patient_test(labels_list_list[model][defi], \
-                                                                                     probs_list_list[model][defi], \
+                CMs, time_differences, icuid_seq, _ = suboptimal_choice_patient_test(labels_list_list[model][defi],
+                                                                                     probs_list_list[model][defi],
                                                                                      test_indices_list_list[model][
-                                                                                         defi], \
+                                                                                         defi],
                                                                                      icuid_sequence_list_list[model][
-                                                                                         defi], \
+                                                                                         defi],
                                                                                      precision=precision, n=n, a1=a1)
             else:
-                CMs, time_differences, _ = suboptimal_choice_patient_test(labels_list_list[model][defi], \
-                                                                          probs_list_list[model][defi], \
-                                                                          test_indices_list_list[model][defi], \
-                                                                          icuid_seq=None, \
+                CMs, time_differences, _ = suboptimal_choice_patient_test(labels_list_list[model][defi],
+                                                                          probs_list_list[model][defi],
+                                                                          test_indices_list_list[model][defi],
+                                                                          icuid_seq=None,
                                                                           precision=precision, n=n, a1=a1)
 
             tpr, tnr, fnr, pre, acc = decompose_cms(CMs)
@@ -618,9 +645,10 @@ def patient_level_main_outputs_threemodels(labels_list_list, probs_list_list, \
         return tprs_list_list, fprs_list_list, fnrs_list_list, pres_list_list, accs_list_list, time_list_list
 
 
-def patient_level_threded_output_threemodels(some_list_list, metric_seq_list_list, \
-                                             models=['lgbm', 'lstm', 'coxph'], \
-                                             definitions=['t_sofa', 't_suspicion', 't_sepsis_min'], \
+def patient_level_threded_output_threemodels(some_list_list, metric_seq_list_list,
+                                             models=['lgbm', 'lstm', 'coxph'],
+                                             definitions=[
+                                                 't_sofa', 't_suspicion', 't_sepsis_min'],
                                              metric_required=[0.85]):
     """
 
@@ -650,15 +678,11 @@ def patient_level_threded_output_threemodels(some_list_list, metric_seq_list_lis
         output_list = []
 
         for defi in range(len(definitions)):
-            output_current = output_at_metric_level(some_list_list[model][defi], \
-                                                    metric_seq_list_list[model][defi], \
+            output_current = output_at_metric_level(some_list_list[model][defi],
+                                                    metric_seq_list_list[model][defi],
                                                     metric_required=metric_required)
             output_list.append(output_current)
 
         output_list_list.append(output_list)
 
     return output_list_list
-
-
-
-

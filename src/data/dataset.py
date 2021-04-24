@@ -1,3 +1,4 @@
+import omni.functions as omni_functions
 import sys
 
 import numpy as np
@@ -5,7 +6,6 @@ import torch
 from torch.utils.data import Dataset
 
 sys.path.insert(0, '../')
-import omni.functions as omni_functions
 
 
 class TimeSeriesDataset(Dataset):
@@ -25,6 +25,7 @@ class TimeSeriesDataset(Dataset):
         - When getting dataset[column_name] it would be good to return a TimeSeriesDataset instance instead of a tensor
         we then need to implement how to add, subtract, divide etc with this class.
     """
+
     def __init__(self, data=None, columns=None, lengths=None):
         """
         Args:
@@ -33,11 +34,12 @@ class TimeSeriesDataset(Dataset):
             columns (list): List of column names of length C.
         """
         if data is not None:
-            self.data = torch.nn.utils.rnn.pad_sequence(data, padding_value=np.nan, batch_first=True)
-            if lengths==None:
+            self.data = torch.nn.utils.rnn.pad_sequence(
+                data, padding_value=np.nan, batch_first=True)
+            if lengths == None:
                 self.lengths = [d.size(0) for d in data]
             else:
-                self.lengths=lengths
+                self.lengths = lengths
             self.columns = columns
 
             # Error handling
@@ -117,13 +119,18 @@ class TimeSeriesDataset(Dataset):
             if len(int_cols) == 0:
                 int_cols = [-1]
             max_int = max(int_cols)
-            columns = [str(x) for x in range(max_int + 1, max_int + 1 + new_features)]
+            columns = [str(x) for x in range(
+                max_int + 1, max_int + 1 + new_features)]
 
         # Error handling
-        assert data.shape[0:2] == self.data.shape[0:2], 'Dataset data and input data are different shapes.'
-        assert len(columns) == new_features, 'Input data has a different length to input columns.'
-        assert isinstance(columns, list), 'Columns must be inserted as list type.'
-        assert len(set(columns)) == len(columns), 'Column names are not unique.'
+        assert data.shape[0:2] == self.data.shape[0:
+                                                  2], 'Dataset data and input data are different shapes.'
+        assert len(
+            columns) == new_features, 'Input data has a different length to input columns.'
+        assert isinstance(
+            columns, list), 'Columns must be inserted as list type.'
+        assert len(set(columns)) == len(
+            columns), 'Column names are not unique.'
 
         # Update
         self.data = torch.cat((self.data, data), dim=2)
@@ -166,12 +173,14 @@ class TimeSeriesDataset(Dataset):
         dataset.lengths = self.lengths
         return dataset
 
+
 class ListDataset(Dataset):
     """Simple dataset for ragged length list-style data.
 
     If your data consists of tensors of variable lengths inside a list, indexing this dataset will get the corresponding
     list indexed tensor. Useful for deep learning sequential modelling, RNNs, GRUs, etc.
     """
+
     def __init__(self, data_list, labels):
         self.data_list = data_list
         self.labels = labels
@@ -185,6 +194,7 @@ class ListDataset(Dataset):
 
 class LocIndexer():
     """ Emulates the pandas loc behaviour to work with TimeSeriesDataset. """
+
     def __init__(self, dataset):
         """
         Args:
@@ -204,7 +214,8 @@ class LocIndexer():
         col_mask = self.dataset._col_indexer(cols)
 
         if not isinstance(idx, slice):
-            assert isinstance(idx, int), 'Either index with a slice (a:b) or an integer.'
+            assert isinstance(
+                idx, int), 'Either index with a slice (a:b) or an integer.'
             idx = slice(idx, idx+1)
 
         return self.dataset.data[idx, :, col_mask]
@@ -237,7 +248,8 @@ def index_getter(full_list, idx_items):
 
     # Check that idx_items exist in full_list
     diff_cols = [c for c in idx_items if c not in full_list]
-    assert len(diff_cols) == 0, "The following cols do not exist in the dataset: {}".format(diff_cols)
+    assert len(diff_cols) == 0, "The following cols do not exist in the dataset: {}".format(
+        diff_cols)
 
     # Actual masking
     col_mask = [c in idx_items for c in full_list]
