@@ -14,7 +14,7 @@ TODO list:
 - [ ] final check analysis code compatibility
 - [ ] bash script to download all existing models to model directory.
 - [x] code cleaning: delete all unnecessary codes, code linting, code commenting.
-- [ ] add the notebook
+- [ ] add notebooks.
 
 ------------
 
