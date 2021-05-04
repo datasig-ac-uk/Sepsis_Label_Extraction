@@ -61,8 +61,6 @@ this will automatically set up the models folder and then run the evaluation for
 python3 models/main.py --model 'LGBM' --process 'eval'
 ```
 
-=======
-
 Illustration 
 ------------
 In order to reproduce all the plots in the paper, run the following command after obtaining all predictions from model evaluation step.   
