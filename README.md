@@ -50,6 +50,16 @@ Hyperparameter tuning, model training and evaluation should be done in sequence 
 2. Then model is trained and saved in /model/ directory for later use on evaluation.
 3. Evaluation will produce numerical results and predictions, which are saved in outputs/results and outputs/predictions respectively. 
 
+Note:
+In order to reproduce our results with our trained model, you can download all the trained modelby
+```
+bash download_models.sh
+```
+this will automatically set up the models folder and then run the evaluation for all models, e.g. for LGBM.
+```
+python3 models/main.py --model 'LGBM' --process 'eval'
+```
+
 Illustration 
 ------------
 In order to reproduce all the plots in the paper, run the following command after obtaining all predictions from model evaluation step.   
