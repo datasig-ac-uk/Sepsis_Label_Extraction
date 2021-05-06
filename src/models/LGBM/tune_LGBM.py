@@ -1,20 +1,22 @@
+import sys
+sys.path.insert(0, '../../')
 import models.LGBM.LGBM_functions as lgbm_func
 import features.mimic3_function as mimic3_myfunc
 import constants
-import sys
+
 
 from lightgbm import LGBMClassifier
 
-sys.path.insert(0, '../../')
+
 
 if __name__ == '__main__':
-    current_data = 'blood_only/'
+    current_data = constants.exclusion_rules[0]
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
         current_data, model=constants.MODELS[0])
 
     a1, a2, k = 6, 0, 5
     x, y = 24, 12
-    n_iter = 500
+    n_iter = 5
 
     Data_Dir = Root_Data + 'train/'
 
