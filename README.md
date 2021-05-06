@@ -24,7 +24,7 @@ pip install -r requirements.txt
 ```
 Export PYTHONPATH
 ```
-source pathonpath.sh
+source pythonpath.sh
 ```
 Raw Data  
 ------------

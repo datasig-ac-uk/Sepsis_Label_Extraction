@@ -1,15 +1,15 @@
-from visualization.plot_functions import suboptimal_choice_patient
-from visualization.patientlevel_function import decompose_cms, output_at_metric_level
-import features.mimic3_function as mimic3_myfunc
-import omni.functions as omni_functions
-import models.CoxPHM.coxphm_functions as coxphm_functions
-import constants
 import sys
 import numpy as np
 import pandas as pd
 from sklearn.metrics import auc
 
 sys.path.insert(0, '../../')
+import constants
+import models.CoxPHM.coxphm_functions as coxphm_functions
+import omni.functions as omni_functions
+import features.mimic3_function as mimic3_myfunc
+from visualization.patientlevel_function import decompose_cms, output_at_metric_level
+from visualization.plot_functions import suboptimal_choice_patient
 
 
 def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
@@ -94,14 +94,14 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
 
 
 if __name__ == '__main__':
-    train_test = 'test'
+    train_test = 'train'
     T_list = constants.T_list[1:2]
     data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs[:1]
     eval_CoxPHM(T_list, x_y, constants.FEATURES, data_folder,
                 train_test, True, fake_test=False)
-    x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules[1:]
-    for data_folder in data_folder_list:
-        eval_CoxPHM(T_list, x_y, constants.FEATURES, data_folder,
-                    train_test, True, fake_test=False)
+    #x_y = [(24, 12)]
+   # data_folder_list = constants.exclusion_rules[1:]
+    #for data_folder in data_folder_list:
+    #    eval_CoxPHM(T_list, x_y, constants.FEATURES, data_folder,
+        #            train_test, True, fake_test=False)

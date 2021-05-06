@@ -12,7 +12,7 @@ import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score, roc_curve, auc
-
+import random
 sys.path.insert(0, '../../')
 
 
@@ -95,8 +95,14 @@ def eval_model(test_dl, model, save_dir):
 def model_cv(config, data_list, device):
     ts_dataset, labels, train_patient_indices, train_full_indices, test_patient_indices, \
         test_full_indices, k = get_pinned_object(data_list)
-    p, hidden_channels, linear_channels, epochs = config["p"], config["hidden_channels"], \
-        config["linear_channels"], config["epochs"]
+    p, hidden_channels, linear_channels, epochs, seed = config["p"], config["hidden_channels"], \
+        config["linear_channels"], config["epochs"],config['seed']
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.backends.cudnn.deterministic = True
     test_true, test_preds = [], []
     data = torch.FloatTensor(ts_dataset.data.float())
     lengths = torch.FloatTensor(ts_dataset.lengths)
@@ -158,5 +164,6 @@ search_space = {
     "hidden_channels": tune.choice([16, 32, 48, 64]),
     "linear_channels": tune.choice([16, 32, 48, 64]),
     "epochs": tune.sample_from(lambda _: np.random.randint(low=10, high=30)),
-    "lr": tune.uniform(1e-4, 8e-4)
+    "lr": tune.uniform(1e-4, 8e-4),
+    "seed": 1234
 }

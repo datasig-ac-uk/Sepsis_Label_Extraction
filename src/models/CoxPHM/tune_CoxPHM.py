@@ -11,6 +11,7 @@ import pandas as pd
 import ray
 from ray import tune
 from ray.tune.utils import pin_in_object_store
+import random
 import constants
 sys.path.insert(0, '../../')
 
@@ -20,6 +21,8 @@ if __name__ == '__main__':
     model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
         current_data, model=model)
+    random.seed(1234)
+    np.random.seed(1234)
 
     T, a2, k = 6, 0, 5
     x, y = 24, 12
@@ -28,7 +31,7 @@ if __name__ == '__main__':
 
     print(Data_Dir)
 
-    for definition in constants.FEATURES:
+    for definition in constants.FEATURES[:1]:
         labels = np.load(Data_Dir + 'label' + '_'+str(x)+'_' +
                          str(y)+'_'+str(T) + definition[1:] + '.npy')
         df = pd.read_pickle(Data_Dir + str(x) + '_' +
@@ -37,9 +40,10 @@ if __name__ == '__main__':
                            str(x) + '_' + str(y) + definition[1:] + '.npy')
 
         icustay_lengths = np.load(
-            Data_Dir + 'icustay_lengths' + definition[1:] + '.npy')
+            Data_Dir + 'icustay_lengths'+'_'+str(x) + '_' +
+                            str(y) + definition[1:] + '.npy')
         tra_patient_indices, tra_full_indices, val_patient_indices, val_full_indices = \
-            coxphm_functions.cv_pack(
+            mimic3_myfunc.cv_pack(
                 icustay_lengths, k=k, definition=definition, path_save=Data_Dir, save=True)
 
         # prepare dataframe for coxph model
@@ -50,7 +54,7 @@ if __name__ == '__main__':
             [df_coxph, tra_full_indices, val_full_indices, k])
         analysis = tune.run(partial(coxphm_functions.model_cv, data=data, a1=T),
                             name='mimic_coxph' + definition[1:], config=coxphm_functions.search_space,
-                            resources_per_trial={"cpu": 1}, num_samples=100,
+                            resources_per_trial={"cpu": 1}, num_samples=10,
                             max_failures=5, reuse_actors=True, verbose=1)
         best_trial = analysis.get_best_trial("mean_accuracy")
         print("Best trial config: {}".format(best_trial.config))

@@ -1,4 +1,3 @@
-import omni.functions as omni_functions
 import sys
 
 import numpy as np
@@ -6,6 +5,7 @@ import torch
 from torch.utils.data import Dataset
 
 sys.path.insert(0, '../')
+import omni.functions as omni_functions
 
 
 class TimeSeriesDataset(Dataset):

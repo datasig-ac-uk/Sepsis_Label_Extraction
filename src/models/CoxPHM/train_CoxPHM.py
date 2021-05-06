@@ -1,13 +1,14 @@
-import features.mimic3_function as mimic3_myfunc
-import omni.functions as omni_functions
-import models.CoxPHM.coxphm_functions as coxphm_functions
-import constants
 import sys
 import numpy as np
 import pandas as pd
 
 
 sys.path.insert(0, '../../')
+import constants
+import models.CoxPHM.coxphm_functions as coxphm_functions
+import omni.functions as omni_functions
+import features.mimic3_function as mimic3_myfunc
+
 
 
 def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
@@ -63,8 +64,8 @@ if __name__ == '__main__':
     x_y = constants.xy_pairs[:1]
     train_CoxPHM(T_list, x_y, constants.FEATURES,
                  data_folder, True, fake_test=False)
-    x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules[1:]
-    for data_folder in data_folder_list:
-        train_CoxPHM(T_list, x_y, constants.FEATURES,
-                     data_folder, True, fake_test=False)
+    #x_y = [(24, 12)]
+    #data_folder_list = constants.exclusion_rules[1:]
+    #for data_folder in data_folder_list:
+       # train_CoxPHM(T_list, x_y, constants.FEATURES,
+                     #data_folder, True, fake_test=False)

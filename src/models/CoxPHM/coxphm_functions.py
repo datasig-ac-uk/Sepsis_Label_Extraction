@@ -1,4 +1,3 @@
-import features.dicts as dicts
 import sys
 
 from lifelines import CoxPHFitter
@@ -7,11 +6,11 @@ import pandas as pd
 from ray import tune
 from ray.tune.utils import get_pinned_object
 from sklearn.metrics import roc_curve, auc, accuracy_score
-
+import random
 sys.path.insert(0, '../../')
+import features.dicts as dicts
 
-
-def Coxph_df(df, features, feature_dict, T, labels, signature=True):
+def Coxph_df(df, features, feature_dict, T, labels,signature=True):
     """
     :param df:
     :param features:
@@ -79,12 +78,15 @@ original_features = dicts.feature_dict_james['vitals'] + dicts.feature_dict_jame
 
 search_space = {
     'regularize': tune.uniform(1e-4, 1e-3),
-    'step_size': tune.uniform(0, 0.2)
+    'step_size': tune.uniform(0, 0.2),
+    'seed': 1234
 }
 
 
 def model_cv(config, data, a1):
-    regularize, step_size = config['regularize'], config['step_size']
+    regularize, step_size,seed = config['regularize'], config['step_size'],config['seed']
+    random.seed(seed)
+    np.random.seed(seed)
     df_coxph, train_full_indices, test_full_indices, k = get_pinned_object(
         data)
     test_true, test_preds = [], []

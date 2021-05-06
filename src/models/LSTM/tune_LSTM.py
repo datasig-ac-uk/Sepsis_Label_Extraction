@@ -11,7 +11,7 @@ import ray
 from ray import tune
 from ray.tune.utils import pin_in_object_store
 import torch
-
+import random
 sys.path.insert(0, '../../')
 
 
@@ -21,6 +21,13 @@ if __name__ == '__main__':
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
+    seed = 1234
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.backends.cudnn.deterministic = True
 
     current_data = 'blood_only/'
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
@@ -39,7 +46,8 @@ if __name__ == '__main__':
         dataset = TimeSeriesDataset().load(Data_Dir + str(x) + '_' +
                                            str(y) + definition[1:] + '_ffill.tsd')
         icustay_lengths = np.load(
-            Data_Dir + 'icustay_lengths' + definition[1:] + '.npy')
+            Data_Dir + 'icustay_lengths' +'_'+ str(x) + '_' +
+            str(y) + definition[1:] + '.npy')
 
         tra_patient_indices, tra_full_indices, val_patient_indices, val_full_indices = \
             mimic3_myfunc.cv_pack(
@@ -49,7 +57,7 @@ if __name__ == '__main__':
                                    val_patient_indices, val_full_indices, k])
         analysis = tune.run(partial(lstm_functions.model_cv, data_list=data, device=device),
                             name='mimic_lstm' + definition[1:], config=lstm_functions.search_space,
-                            resources_per_trial={"gpu": 1}, num_samples=80,
+                            resources_per_trial={"gpu": 1}, num_samples=3,
                             max_failures=5, reuse_actors=True, verbose=1)
         best_trial = analysis.get_best_trial("mean_accuracy")
         print("Best trial config: {}".format(best_trial.config))

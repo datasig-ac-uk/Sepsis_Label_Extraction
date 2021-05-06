@@ -51,11 +51,12 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
                     config_dir + definition[1:])
                 print('load timeseries dataset')
                 dataset = TimeSeriesDataset().load(
-                    Data_Dir + definition[1:] + '_ffill.tsd')
+                    Data_Dir + str(x) + '_' +
+                    str(y) + definition[1:] + '_ffill.tsd')
 
                 print('load train labels')
                 labels_test = np.load(
-                    Data_Dir + 'label' + definition[1:] + '_' + str(T) + '.npy')
+                    Data_Dir + 'label' + '_' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
                 # get torch dataloader for lstm
                 scaler = omni_functions.load_pickle(
                     Model_Dir + 'hyperparameter/scaler' + definition[1:])
@@ -80,7 +81,7 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
                                                                                               T) + definition[
                                                                                               1:] + '_' + train_test + '.npy')
                 df_sepsis = pd.read_pickle(
-                    Data_Dir + definition[1:] + '_dataframe.pkl')
+                    Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
                 preds = np.load(Output_predictions + str(x) + '_' + str(y) + '_'
                                 + str(T) + definition[1:] + '_' + train_test + '.npy')
                 CMs, _, _ = suboptimal_choice_patient(df_sepsis, true, preds, a1=6, thresholds=thresholds,
@@ -115,14 +116,16 @@ if __name__ == '__main__':
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
-    train_test = 'test'
-    T_list = constants.T_list[2]
+    train_test = 'train'
+    T_list = constants.T_list[1:2]
     data_folder = constants.exclusion_rules[0]
-    x_y = constants.xy_pairs
-    eval_LSTM(T_list, x_y, constants.FEATURES,
+    x_y = constants.xy_pairs[:1]
+    eval_LSTM(T_list, x_y, constants.FEATURES[:1],
               data_folder, train_test, fake_test=False)
+    """
     x_y = [(24, 12)]
     data_folder_list = constants.exclusion_rules[1:]
     for data_folder in data_folder_list:
         eval_LSTM(T_list, x_y, constants.FEATURES,
                   data_folder, train_test, fake_test=False)
+    """

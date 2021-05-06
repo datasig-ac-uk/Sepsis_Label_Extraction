@@ -1,7 +1,3 @@
-import features.dicts as dicts
-from data.functions import torch_ffill
-from data.dataset import TimeSeriesDataset
-import constants
 import os
 import sys
 
@@ -14,6 +10,10 @@ import torch
 
 # from dicts import *
 sys.path.insert(0, '../')
+import constants
+from data.dataset import TimeSeriesDataset
+from data.functions import torch_ffill
+import features.dicts as dicts
 
 
 def create_folder(path):
@@ -29,14 +29,14 @@ def create_folder(path):
 def folders(current_data, model='LGBM'):
     Root_Data = constants.DATA_processed + current_data+'/'
 
-    Model_Dir = constants.MODELS_DIR + current_data + model + '/'
+    Model_Dir = constants.MODELS_DIR + current_data + '/' + model + '/'
     create_folder(Model_Dir)
 
 #     Data_save = Root_Data + 'results/'
 
     Output_predictions = constants.OUTPUT_DIR + \
-        'predictions/' + current_data + model + '/'
-    Output_results = constants.OUTPUT_DIR + 'results/' + current_data + model + '/'
+        'predictions/' + current_data + '/' + model + '/'
+    Output_results = constants.OUTPUT_DIR + 'results/' + current_data + '/' + model + '/'
 
     # create_folder(Data_save)
     create_folder(Output_predictions)

@@ -1,10 +1,8 @@
-import features.mimic3_function as mimic3_myfunc
-import constants
 import sys
 
 sys.path.insert(0, '../')
-
-
+import constants
+import features.mimic3_function as mimic3_myfunc
 def features_wrapper(data_list, x_y_list, purpose):
     """
 

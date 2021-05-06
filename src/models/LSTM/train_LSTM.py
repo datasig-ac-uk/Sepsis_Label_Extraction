@@ -74,13 +74,19 @@ if __name__ == '__main__':
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
-
+    """
+    seed = 1023
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.backends.cudnn.deterministic = True
+    """
     T_list = constants.T_list[1:2]
     print(T_list)
     data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs[:1]
 
-    train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
+    train_LSTM(T_list, x_y, constants.FEATURES[:1], data_folder, fake_test=False)
     """
     x_y = [(24, 12)]
     data_folder_list = constants.exclusion_rules[1:]
