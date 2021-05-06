@@ -1,9 +1,4 @@
-import models.LGBM.LGBM_functions as lgbm_functions
-import visualization.patientlevel_function as mimic3_myfunc_patientlevel
-import features.mimic3_function as mimic3_myfunc
-import omni.functions as omni_functions
-from data.dataset import TimeSeriesDataset
-import constants
+
 import os
 import sys
 
@@ -14,6 +9,12 @@ from sklearn import metrics
 
 sys.path.insert(0, '../../')
 
+import models.LGBM.LGBM_functions as lgbm_functions
+import visualization.patientlevel_function as mimic3_myfunc_patientlevel
+import features.mimic3_function as mimic3_myfunc
+import omni.functions as omni_functions
+from data.dataset import TimeSeriesDataset
+import constants
 
 def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', thresholds=np.arange(10000) / 10000, fake_test=False):
     """
@@ -38,7 +39,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
     purpose = train_test
     Data_Dir = Root_Data + purpose + '/'
 
-    for x, y in x_y:
+    for x, y in x_y[1:2]:
 
         for a1 in T_list:
             for definition in definitions:
@@ -96,11 +97,11 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
 
 if __name__ == '__main__':
 
-    data_folder = 'blood_only/'
+    data_folder = constants.exclusion_rules[0]
 
     eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
               data_folder, train_test='train',  fake_test=False)
-    data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
+    data_folder_list =  constants.exclusion_rules[1:]
     xy_pairs = [(24, 12)]
     for data_folder in data_folder_list:
          eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder, fake_test=False)
