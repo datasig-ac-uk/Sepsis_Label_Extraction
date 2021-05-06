@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
               data_folder, train_test='train',  fake_test=False)
-#     data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
-#     xy_pairs = [(24, 12)]
-#     for data_folder in data_folder_list:
-#         eval_LSTM([6], xy_pairs, constants.FEATURES, data_folder, fake_test=False)
+    data_folder_list = ['no_gcs/', 'all_cultures/', 'absolute_values/', 'strict_exclusion/']
+    xy_pairs = [(24, 12)]
+    for data_folder in data_folder_list:
+         eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder, fake_test=False)
