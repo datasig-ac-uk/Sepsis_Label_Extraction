@@ -1,3 +1,6 @@
+import sys
+
+sys.path.insert(0, '../../')
 import models.LGBM.LGBM_functions as lgbm_func
 import features.mimic3_function as mimic3_myfunc
 import constants
@@ -9,20 +12,18 @@ import pickle
 
 from lightgbm import LGBMClassifier
 
-import sys
 
-sys.path.insert(0, '../../')
 
 
 if __name__ == '__main__':
 
     a2, k = 0, 5
-    current_data = 'blood_only/'
+    current_data = constants.exclusion_rules[0]
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
         current_data, model='LGBM')
 
     train_Dir = Root_Data + 'train/'
-    for x, y in constants.xy_pairs:
+    for x, y in constants.xy_pairs[1:2]:
         for definition in constants.FEATURES:
             for a1 in constants.T_list:
                 print(x, y, a1, definition)
