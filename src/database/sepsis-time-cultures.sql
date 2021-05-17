@@ -15,8 +15,8 @@ Some of the tables written by Alistair Johnson, we have changed the tables for e
 
 */
 
-  DROP MATERIALIZED VIEW IF EXISTS sepsis_cohort_time_sensitivity_2412 CASCADE;
-CREATE MATERIALIZED VIEW sepsis_cohort_time_sensitivity_2412 AS
+  DROP MATERIALIZED VIEW IF EXISTS sepsis_cohort_time_cultures_2412 CASCADE;
+CREATE MATERIALIZED VIEW sepsis_cohort_time_cultures_2412 AS
 
 
         -- Define the services that the patient is receiving care under
@@ -146,6 +146,10 @@ CREATE MATERIALIZED VIEW sepsis_cohort_time_sensitivity_2412 AS
                , spec_type_desc
                , MAX(CASE WHEN org_name IS NOT NULL AND org_name != '' THEN 1 ELSE 0 END) AS PositiveCulture
           FROM microbiologyevents
+           WHERE spec_type_desc IN 
+                                   (SELECT spec_type_desc 
+                                      FROM culture_list 
+                                     WHERE used_for_sepsis IN ('yes', 'depends'))
          GROUP BY hadm_id, chartdate, charttime, spec_type_desc
         )
         
@@ -204,7 +208,7 @@ CREATE MATERIALIZED VIEW sepsis_cohort_time_sensitivity_2412 AS
                      (PARTITION BY psofa.icustay_id, t_suspicion 
                           ORDER BY psofa.icustay_id, t_suspicion, starttime) AS sofa_difference
           FROM unique_times u
-          LEFT JOIN pivoted_sofa_mod psofa
+          LEFT JOIN pivoted_sofa_ly psofa
             ON u.icustay_id = psofa.icustay_id
     
     

@@ -13,7 +13,10 @@
 \ir extracted_data.sql
 
 \ir abx-poe-list.sql
-\ir sepsis-time-all.sql
+
+\ir culture_list.sql
+
+\ir sepsis-time-cultures.sql
 \ir sepsis-time-abs.sql
 \ir sepsis-time-nogcs.sql
 
