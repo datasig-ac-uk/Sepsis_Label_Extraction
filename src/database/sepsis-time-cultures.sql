@@ -208,7 +208,7 @@ CREATE MATERIALIZED VIEW sepsis_cohort_time_cultures_2412 AS
                      (PARTITION BY psofa.icustay_id, t_suspicion 
                           ORDER BY psofa.icustay_id, t_suspicion, starttime) AS sofa_difference
           FROM unique_times u
-          LEFT JOIN pivoted_sofa_ly psofa
+          LEFT JOIN pivoted_sofa_mod psofa
             ON u.icustay_id = psofa.icustay_id
     
     
