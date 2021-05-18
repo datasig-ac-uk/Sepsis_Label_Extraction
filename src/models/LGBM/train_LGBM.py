@@ -28,7 +28,7 @@ if __name__ == '__main__':
             for a1 in constants.T_list:
                 print(x, y, a1, definition)
                 labels, features, icustay_lengths, icustay_ids = lgbm_func.feature_loading(train_Dir, definition,
-                                                                                           a1, k=k, cv=False)
+                                                                                           a1, k=k, x=x,y=y,cv=False)
 
                 with open(Model_Dir + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
                     best_paras_ = pickle.load(file)
