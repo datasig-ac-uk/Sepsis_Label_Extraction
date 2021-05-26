@@ -16,65 +16,7 @@ CREATE MATERIALIZED VIEW pivoted_lab_ffill AS
         -- involves first creating a lag/lead version of intime/outtime
         -- create a table which has fuzzy boundaries on ICU admission
         -- involves first creating a lag/lead version of intime/outtime
-  WITH i AS
-       (
-        SELECT subject_id, hadm_id, icustay_id, intime, outtime
-                -- find the outtime of the previous icustay and the intime of the next icustay
-               , LAG (outtime) OVER (PARTITION BY subject_id, hadm_id ORDER BY intime) AS outtime_lag
-               , LEAD (intime) OVER (PARTITION BY subject_id, hadm_id ORDER BY intime) AS intime_lead
-          FROM icustays
-        )
-
-       , iid_assign AS
-       (
-        SELECT i.subject_id, i.hadm_id, i.icustay_id
-               , admittime, dischtime,  intime, outtime, outtime_lag, intime_lead -- this line is just for checking purposes, can comment out
-                -- for the first icustay, then everything starting from hospital admission to outtime is assigned to this icustay id
-                -- for subsequent icustays, only data from the end of the previous icustay to the end of the currect icustay gets assigned to these ids. For the last icustay in the sequence, then everything from icu intime to the end of hospital admission is included
-                -- in order for the data extraction to be as inclusive as possible almost all lab events are included using the following boundaries (3 days before and after discharge - actually only 2.5 days / 60 hours before is required but this is easier for the purposed of having a hospital admission boundary). Only leaves out a special case which has been raised as an issue. The discrepency between edregtime and admittime has been raised as an issue.
-               , CASE WHEN i.outtime_lag IS NOT NULL 
-                 THEN i.outtime_lag
-                 ELSE ad.admittime - INTERVAL '72' HOUR
-                  END AS data_start
-               , CASE WHEN i.intime_lead IS NOT NULL 
-                 THEN i.outtime
-                 ELSE ad.dischtime + INTERVAL '72' HOUR
-                  END AS data_end
-          FROM i
-         INNER JOIN admissions ad 
-            ON i.hadm_id = ad.hadm_id
-        )
-        -- also create fuzzy boundaries on hospitalization
-        -- Note that sometimes the discharge time of the previous hospital occurs after the next hospital admission causing a negative difference, in that case the boundary here is set before the discharge time of the previous stay/after admittime of next hospital stay
-        -- No duplicate data appears to be created if we drop this requirement and this is likely to how the labevents table was created in the first place.
-       , h AS
-       (
-        SELECT subject_id, hadm_id, admittime, dischtime
-               , LAG (dischtime) OVER (PARTITION BY subject_id ORDER BY admittime) AS dischtime_lag
-               , LEAD (admittime) OVER (PARTITION BY subject_id ORDER BY admittime) AS admittime_lead
-          FROM admissions
-        )
-        
-       , adm AS
-       (
-        SELECT h.subject_id, h.hadm_id
-            -- this rule is:
-            --  if there are two hospitalizations within 24 hours, set the start/stop
-            --  time as half way between the two admissions
-               , CASE WHEN h.dischtime_lag IS NOT NULL
-                       AND h.dischtime_lag > (h.admittime - INTERVAL '144' HOUR)
-                 THEN h.admittime - ((h.admittime - h.dischtime_lag)/2)
-                 ELSE h.admittime - INTERVAL '72' HOUR
-                  END AS data_start
-               , CASE WHEN h.admittime_lead IS NOT NULL
-                       AND h.admittime_lead < (h.dischtime + INTERVAL '144' HOUR)
-                 THEN h.dischtime + ((h.admittime_lead - h.dischtime)/2)
-                 ELSE (h.dischtime + INTERVAL '72' HOUR)
-                  END AS data_end
-          FROM h
-        )
-        
-       , le AS
+  WITH le AS
        (
           -- begin query that extracts the data
         SELECT subject_id, charttime
@@ -232,17 +174,13 @@ CREATE MATERIALIZED VIEW pivoted_lab_ffill AS
         -- assign an icustay_id
        , all_data AS
        (
-        SELECT iid.icustay_id, adm.hadm_id, le_avg.*
+        SELECT id.icustay_id, id.hadm_id, le_avg.*
           FROM le_avg
-          LEFT JOIN adm
-            ON le_avg.subject_id  = adm.subject_id
-           AND le_avg.charttime >= adm.data_start
-           AND le_avg.charttime  < adm.data_end
-          LEFT JOIN iid_assign iid
-            ON  le_avg.subject_id = iid.subject_id
-           AND le_avg.charttime >= iid.data_start
-           AND le_avg.charttime  < iid.data_end
-         ORDER BY le_avg.subject_id, le_avg.charttime
+          LEFT JOIN assign_lab_ids id
+            ON le_avg.subject_id  = id.subject_id
+           AND le_avg.charttime >= id.starttime
+           AND le_avg.charttime  < id.endtime
+         ORDER BY le_avg.subject_id, le_avg.charttime;
         )
     
         -- Next we create some more tables to forward fill the data since lab data is so sparse

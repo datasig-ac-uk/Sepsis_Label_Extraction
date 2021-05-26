@@ -5,6 +5,7 @@
 \ir current_icu.sql
 
 \ir times.sql
+\ir assign-lab-ids.sql
 
 \ir pivoted-bg-mod.sql
 \ir pivoted-lab-ffill.sql

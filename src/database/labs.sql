@@ -362,6 +362,7 @@ CREATE MATERIALIZED VIEW extracted_labs AS
             AND grp.charttime < adm.data_end   
           INNER JOIN iid_assign iid
              ON grp.subject_id = iid.subject_id
+            AND iid.hadm_id = adm.hadm_id
           WHERE grp.charttime >= iid.data_start 
             AND grp.charttime <= iid.data_end
             AND (grp.specimen = 'ART' 
