@@ -180,7 +180,7 @@ CREATE MATERIALIZED VIEW pivoted_lab_ffill AS
             ON le_avg.subject_id  = id.subject_id
            AND le_avg.charttime >= id.starttime
            AND le_avg.charttime  < id.endtime
-         ORDER BY le_avg.subject_id, le_avg.charttime;
+         ORDER BY le_avg.subject_id, le_avg.charttime
         )
     
         -- Next we create some more tables to forward fill the data since lab data is so sparse
