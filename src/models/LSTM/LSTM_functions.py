@@ -1,7 +1,3 @@
-from models.nets import LSTM
-from data.torch_timeseries_dataset import LSTM_Dataset
-import features.scaler as scaler
-import constants
 import sys
 import time
 
@@ -15,7 +11,12 @@ from sklearn.metrics import accuracy_score, roc_curve, auc
 import random
 sys.path.insert(0, '../../')
 
-
+from models.nets import LSTM
+from data.torch_timeseries_dataset import LSTM_Dataset
+import features.scaler as scaler
+import constants
+import omni.functions as omni_functions
+from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
 def prepared_data_train(ts_dataset, labels, normalize, batch_size, device):
     dataset = ts_dataset
     if normalize:
@@ -77,6 +78,7 @@ def eval_model(test_dl, model, save_dir):
     fpr, tpr, thresholds = roc_curve(
         test_true + 1, test_preds[:, 1], pos_label=2)
     index = np.where(tpr >= 0.85)[0][0]
+
     specificity = 1 - fpr[index]
     auc_score = auc(fpr, tpr)
     print(test_true.shape, test_preds.shape)
@@ -84,12 +86,46 @@ def eval_model(test_dl, model, save_dir):
     if save_dir is None:
         pass
     else:
+        omni_functions._create_folder_if_not_exist(save_dir)
         np.save(save_dir, test_preds[:, 1])
     test_pred_labels = (test_preds[:, 1] > thresholds[index]).astype('int')
+    tn, fp, fn, tp = confusion_matrix(test_true, test_pred_labels).ravel()
+    sensitivity = tp / (tp + fn)
+    specificity = tn / (tn + fp)
     accuracy = accuracy_score(test_true, test_pred_labels)
     print('accuracy=', accuracy)
 
-    return auc_score, specificity, accuracy, test_true, test_preds[:, 1]
+    return auc_score, specificity,sensitivity, accuracy, test_true, test_preds[:, 1]
+
+def eval_model1(test_dl, model,threshold, save_dir):
+    model.eval()
+    test_preds, test_y = [], []
+    with torch.no_grad():
+        for step, (x, y) in enumerate(test_dl):
+            test_y.append(y.view(-1))
+            test_preds.append(torch.nn.functional.softmax(model(x), dim=1))
+
+    def tfm(x): return torch.cat(x).cpu().detach().numpy()
+
+    prob_preds_test = tfm(test_preds)[:,1]
+    test_labels = tfm(test_y)
+    test_preds = np.array((prob_preds_test >= threshold).astype('int'))
+    tn, fp, fn, tp = confusion_matrix(test_true, test_preds).ravel()
+    specificity = tn / (tn + fp)
+    sensitivity = tp / (tp + fn)
+
+    print('auc,sepcificity,sensitivity', roc_auc_score(
+        test_labels, prob_preds_test), specificity, sensitivity)
+    print('accuracy', accuracy_score(test_labels, test_preds))
+    accuracy = accuracy_score(df['label'].values, test_preds)
+    print('auc, sepcificity,accuracy', auc_score, specificity, accuracy)
+    if save_dir is None:
+        pass
+    else:
+        omni._create_folder_if_not_exist(filename)
+        np.save(save_dir, prob_preds_test)
+
+    return auc_score, specificity, sensitivity, accuracy, test_labels, prob_preds_test
 
 
 def model_cv(config, data_list, device):

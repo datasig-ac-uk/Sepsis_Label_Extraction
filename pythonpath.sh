@@ -6,3 +6,4 @@ function join() {
 mystring=$(join ':' $PWD/*)
 
 export PYTHONPATH="$mystring:$PYTHONPATH"
+echo $PYTHONPATH

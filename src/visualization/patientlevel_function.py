@@ -1,17 +1,17 @@
-import features.mimic3_function as mimic3_myfunc
-import features.dicts as dicts
 import os
 import pickle
 import random
-import sys
+
 
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
-
+import sys
 sys.path.insert(0, '../')
 
+import features.mimic3_function as mimic3_myfunc
+import features.dicts as dicts
 
 ################## Those for CV #############################
 
@@ -236,7 +236,9 @@ def suboptimal_choice_patient_df(df, labels_true, prob_preds, a1=6, thresholds=n
     CMs = []
     patient_pred_label_list = []
     pred_septic_time_list = []
+
     for thred in thresholds:
+
         pred_labels = (prob_preds >= thred).astype('int')
 
         _, patient_pred_label, CM, pred_septic_time, _, _, _ = patient_level_pred(df, labels_true, pred_labels, a1,
@@ -425,7 +427,7 @@ def suboptimal_choice_patient_test(labels_true, prob_preds, test_full_indices,
     if icuid_seq != None:
         return CMs, time_difference_list, icuid_seq_preds_septic_list, preds_septic_perpatient_list
     else:
-        return CMs, time_difference_list, preds_septic_perpatient_list
+        return CMs,time_difference_list, preds_septic_perpatient_list ##changed 19 May
 
 
 ################## Some useful functions #############################

@@ -1,26 +1,27 @@
-import features.mimic3_function as mimic3_myfunc
 import pickle
 import sys
-
+import pandas as pd
 from lightgbm import LGBMClassifier
 import numpy as np
-from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve
+from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 import joblib
 
 sys.path.insert(0, '../../')
+import features.mimic3_function as mimic3_myfunc
+import visualization.patientlevel_function as mimic3_myfunc_patientlevel
 
 
 ################################### LGBM tuning/training ########################################
 def feature_loading(Data_Dir, definition, a1, x=24, y=12, k=5, cv=True, save=True):
     current_labels = np.load(Data_Dir + 'label' + '_' +
-                             str(x)+'_'+str(y)+'_'+str(a1) + definition[1:] + '.npy')
+                             str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy')
     feature_data = np.load(Data_Dir + 'james_features' +
-                           '_' + str(x)+'_'+str(y) + definition[1:] + '.npy')
+                           '_' + str(x) + '_' + str(y) + definition[1:] + '.npy')
     icustay_lengths = np.load(
-        Data_Dir + 'icustay_lengths' + '_' + str(x)+'_'+str(y) + definition[1:] + '.npy')
+        Data_Dir + 'icustay_lengths' + '_' + str(x) + '_' + str(y) + definition[1:] + '.npy')
     icustay_ids = np.load(Data_Dir + 'icustay_id' + '_' +
-                          str(x)+'_'+str(y) + definition[1:] + '.npy')
+                          str(x) + '_' + str(y) + definition[1:] + '.npy')
     if cv:
         tra_patient_indices, tra_full_indices, val_patient_indices, val_full_indices = \
             mimic3_myfunc.cv_pack(
@@ -88,8 +89,8 @@ def model_validation(model, dataset, labels, tra_full_indices, val_full_indices)
     print('accuracy', accuracy_score(labels_true, tra_preds))
 
     return tra_preds, prob_preds, labels_true, \
-        roc_auc_score(labels_true, prob_preds), \
-        1 - fpr[index], accuracy_score(labels_true, tra_preds)
+           roc_auc_score(labels_true, prob_preds), \
+           1 - fpr[index], accuracy_score(labels_true, tra_preds)
 
 
 grid_parameters = {  # LightGBM
@@ -141,7 +142,7 @@ def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, par
                           scoring=scoring,
                           verbose=verbose)
     else:
-
+        np.random.seed(42)
         gs = RandomizedSearchCV(model,
                                 param_grid,
                                 n_jobs=n_jobs,
@@ -156,7 +157,8 @@ def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, par
     return best_params_
 
 
-def feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition, a1, grid_parameters, x=24, y=12, n_iter=1000, k=5,
+def feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition, a1, grid_parameters, x=24, y=12, n_iter=1000,
+                                 k=5,
                                  n_jobs=-1, scoring='roc_auc', save=True):
     current_labels, feature_data, _, tra_full_indices, _, val_full_indices = feature_loading(Data_Dir,
                                                                                              definition,
@@ -264,19 +266,28 @@ def model_training(model_dir, test_set, test_labels):
     prob_preds_test = model.predict_proba(test_set)[:, 1]
 
     print('Model fitting:')
-    fpr, tpr, thresholds = roc_curve(test_labels, prob_preds_test, pos_label=1)
-    index = np.where(tpr >= 0.85)[0][0]
-    test_preds = np.array((prob_preds_test >= thresholds[index]).astype('int'))
+    try:
+        model_threshold_dir = model_dir[:-4] + '_threshold' + model_dir[-4:]
+        threshold = joblib.load(model_threshold_dir)
 
-    print('auc and sepcificity', roc_auc_score(
-        test_labels, prob_preds_test), 1 - fpr[index])
-    print('accuracy', accuracy_score(test_labels, test_preds))
+        test_preds = np.array((prob_preds_test >= threshold).astype('int'))
 
-    return test_preds, prob_preds_test, roc_auc_score(test_labels, prob_preds_test), \
-        1 - fpr[index], accuracy_score(test_labels, test_preds)
+        tn, fp, fn, tp = confusion_matrix(test_labels, test_preds).ravel()
+        specificity = tn / (tn + fp)
+        sensitivity = tp / (tp + fn)
+
+        print('auc,sepcificity,sensitivity', roc_auc_score(
+            test_labels, prob_preds_test), specificity, sensitivity)
+        print('accuracy', accuracy_score(test_labels, test_preds))
+
+        return test_preds, prob_preds_test, roc_auc_score(test_labels, prob_preds_test), \
+               specificity, sensitivity, accuracy_score(test_labels, test_preds)
+    except:
+        return prob_preds_test, roc_auc_score(test_labels, prob_preds_test)
 
 
-def model_fit_saving(model, train_set, train_labels, save_name):
+def model_fit_saving(model, train_set, train_labels, save_name, Data_Dir, x=24, y=12, a1=6, definition='t_sofa',
+                     thresholds=np.arange(10000) / 10000):
     """
 
     For chosen model, conduct standard training and testing
@@ -289,4 +300,26 @@ def model_fit_saving(model, train_set, train_labels, save_name):
     """
 
     model.fit(X=train_set, y=train_labels)
+
     joblib.dump(model, save_name)
+
+    prob_preds_train = model.predict_proba(train_set)[:, 1]
+
+    print('Model fitting:')
+    fpr, tpr, thresholds_ = roc_curve(train_labels, prob_preds_train, pos_label=1)
+
+    index = np.where(tpr >= 0.85)[0][0]
+    print(tpr[index])
+    joblib.dump(thresholds_[index], save_name[:-4] + '_threshold' + save_name[-4:])
+
+    df_sepsis = pd.read_pickle(
+        Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
+
+    CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
+        df_sepsis, train_labels, prob_preds_train, a1=a1, thresholds=thresholds, sample_ids=None)
+
+    tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
+    threshold_patient = mimic3_myfunc_patientlevel.output_at_metric_level(thresholds, tprs, metric_required=[0.85])
+
+    joblib.dump(threshold_patient, save_name[:-4] + '_threshold_patient' + save_name[-4:])
+

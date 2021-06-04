@@ -1,10 +1,5 @@
-import models.LSTM.LSTM_functions as lstm_functions
-import features.mimic3_function as mimic3_myfunc
-from data.dataset import TimeSeriesDataset
-import omni.functions as omni_functions
-from functools import partial
-import os
 import sys
+import os
 
 import numpy as np
 import ray
@@ -13,6 +8,12 @@ from ray.tune.utils import pin_in_object_store
 import torch
 import random
 sys.path.insert(0, '../../')
+import models.LSTM.LSTM_functions as lstm_functions
+import features.mimic3_function as mimic3_myfunc
+from data.dataset import TimeSeriesDataset
+import omni.functions as omni_functions
+from functools import partial
+
 
 
 if __name__ == '__main__':
@@ -29,7 +30,7 @@ if __name__ == '__main__':
         torch.cuda.manual_seed(seed)
         torch.backends.cudnn.deterministic = True
 
-    current_data = 'blood_only/'
+    current_data = 'updated_data/blood_only/'
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
         current_data, model='LSTM')
     print(Model_Dir)
@@ -57,7 +58,7 @@ if __name__ == '__main__':
                                    val_patient_indices, val_full_indices, k])
         analysis = tune.run(partial(lstm_functions.model_cv, data_list=data, device=device),
                             name='mimic_lstm' + definition[1:], config=lstm_functions.search_space,
-                            resources_per_trial={"gpu": 1}, num_samples=3,
+                            resources_per_trial={"gpu": 1}, num_samples=100,
                             max_failures=5, reuse_actors=True, verbose=1)
         best_trial = analysis.get_best_trial("mean_accuracy")
         print("Best trial config: {}".format(best_trial.config))
