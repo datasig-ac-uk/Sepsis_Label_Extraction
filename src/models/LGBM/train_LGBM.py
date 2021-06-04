@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     a2, k = 0, 5
     current_data = constants.exclusion_rules[0]
-    #     current_data = constants.exclusion_rules_hos_stay[0]
+
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
         current_data, model='LGBM')
 
