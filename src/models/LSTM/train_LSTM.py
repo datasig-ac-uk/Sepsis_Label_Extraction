@@ -1,20 +1,22 @@
+import sys
+
+import numpy as np
+import torch
+from torch import nn, optim
+import os
+sys.path.insert(0, '../../')
 import features.mimic3_function as mimic3_myfunc
 import omni.functions as omni_functions
 import models.LSTM.LSTM_functions as lstm_functions
 from models.nets import LSTM
 from data.dataset import TimeSeriesDataset
 import constants
-import os
-import sys
-
-import numpy as np
-import torch
-from torch import nn, optim
-
-sys.path.insert(0, '../../')
+import pandas as pd
+from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
+import visualization.patientlevel_function as mimic3_myfunc_patientlevel
 
 
-def train_LSTM(T_list, x_y, definitions, data_folder='blood_only_data/', fake_test=False):
+def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=False):
     """
 
     :param T_list: (list of int) list of parameter T
@@ -24,9 +26,11 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only_data/', fake_te
     :return:
 
     """
+    results = []
+    results_patient_level = []
     for x, y in x_y:
         data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
-        Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
+        Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(
             data_folder, model='LSTM')
         config_dir = constants.MODELS_DIR + 'blood_only/LSTM/hyperparameter/config'
 
@@ -61,35 +65,88 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only_data/', fake_te
                              hidden_1=config['linear_channels'], out_channels=2,
                              dropout=0).to(device)
 
-                lstm_functions.train_model(model, train_dl, n_epochs=config['epochs'],
+                lstm_functions.train_model(model, train_dl, n_epochs=1,
                                            save_dir=Model_Dir + '_' +
                                            str(x) + '_' + str(y) + '_' +
                                            str(T) + definition[1:],
                                            loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=config['lr']))
+                model.load_state_dict(
+                    torch.load(Model_Dir + '_' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:],
+                               map_location=torch.device('cpu')))
+                auc_score, specificity, sensitivity, accuracy, true, preds = lstm_functions.eval_model(train_dl, model,
+                                                                                          save_dir=Output_predictions+'train/' +
+                                                                                                   str(x) + '_' + str(y) + '_'+ str(T) +
+                                                                                                   definition[1:] + '.npy')
 
+                df_sepsis = pd.read_pickle(
+                    Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
+                preds = np.load(Output_predictions+'train/' + str(x) + '_' + str(y) + '_'+ str(T) + definition[1:] + '.npy')
+                fpr, tpr, thresholds_ = roc_curve(true, preds, pos_label=1)
+
+                index = np.where(tpr >= 0.85)[0][0]
+                print(tpr[index])
+                omni_functions.save_pickle(thresholds_[index], Model_Dir + 'thresholds/' +
+                                           str(x) + '_' + str(y) + '_' +
+                                           str(T) + definition[1:] + '_threshold.pkl')
+                thresholds = np.arange(10000) / 10000
+                CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
+                    df_sepsis, true, preds, a1=T, thresholds=thresholds, sample_ids=None)
+
+                tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
+                threshold_patient = mimic3_myfunc_patientlevel.output_at_metric_level(thresholds, tprs,
+                                                                                      metric_required=[0.85])
+
+                omni_functions.save_pickle(threshold_patient, Model_Dir + 'thresholds_patients/' +
+                                           str(x) + '_' + str(y) + '_' +
+                                           str(T) + definition[1:] + '_threshold_patient.pkl')
+
+                results_patient_level.append(
+                    [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
+                         tnrs, thresholds, metric_required=[0.85])), \
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
+                         tprs, thresholds, metric_required=[0.85])),
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
+                                                                                       metric_required=[
+                                                                                           0.85]))])
+
+                # auc_score, specificity, accuracy = eval_model(test_dl, model,
+                #                                             save_dir=None)
+                results.append([str(x) + ',' + str(y), T,
+                                definition, auc_score, specificity,sensitivity, accuracy])
+
+    result_df = pd.DataFrame(
+            results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity','sensitivity', 'accuracy'])
+
+    result_df.to_csv(Output_predictions + purpose +
+                     '/LSTM_' + purpose + '_results.csv')
+    ############Patient level now ###############
+    results_patient_level_df = pd.DataFrame(results_patient_level,
+                                                columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
+                                                         'accuracy'])
+    results_patient_level_df.to_csv(
+        Output_results + train_test + '_patient_level_results.csv')
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
     print(os.environ["CUDA_VISIBLE_DEVICES"])
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
-    """
     seed = 1023
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.backends.cudnn.deterministic = True
-    """
-    T_list = constants.T_list[1:2]
-    print(T_list)
-    data_folder = constants.exclusion_rules[0]
-    x_y = constants.xy_pairs[:1]
 
-    train_LSTM(T_list, x_y, constants.FEATURES[:1], data_folder, fake_test=False)
-    """
-    x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules[1:]
-    for data_folder in data_folder_list:
-        train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
-    """
+    T_list = constants.T_list
+    data_folder = constants.exclusion_rules1[0]
+    x_y = constants.xy_pairs
+
+    train_LSTM(T_list, x_y[:1], constants.FEATURES[:1], data_folder, fake_test=False)
+
+    #x_y = [(24, 12)]
+    #data_folder_list = constants.exclusion_rules1[1:]
+    #for data_folder in data_folder_list:
+        #train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
+

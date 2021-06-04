@@ -1,9 +1,3 @@
-import features.mimic3_function as mimic3_myfunc
-import models.CoxPHM.coxphm_functions as coxphm_functions
-import omni.functions as omni_functions
-from functools import partial
-
-from functools import partial
 import sys
 
 import numpy as np
@@ -14,9 +8,16 @@ from ray.tune.utils import pin_in_object_store
 import random
 import constants
 sys.path.insert(0, '../../')
+import features.mimic3_function as mimic3_myfunc
+import models.CoxPHM.coxphm_functions as coxphm_functions
+import omni.functions as omni_functions
+from functools import partial
+
+from functools import partial
+
 
 if __name__ == '__main__':
-    current_data = 'blood_only/'
+    current_data = 'updated_data/blood_only/'
     signature = True
     model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
@@ -54,7 +55,7 @@ if __name__ == '__main__':
             [df_coxph, tra_full_indices, val_full_indices, k])
         analysis = tune.run(partial(coxphm_functions.model_cv, data=data, a1=T),
                             name='mimic_coxph' + definition[1:], config=coxphm_functions.search_space,
-                            resources_per_trial={"cpu": 1}, num_samples=10,
+                            resources_per_trial={"cpu": 1}, num_samples=100,
                             max_failures=5, reuse_actors=True, verbose=1)
         best_trial = analysis.get_best_trial("mean_accuracy")
         print("Best trial config: {}".format(best_trial.config))
