@@ -72,7 +72,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
                         '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy', prob_preds)
 
                 ############Patient level now ###############
-                if data_folder == constants.exclusion_rules_hos_stay[0]:
+                if data_folder == constants.exclusion_rules[0]:
                     df_sepsis = pd.read_pickle(
                         Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
 
@@ -96,7 +96,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
                                                                                                threshold_patient]))])
 
                 ############################################
-    if data_folder == constants.exclusion_rules_hos_stay[0]:
+    if data_folder == constants.exclusion_rules[0]:
         result_df = pd.DataFrame(
             results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'sensitivity', 'accuracy'])
     else:
@@ -106,7 +106,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
     result_df.to_csv(Output_predictions + purpose +
                      '/lgbm_' + purpose + '_results.csv')  ##to change?
     ############Patient level now ###############
-    if data_folder == constants.exclusion_rules_hos_stay[0]:
+    if data_folder == constants.exclusion_rules[0]:
         results_patient_level_df = pd.DataFrame(results_patient_level,
                                                 columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
                                                          'accuracy'])
@@ -117,7 +117,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
 
 if __name__ == '__main__':
 
-    data_folder = constants.exclusion_rules_hos[0]
+    data_folder = constants.exclusion_rules[0]
 
     eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
               data_folder, train_test='train', fake_test=False)
