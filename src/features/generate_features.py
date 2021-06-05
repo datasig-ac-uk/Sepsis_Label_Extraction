@@ -39,11 +39,11 @@ def features_wrapper(data_list, x_y_list, purpose):
 
 
 if __name__ == '__main__':
-    # TODO ask yue to chekc if this feature_wrapper could work on her side
-    data_list = constants.exclusion_rules1[0:1]
-    features_wrapper(data_list, constants.xy_pairs[:1], purpose='train')
+    #
+    #data_list = constants.exclusion_rules[0:1]
+    #features_wrapper(data_list, constants.xy_pairs, purpose='train')
 
     #other exclusion rules
-    #data_list = constants.exclusion_rules1[2:3]
+    data_list = constants.exclusion_rules[1:]
 
-    #features_wrapper(data_list, x_y_list=[(24, 12)], purpose='train')
+    features_wrapper(data_list, x_y_list=[(24, 12)], purpose='train')
