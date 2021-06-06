@@ -122,7 +122,7 @@ def eval_model1(test_dl, model,threshold, save_dir):
     if save_dir is None:
         pass
     else:
-        omni._create_folder_if_not_exist(filename)
+        omni_functions._create_folder_if_not_exist(filename)
         np.save(save_dir, prob_preds_test)
 
     return auc_score, specificity, sensitivity, accuracy, test_labels, prob_preds_test
@@ -183,7 +183,7 @@ def model_cv(config, data_list, device):
                     loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=1e-3))
         model.load_state_dict(torch.load(constants.MODELS_DIR + '/LSTM_mimic' + 'cv_' + str(i),
                                          map_location=torch.device('cpu')))
-        _, _, _, true, preds = eval_model(test_dl, model, None)
+        _, _, _,_, true, preds = eval_model(test_dl, model, None)
         test_true.append(true)
         test_preds.append(preds)
     test_true_full = np.concatenate(

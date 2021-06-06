@@ -2,7 +2,7 @@ import sys
 
 sys.path.insert(0, '../../')
 
-import models.LGBM.LGBM_functions_change as lgbm_func
+import models.LGBM.LGBM_functions as lgbm_func
 import features.mimic3_function as mimic3_myfunc
 import constants
 import numpy as np
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     train_Dir = Root_Data + 'train/'
     print(train_Dir)
     for x, y in constants.xy_pairs:
-        for definition in constants.FEATURES:
+        for definition in constants.FEATURES[:1]:
             for a1 in constants.T_list:
                 print(x, y, a1, definition)
                 labels, features, icustay_lengths, icustay_ids = lgbm_func.feature_loading(train_Dir, definition,

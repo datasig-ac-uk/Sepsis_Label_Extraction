@@ -1,5 +1,5 @@
 import sys
-
+sys.path.insert(0, '../../')
 from lifelines import CoxPHFitter
 import numpy as np
 import pandas as pd
@@ -7,8 +7,9 @@ from ray import tune
 from ray.tune.utils import get_pinned_object
 from sklearn.metrics import roc_curve, auc, accuracy_score
 import random
-sys.path.insert(0, '../../')
+
 import features.dicts as dicts
+import omni.functions as omni_functions
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
 def Coxph_df(df, features, feature_dict, T, labels,signature=True):
     """
@@ -58,7 +59,7 @@ def Coxph_eval(df, model, T, save_dir=None):
 
     df['risk_score'] = risk_score
     if save_dir is not None:
-        omni._create_folder_if_not_exist(filename)
+        omni_functions._create_folder_if_not_exist(save_dir)
         np.save(save_dir, df['risk_score'])
     fpr, tpr, thresholds = roc_curve(
         df['label'], df['risk_score'], pos_label=1)
@@ -87,7 +88,7 @@ def Coxph_eval1(df, model, T,threshold,save_dir=None):
 
     df['risk_score'] = risk_score
     if save_dir is not None:
-        _create_folder_if_not_exist(save_dir)
+        omni_functions._create_folder_if_not_exist(save_dir)
         np.save(save_dir, df['risk_score'])
     prob_preds_test = risk_score
     test_preds = np.array((prob_preds_test >= threshold).astype('int'))
