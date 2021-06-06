@@ -16,7 +16,8 @@ from functools import partial
 
 
 if __name__ == '__main__':
-    current_data =constants.exclusion_rules[0]
+
+    current_data = constants.exclusion_rules[0]
     signature = True
     model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(

@@ -21,12 +21,14 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
     :param data_folder(str): folder name specifying
     :return:
     """
+    results = []
+    results_patient_level = []
     model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
     config_dir = constants.MODELS_DIR + 'blood_only/CoxPHM/hyperparameter/config'
     data_folder = 'fake_test1/'+data_folder if fake_test else data_folder
     for x, y in x_y:
 
-        Root_Data, Model_Dir, Output_predictions, _ = mimic3_myfunc.folders(
+        Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(
             data_folder, model=model)
         Data_Dir = Root_Data + 'train' + '/'
         for definition in definitions:
@@ -36,23 +38,23 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
             for T in T_list:
                 print(definition, x, y, T)
                 print('load dataframe and input features')
-                df_sepsis_train = pd.read_pickle(
+                df_sepsis = pd.read_pickle(
                     Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
                 features_train = np.load(
                     Data_Dir + 'james_features'+'_'+str(x) + '_' + str(y) + definition[1:] + '.npy')
 
                 print('load train labels')
-                labels_train = np.load(
+                labels = np.load(
                     Data_Dir + 'label' + '_'+str(x)+'_'+str(y)+'_'+str(T) + definition[1:] + '.npy')
 
                 # prepare dataframe for coxph model
-                df_coxph_train = coxphm_functions.Coxph_df(df_sepsis_train, features_train,
-                                                           coxphm_functions.original_features, T, labels_train,
+                df_coxph = coxphm_functions.Coxph_df(df_sepsis, features_train,
+                                                           coxphm_functions.original_features, T, labels,
                                                            signature=signature)
 
                 # fit CoxPHM
                 cph = coxphm_functions.CoxPHFitter(penalizer=config['regularize']) \
-                    .fit(df_coxph_train, duration_col='censor_hours', event_col='label',
+                    .fit(df_coxph, duration_col='censor_hours', event_col='label',
                          show_progress=True, step_size=config['step_size'])
 
                 omni_functions.save_pickle(
@@ -61,8 +63,7 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
                                                                                Output_predictions + 'train/' +
                                                                                str(x) + '_' + str(y) + '_' + str(T) +
                                                                                definition[1:] + '.npy')
-                preds = np.load(Output_predictions + str(x) + '_' + str(y) + '_'
-                                + str(T) + definition[1:] + '_' + train_test + '.npy')
+                preds = np.load(Output_predictions + 'train/' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
                 fpr, tpr, thresholds_ = roc_curve(labels, preds, pos_label=1)
 
                 index = np.where(tpr >= 0.85)[0][0]
@@ -70,6 +71,7 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
                 omni_functions.save_pickle(thresholds_[index], Model_Dir +'thresholds/' +
                                            str(x) + '_' + str(y) + '_' +
                                            str(T) + definition[1:]+'_threshold.pkl')
+                thresholds = np.arange(10000) / 10000
                 CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
                 df_sepsis, labels, preds, a1=T, thresholds=thresholds, sample_ids=None)
 
@@ -92,7 +94,7 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
                                                                                            0.85]))])
 
                 results.append([str(x) + ',' + str(y), T,
-                               definition, auc_score, specificity, accuracy])
+                               definition, auc_score, specificity,0.85, accuracy])
     results_patient_level_df = pd.DataFrame(results_patient_level,
                                             columns=['x,y', 'T', 'definition', 'auc', 'sepcificity','sensitivity', 'accuracy'])
 
@@ -105,12 +107,12 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
 
 if __name__ == '__main__':
     T_list = constants.T_list
-    data_folder = constants.exclusion_rules1[0]
+    data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
-    train_CoxPHM(T_list, x_y, constants.FEATURES,
+    train_CoxPHM(T_list, x_y, constants.FEATURES[:1],
                  data_folder, True, fake_test=False)
     x_y = [(24, 12)]
     data_folder_list = constants.exclusion_rules1[1:]
     for data_folder in data_folder_list:
-        train_CoxPHM(T_list, x_y, constants.FEATURES,
+       train_CoxPHM(T_list, x_y, constants.FEATURES[:1],
                      data_folder, True, fake_test=False)

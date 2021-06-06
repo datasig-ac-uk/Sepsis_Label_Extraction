@@ -23,7 +23,8 @@ if __name__ == '__main__':
 
     train_Dir = Root_Data + 'train/'
     print(train_Dir)
-    for x, y in constants.xy_pairs[2:]:
+
+    for x, y in constants.xy_pairs:
         for definition in constants.FEATURES[:1]:
             for a1 in constants.T_list:
                 print(x, y, a1, definition)
