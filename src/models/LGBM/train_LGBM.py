@@ -23,6 +23,7 @@ if __name__ == '__main__':
 
     train_Dir = Root_Data + 'train/'
     print(train_Dir)
+
     for x, y in constants.xy_pairs:
         for definition in constants.FEATURES[:1]:
             for a1 in constants.T_list:
@@ -45,29 +46,29 @@ if __name__ == '__main__':
                 lgbm_func.model_fit_saving(clf, features, labels, model_dir, train_Dir, x=x, y=y, a1=a1,
                                            definition=definition)
 
-    for current_data in constants.exclusion_rules[1:]:
+#     for current_data in constants.exclusion_rules[1:]:
 
-        Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
-            current_data, model='LGBM')
-        _, Model_Dir_root, _, _ = mimic3_myfunc.folders(constants.exclusion_rules[0], model='LGBM')
+#         Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
+#             current_data, model='LGBM')
+#         _, Model_Dir_root, _, _ = mimic3_myfunc.folders(constants.exclusion_rules[0], model='LGBM')
 
-        train_Dir = Root_Data + 'train/'
-        for x, y in constants.xy_pairs[1:2]:
-            for definition in constants.FEATURES:
-                for a1 in constants.T_list[2:3]:
-                    print(x, y, a1, definition)
-                    labels, features, icustay_lengths, icustay_ids = lgbm_func.feature_loading(train_Dir, definition,
-                                                                                               a1, k=k, x=x, y=y,
-                                                                                               cv=False)
+#         train_Dir = Root_Data + 'train/'
+#         for x, y in constants.xy_pairs[1:2]:
+#             for definition in constants.FEATURES:
+#                 for a1 in constants.T_list[2:3]:
+#                     print(x, y, a1, definition)
+#                     labels, features, icustay_lengths, icustay_ids = lgbm_func.feature_loading(train_Dir, definition,
+#                                                                                                a1, k=k, x=x, y=y,
+#                                                                                                cv=False)
 
-                    with open(Model_Dir_root + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
-                        best_paras_ = pickle.load(file)
+#                     with open(Model_Dir_root + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
+#                         best_paras_ = pickle.load(file)
 
-                    clf = LGBMClassifier(random_state=42).set_params(**best_paras_)
+#                     clf = LGBMClassifier(random_state=42).set_params(**best_paras_)
 
-                    model_dir = Model_Dir + \
-                                str(x) + '_' + str(y) + '_' + \
-                                str(a1) + definition[1:] + '.pkl'
+#                     model_dir = Model_Dir + \
+#                                 str(x) + '_' + str(y) + '_' + \
+#                                 str(a1) + definition[1:] + '.pkl'
 
-                    lgbm_func.model_fit_saving(clf, features, labels, model_dir,Data_Dir=train_Dir)
+#                     lgbm_func.model_fit_saving(clf, features, labels, model_dir)
 
