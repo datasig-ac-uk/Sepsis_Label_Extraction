@@ -65,7 +65,7 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
                              hidden_1=config['linear_channels'], out_channels=2,
                              dropout=0).to(device)
 
-                lstm_functions.train_model(model, train_dl, n_epochs=1,
+                lstm_functions.train_model(model, train_dl, n_epochs=config['epochs'],
                                            save_dir=Model_Dir + '_' +
                                            str(x) + '_' + str(y) + '_' +
                                            str(T) + definition[1:],
@@ -103,12 +103,12 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
                 results_patient_level.append(
                     [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
-                         tnrs, thresholds, metric_required=[0.85])), \
+                         tnrs, thresholds, metric_required=[threshold_patient])), \
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
-                         tprs, thresholds, metric_required=[0.85])),
+                         tprs, thresholds, metric_required=[threshold_patient])),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
                                                                                        metric_required=[
-                                                                                           0.85]))])
+                                                                                           threshold_patient]))])
 
                 # auc_score, specificity, accuracy = eval_model(test_dl, model,
                 #                                             save_dir=None)
@@ -118,14 +118,14 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
     result_df = pd.DataFrame(
             results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity','sensitivity', 'accuracy'])
 
-    result_df.to_csv(Output_predictions + purpose +
-                     '/LSTM_' + purpose + '_results.csv')
+    result_df.to_csv(Output_results +'train'+
+                     '_results.csv')
     ############Patient level now ###############
     results_patient_level_df = pd.DataFrame(results_patient_level,
                                                 columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
                                                          'accuracy'])
     results_patient_level_df.to_csv(
-        Output_results + train_test + '_patient_level_results.csv')
+        Output_results + 'train' + '_patient_level_results.csv')
 
 if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
@@ -140,10 +140,10 @@ if __name__ == '__main__':
         torch.backends.cudnn.deterministic = True
 
     T_list = constants.T_list
-    data_folder = constants.exclusion_rules1[0]
+    data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
 
-    train_LSTM(T_list, x_y[:1], constants.FEATURES[:1], data_folder, fake_test=False)
+    train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
 
     #x_y = [(24, 12)]
     #data_folder_list = constants.exclusion_rules1[1:]

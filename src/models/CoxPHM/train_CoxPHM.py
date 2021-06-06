@@ -86,12 +86,12 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
                 results_patient_level.append(
                     [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
-                         tnrs, thresholds, metric_required=[0.85])), \
+                         tnrs, thresholds, metric_required=[threshold_patient])), \
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
-                         tprs, thresholds, metric_required=[0.85])),
+                         tprs, thresholds, metric_required=[threshold_patient])),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
                                                                                        metric_required=[
-                                                                                           0.85]))])
+                                                                                           threshold_patient]))])
 
                 results.append([str(x) + ',' + str(y), T,
                                definition, auc_score, specificity,0.85, accuracy])
@@ -99,20 +99,20 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
                                             columns=['x,y', 'T', 'definition', 'auc', 'sepcificity','sensitivity', 'accuracy'])
 
     results_patient_level_df.to_csv(
-        Output_results + train_test + '_patient_level_results.csv')
+        Output_results + 'train' + '_patient_level_results.csv')
     result_df = pd.DataFrame(
         results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity','sensitivity', 'accuracy'])
-    result_df.to_csv(Output_results + train_test + '_results.csv')
+    result_df.to_csv(Output_results + 'train' + '_results.csv')
 
 
 if __name__ == '__main__':
     T_list = constants.T_list
     data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
-    train_CoxPHM(T_list, x_y, constants.FEATURES[:1],
+    train_CoxPHM(T_list, x_y, constants.FEATURES,
                  data_folder, True, fake_test=False)
-    x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules1[1:]
-    for data_folder in data_folder_list:
-       train_CoxPHM(T_list, x_y, constants.FEATURES[:1],
-                     data_folder, True, fake_test=False)
+    #x_y = [(24, 12)]
+   # data_folder_list = constants.exclusion_rules1[1:]
+   # for data_folder in data_folder_list:
+      # train_CoxPHM(T_list, x_y, constants.FEATURES[:1],
+                #     data_folder, True, fake_test=False)
