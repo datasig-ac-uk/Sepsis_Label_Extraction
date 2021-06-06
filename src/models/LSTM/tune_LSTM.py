@@ -13,6 +13,7 @@ import features.mimic3_function as mimic3_myfunc
 from data.dataset import TimeSeriesDataset
 import omni.functions as omni_functions
 from functools import partial
+import constants
 
 
 
@@ -30,7 +31,7 @@ if __name__ == '__main__':
         torch.cuda.manual_seed(seed)
         torch.backends.cudnn.deterministic = True
 
-    current_data = 'updated_data/blood_only/'
+    current_data = constants.exclusion_rules[0]
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
         current_data, model='LSTM')
     print(Model_Dir)
@@ -38,7 +39,7 @@ if __name__ == '__main__':
     x, y = 24, 12
 
     Data_Dir = Root_Data + 'train' + '/'
-    definitions = ['t_sepsis_min']
+    definitions = constants.FEATURES[:1]
     print(Data_Dir)
 
     for definition in definitions:

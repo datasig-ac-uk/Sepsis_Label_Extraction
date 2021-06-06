@@ -25,6 +25,6 @@ if __name__ == '__main__':
 
     model = LGBMClassifier(random_state=42)
 
-    for definition in constants.FEATURES:
+    for definition in constants.FEATURES[:1]:
         lgbm_func.feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition,
                                                a1, lgbm_func.grid_parameters, n_iter=n_iter, k=k, save=True)

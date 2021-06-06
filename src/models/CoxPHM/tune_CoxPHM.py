@@ -6,18 +6,17 @@ import ray
 from ray import tune
 from ray.tune.utils import pin_in_object_store
 import random
-import constants
+
 sys.path.insert(0, '../../')
+import constants
 import features.mimic3_function as mimic3_myfunc
 import models.CoxPHM.coxphm_functions as coxphm_functions
 import omni.functions as omni_functions
 from functools import partial
 
-from functools import partial
-
 
 if __name__ == '__main__':
-    current_data = 'updated_data/blood_only/'
+    current_data =constants.exclusion_rules[0]
     signature = True
     model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
