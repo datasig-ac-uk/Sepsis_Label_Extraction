@@ -140,7 +140,7 @@ if __name__ == '__main__':
         torch.backends.cudnn.deterministic = True
 
     T_list = constants.T_list
-    data_folder = constants.exclusion_rules1[0]
+    data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
 
     train_LSTM(T_list, x_y[:1], constants.FEATURES[:1], data_folder, fake_test=False)
