@@ -9,7 +9,7 @@ import joblib
 
 sys.path.insert(0, '../../')
 
-import models.LGBM.LGBM_functions_change as lgbm_functions
+import models.LGBM.LGBM_functions as lgbm_functions
 import visualization.patientlevel_function as mimic3_myfunc_patientlevel
 import features.mimic3_function as mimic3_myfunc
 import omni.functions as omni_functions
@@ -119,14 +119,14 @@ if __name__ == '__main__':
 
     data_folder = constants.exclusion_rules[0]
 
-    eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
+    eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES[:1],
               data_folder, train_test='train', fake_test=False)
 
     #     eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
     #               data_folder, train_test='test',  fake_test=False)
 
-    data_folder_list = constants.exclusion_rules[1:]
-    xy_pairs = [(24, 12)]
-    for data_folder in data_folder_list:
-        eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder, train_test='train', fake_test=False)
+#     data_folder_list = constants.exclusion_rules[1:]
+#     xy_pairs = [(24, 12)]
+#     for data_folder in data_folder_list:
+#         eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder, train_test='train', fake_test=False)
 #         eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder,train_test='test', fake_test=False)
