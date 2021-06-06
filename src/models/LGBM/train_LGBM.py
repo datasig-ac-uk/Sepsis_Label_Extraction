@@ -69,5 +69,5 @@ if __name__ == '__main__':
                                 str(x) + '_' + str(y) + '_' + \
                                 str(a1) + definition[1:] + '.pkl'
 
-                    lgbm_func.model_fit_saving(clf, features, labels, model_dir)
+                    lgbm_func.model_fit_saving(clf, features, labels, model_dir,Data_Dir=train_Dir)
 
