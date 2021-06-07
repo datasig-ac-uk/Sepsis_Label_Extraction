@@ -1,0 +1,92 @@
+#!/bin/bash
+set -e
+
+export BASE_DIR=/docker-entrypoint-initdb.d/buildmimic/
+
+echo 'POPULATING MIMIC DATABASE ... '
+
+# check for the admissions to set the extension
+if [ -e "/mimic_data/ADMISSIONS.csv.gz" ]; then
+  COMPRESSED=1
+  EXT='.csv.gz'
+elif [ -e "/mimic_data/ADMISSIONS.csv" ]; then
+  COMPRESSED=0
+  EXT='.csv'
+else
+  echo "Unable to find a MIMIC data file (ADMISSIONS) in /mimic_data"
+  echo "Did you map a local directory using `docker run -v /path/to/mimic/data:/mimic_data` ?"
+  exit 1
+fi
+
+# check for all the tables, exit if we are missing any
+ALLTABLES='admissions callout caregivers chartevents cptevents datetimeevents d_cpt diagnoses_icd d_icd_diagnoses d_icd_procedures d_items d_labitems drgcodes icustays inputevents_cv inputevents_mv labevents microbiologyevents noteevents outputevents patients prescriptions procedureevents_mv procedures_icd services transfers'
+
+for TBL in $ALLTABLES; do
+  if [ ! -e "/mimic_data/${TBL^^}$EXT" ];
+  then
+    echo "Unable to find ${TBL^^}$EXT in /mimic_data"
+    exit 1
+  fi
+  echo "Found all tables in /mimic_data - beginning import from $EXT files."
+done
+
+# checks passed - begin building the database
+if [ ${PG_MAJOR:0:1} -eq 1 ]; then
+echo "$0: running postgres_create_tables_pg10.sql"
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < $BASE_DIR/postgres/postgres_create_tables_pg10.sql
+else
+echo "$0: running postgres_create_tables.sql"
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < $BASE_DIR/postgres/postgres_create_tables.sql
+fi
+
+if [ $COMPRESSED -eq 1 ]; then
+echo "$0: running postgres_load_data_gz.sql"
+cd $BASE_DIR/postgres/
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" -v mimic_data_dir=/mimic_data < postgres_load_data_gz.sql
+else
+echo "$0: running postgres_load_data.sql"
+cd $BASE_DIR/postgres/
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" -v mimic_data_dir=/mimic_data < postgres_load_data.sql
+fi
+
+echo "$0: running postgres_add_indexes.sql"
+cd $BASE_DIR/postgres/
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < postgres_add_indexes.sql
+
+echo "$0: running postgres_add_constraints.sql"
+cd $BASE_DIR/postgres/
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < postgres_add_constraints.sql
+
+echo "$0: running postgres_checks.sql (all rows should return PASSED)"
+cd $BASE_DIR/postgres/
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < postgres_checks.sql
+
+echo "$0: running make-concepts.sql"
+cd $BASE_DIR/concepts/
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < make-concepts.sql
+
+echo "$0: running pivoted-gcs.sql"
+cd $BASE_DIR/concepts/pivot/
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < pivoted-gcs.sql
+
+echo "$0: running pivoted-uo.sql"
+cd $BASE_DIR/concepts/pivot/
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < pivoted-uo.sql
+
+echo "$0: running pivoted-uo.sql"
+cd $BASE_DIR/concepts/durations/
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < epinephrine-dose.sql
+
+echo "$0: running pivoted-uo.sql"
+cd $BASE_DIR/concepts/durations
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < norepinephrine-dose.sql
+
+echo "$0: running dopamine-dose.sql"
+cd $BASE_DIR/concepts/durations
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < dopamine-dose.sql
+
+echo "$0: running dopamine-dose.sql"
+cd $BASE_DIR/concepts/durations
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" < dobutamine-dose.sql
+
+echo 'DONE POPULATING MIMIC DATABASE'

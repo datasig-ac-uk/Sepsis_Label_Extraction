@@ -1,23 +1,177 @@
-# Data extraction pipeline
+# Data Extraction Pipeline
 
-To make analysis easier, we will change the relational format of the MIMIC-III database to a pivoted view which includes key demographic information, vital signs, and laboratory readings. This will be done in a similar way to the pivoted tables provided by the MIT team at 
-https://github.com/MIT-LCP/mimic-code/concepts/pivot
-Separately we will also create tables for the possible sepsis onset times of each patient.
+To train and evaluate our models, we will change the relational format of the [MIMIC-III database](https://mimic.mit.edu/iii/gettingstarted/overview/) to a pivoted view which includes key demographic information, vital signs, and laboratory readings. We will also create tables for the possible sepsis onset times of each patient. We will subsequently output the pivoted data to comma-separated value (CSV) files, which serve as input for model training and evaluation. The scripts in this directory accomplish the following steps, which we refer to as our data extraction pipeline:
 
-The scripts in this folder is designed to be the complete pipeline of how we took the MIMIC-III data and produced the data and train/test split to use in our analyses.
+* Initialise a PostgreSQL installation with a new database for storing MIMIC-III data
+* Populate the database using MIMIC-III data files
+* Change the relational format of the database
+* Generate CSV files containing IDs of exemplars in training and testing subsets
+* Generate CSV files containing data for model training and testing
 
-Once MIMIC-III access is granted, set up a local PSQL database by following the guide in `mimic_setup.md`. We used the version of code found at:
-https://github.com/MIT-LCP/mimic-code/tree/5f563bd40fac781eaa3d815b71503a6857ce9599
-So please git pull that version to ensure our scripts run smoothly on top of built tables/views.
+# Preliminaries
 
-Once the database is set up and the additional tables/views from the mimic-code repository has been built on top, we are ready to create our pivoted table and sepsis times by running the `sepsis_time.sh` file  
+Before executing any of the steps in the pipeline, it is necessary that you complete the following tasks [described on the MIMIC-III website](https://mimic.mit.edu/iii/gettingstarted/):
+
+* [Become a credentialed user on PhysioNet](https://physionet.org/settings/credentialing/). This involves completion of a half-day online training course in human subjects research.
+* Sign the data use agreement (DUA). Adherence to the terms of the DUA is paramount.
+* Download the MIMIC-III data locally by [navigating to the Files section on the PhysioNet MIMIC-III project page](https://physionet.org/content/mimiciii/1.4/#files)
+* You may alternatively download the files using the `wget` utility:
 ```console
-~$ bash sepsis_time.sh
+wget -r -N -c -np --user username --ask-password https://physionet.org/files/mimiciii/1.4/
 ```
 
-Then view the `patient_split.ipynb` to get the train/test split, you can choose whether to create a new split or copy over the original split we used (which can be found in `original_ids`). Build the tables of these ids with
+# Requirements
+
+Running the data extraction pipeline requires a Bash command line environment. We have successfully tested the pipeline using Bash 3.2 under MacOS Catalina 10.15 and Bash 4.4.20 under Ubuntu Linux 18.04.
+
+As a prerequisite for running the Jupyter notebooks which are part of the data extraction pipeline, please install the Python dependencies listed in [requirements.txt](requirements.txt). A typical process for installing the package dependencies involves creating a new Python virtual environment and then inside the environment executing
 ```console
-~$ bash make_ids.sh
+pip install -r requirements.txt
 ```
 
-Once this is done, run through `tables_to_csvs.ipynb` notebook to create the csv files which are needed for our analysis.
+Finally, you will also need a running local PostgreSQL installation. As an alternative to installing Postgresql manually on your local machine, we provide scripts for automatically deploying PostgreSQL inside a Docker container (and subsequently removing the container). We have successfully tested the latter approach using Docker Desktop 2.2.0.3 under MacOS Catalina 10.15.
+
+The populated PostgreSQL database required around 65GB of storage space.
+
+Depending on your preferred choice of installing PostgreSQL on your machine yourself or using a Docker container, please proceed with the relevant section below.
+
+# Local PostgreSQL Installation
+## Option 1: Install from Package
+To install PostgreSQL locally, we recommend using a package manager if possible, e.g. for Ubuntu Linux
+```console
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo service postgresql start
+```
+or for Mac
+```console
+brew install postgres
+brew services start postgresql
+```
+
+## Option 2: Install from Source
+
+Another possibility is to install from source by cloning the repository at https://github.com/postgres/postgres. If your operating system does not permit you to follow the steps, then you should consider installing from source too.
+Steps to install from source:
+* Make a new directory at a suitable location,  e.g. `mkdir source`
+* Clone repository `git clone git@github.com:postgres/postgres.git`
+* Go to the cloned directory
+* `./configure --prefix=/path_to_installation_directory`
+* `make`
+* `make install`
+* Add the line `export PATH=/path_of_directory_of_installation` to your .bashrc file.
+* `source .bashrc`
+* `cd path_of_directory_of_installation`
+* `mkdir data`
+* `cd data`
+* Initialise the server with `initdb`.
+* Now go back to the .bashrc file and add the line `export PGDATA=path_of_directory_of_installation/data`
+* `source .bashrc`
+* Now you should be able to initialise the database server with `path_of_directory_of_installation/bin/pg_ctl -D path_of_directory_of_installation/data/ -l logfile start`
+
+## Test the PostgreSQL Installation
+Check that you have psql installed with
+```console
+psql -V
+```
+# 
+
+## Initialise PostgreSQL installation with a new database for storing MIMIC-III data
+
+The script `00_define_database_environment.sh` contains relevant environment variables for connecting to PostgreSQL. It should not be necessary to change the value of any of these variables, with the exception of MIMIC_DATA_PATH, which you should change to the path containing the MIMIC-III data files you downloaded previously.
+
+To initialise the PostgreSQL installation with a new database for storing MIMIC-III data, invoke the script 
+```console
+./10_initialise_mimic_database.sh
+```
+Note that this script and all subsequent scripts in the pipeline should be invoked from within this directory. If you are asked to provide a password, try authenticating using the default password `postgres`.
+
+## Populate the database using MIMIC-III data files
+
+Next, populate the newly created database by invoking the script
+```console
+./20_load_mimic_database.sh
+```
+Note that the preceding two steps are based on the instructions for installing MIMIC-III manually [available on the MIMIC website](https://mimic.mit.edu/iii/tutorials/install-mimic-locally-ubuntu/).
+
+## Change the relational format of the database
+
+Next, change the relational format of the database by invoking the script
+```console
+./30_sepsis_time.sh
+```
+NB: Please provision for several hours for `./20_load_mimic_database.sh` and `./30_sepsis_time.sh` to complete.
+
+Note also that our adaptations and database loading scripts are based on the [mimic-code repository](https://github.com/MIT-LCP/mimic-code/tree/5f563bd40fac781eaa3d815b71503a6857ce9599) at commit 5f563bd40fac781eaa3d815b71503a6857ce9599. We include all required scripts as part of this repository, therefore it is not necessary to check out any of the aforementioned repository separately.
+
+## Generate CSV files containing IDs of exemplars in training and testing subsets
+
+To generate the CSV files containing IDs of exemplars in training and testing subsets, open the following notebook in Jupyter and execute all cells
+```console
+40_patient_split.ipynb
+```
+To avoid issues with working memory consumption, after executing `40_patient_split.ipynb` we recommend shutting down the notebook.
+
+## Generate CSV files containing data for model training and testing
+
+This step requires first executing the script
+```console
+./50_make_ids.sh
+```
+Once the script has completed, open the following notebook in Jupyter and execute all cells
+```console
+60_tables_to_csvs_final.ipynb
+```
+The result of executing 60_tables_to_csvs_final.ipynb should be that the CSV files for subsequent model training and testing are reproduced and output to the directory [../../data/raw/](../../data/raw/).
+
+# Deploy PostgreSQL using Docker
+
+The scripts for executing the analogous pipeline based on Docker are located inside the directory [docker/](docker/). In common with the scripts described in the preceding section, it is required that all scripts are executed from inside te aforementioned directory. This is the reason why in the following, we execute scripts inside a subshell, e.g. `(cd docker && ./10_initialise_mimic_database.sh)`. As an alternative, you may simply use `cd docker`. However, please note that the Jupyter notebooks are located inside the parent directory.
+
+## Initialise PostgreSQL installation with a new database for storing MIMIC-III data
+
+The script `./docker/00_define_database_environment.sh` contains relevant environment variables for connecting to PostgreSQL. It should not be necessary to change the values of MIMIC_POSTGRES_PORT and MIMIC_POSTGRES_PASSWORD. However, you should change MIMIC_DATA_PATH to the path containing the MIMIC-III data files you downloaded previously. In addition, you should change POSTGRESQL_DATA_PATH to a newly created directory which will be used to store the database.
+
+To initialise the PostgreSQL installation with a new database for storing MIMIC-III data, invoke the script with
+```console
+(cd docker && ./10_initialise_mimic_database.sh)
+```
+## Populate the database using MIMIC-III data files
+
+Next, populate the newly created database by invoking 
+```console
+(cd docker && ./20_load_mimic_database.sh)
+```
+## Change the relational format of the database
+
+Next, change the relational format of the database by invoking
+```console
+(cd docker && ./30_sepsis_time.sh)
+```
+NB: Please provision for several hours for `20_load_mimic_database.sh` and `30_sepsis_time.sh` to complete.
+## Generate CSV files containing IDs of exemplars in training and testing subsets
+
+To generate the CSV files containing IDs of exemplars in training and testing subsets, open the following notebook in Jupyter and execute all cells
+```console
+40_patient_split.ipynb
+```
+To avoid issues with working memory consumption, after executing `40_patient_split.ipynb` we recommend shutting down the notebook.
+## Generate CSV files containing data for model training and testing
+
+This step requires first executing
+```console
+(cd docker && ./50_make_ids.sh)
+```
+Once the script has completed, open the following notebook in Jupyter and execute all cells
+```console
+60_tables_to_csvs_final.ipynb
+```
+As was described in the preceding section, the result of executing 60_tables_to_csvs_final.ipynb should be that the CSV files for subsequent model training and testing are reproduced and output to the directory [../../data/raw/](../../data/raw/).
+
+## Remove the Docker container
+
+To remove the Docker container, execute
+```console
+(cd docker && ./70_remove_postgres_container.sh)
+```
+You may also wish to clean up by deleting the contents of the directory you assigned to POSTGRESQL_DATA_PATH.

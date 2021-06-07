@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+cd /docker-entrypoint-initdb.d/custom_sql
+
+echo "$0: id_labels.sql"
+psql "dbname=mimic user='mimicuser' options=--search_path=mimiciii" -f id_tables.sql
