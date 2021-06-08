@@ -110,7 +110,7 @@ grid_parameters = {  # LightGBM
 
 
 def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, param_grid,
-                 grid=False, n_iter=100, n_jobs=-1, scoring='roc_auc', verbose=2):
+                 grid=False, n_iter=100, n_jobs=32, scoring='roc_auc', verbose=2):
     """
 
         For chosen base model, we conduct hyperparameter-tuning on given cv splitting.
@@ -149,7 +149,8 @@ def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, par
                                 n_iter=n_iter,
                                 cv=cv,
                                 scoring=scoring,
-                                verbose=verbose)
+                                verbose=verbose,
+                                random_state=42)
 
     fitted_model = gs.fit(X=dataset, y=labels)
     best_params_ = fitted_model.best_params_
