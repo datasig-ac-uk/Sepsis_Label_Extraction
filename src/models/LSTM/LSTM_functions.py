@@ -56,11 +56,17 @@ def train_model(model, train_dl, n_epochs, save_dir, loss_func, optimizer):
 def prepared_data_test(ts_dataset, labels, normalize, scaler, batch_size, device):
     if normalize:
         ts_dataset.data = scaler.transform(ts_dataset.data)
+
+    def seed_worker(worker_id):
+        worker_seed = torch.initial_seed() % 2 ** 32
+        numpy.random.seed(worker_seed)
+        random.seed(worker_seed)
+
     data = torch.FloatTensor(ts_dataset.data.float())
     lengths = torch.FloatTensor(ts_dataset.lengths)
     labels = torch.LongTensor(labels)
     ds = LSTM_Dataset(x=data, y=labels, p=20, lengths=lengths, device=device)
-    dl = DataLoader(ds, batch_size=batch_size)
+    dl = DataLoader(ds, batch_size=batch_size,num_workers=4,worker_init_fn=seed_worker)
     return dl
 
 
@@ -197,8 +203,8 @@ def model_cv(config, data_list, device):
 
 search_space = {
     "p": tune.choice([20]),
-    "hidden_channels": tune.choice([16, 32, 48, 64]),
-    "linear_channels": tune.choice([16, 32, 48, 64]),
+    "hidden_channels": tune.sample_from(lambda _: np.random.choice(np.array([16,32,48,64]))),
+    "linear_channels": tune.sample_from(lambda _: np.random.choice(np.array([16,32,48,64]))),
     "epochs": tune.sample_from(lambda _: np.random.randint(low=10, high=30)),
     "lr": tune.uniform(1e-4, 8e-4),
     "seed": 1234

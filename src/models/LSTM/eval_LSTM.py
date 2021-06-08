@@ -132,6 +132,12 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
 if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     print(os.environ["CUDA_VISIBLE_DEVICES"])
+    seed = 1023
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.backends.cudnn.deterministic = True
+    torch.use_deterministic_algorithms(True)
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)

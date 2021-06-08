@@ -30,6 +30,7 @@ if __name__ == '__main__':
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.backends.cudnn.deterministic = True
+    torch.use_deterministic_algorithms(True)
 
     current_data = constants.exclusion_rules[0]
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
@@ -59,7 +60,7 @@ if __name__ == '__main__':
                                    val_patient_indices, val_full_indices, k])
         analysis = tune.run(partial(lstm_functions.model_cv, data_list=data, device=device),
                             name='mimic_lstm' + definition[1:], config=lstm_functions.search_space,
-                            resources_per_trial={"gpu": 1}, num_samples=80,
+                            resources_per_trial={"gpu": 1}, num_samples=10,
                             max_failures=5, reuse_actors=True, verbose=1)
         best_trial = analysis.get_best_trial("mean_accuracy")
         print("Best trial config: {}".format(best_trial.config))
