@@ -30,7 +30,6 @@ if __name__ == '__main__':
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.backends.cudnn.deterministic = True
-    torch.use_deterministic_algorithms(True)
 
     current_data = constants.exclusion_rules[0]
     Root_Data, Model_Dir, _, _ = mimic3_myfunc.folders(
