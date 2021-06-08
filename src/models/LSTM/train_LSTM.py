@@ -147,7 +147,7 @@ if __name__ == '__main__':
     data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
 
-    train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
+    train_LSTM(T_list[:1], x_y[:1], constants.FEATURES[:1], data_folder, fake_test=False)
 
     #x_y = [(24, 12)]
     #data_folder_list = constants.exclusion_rules1[1:]
