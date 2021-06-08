@@ -141,7 +141,7 @@ if __name__ == '__main__':
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.backends.cudnn.deterministic = True
-    torch.use_deterministic_algorithms(True)
+
 
     T_list = constants.T_list
     data_folder = constants.exclusion_rules[0]
