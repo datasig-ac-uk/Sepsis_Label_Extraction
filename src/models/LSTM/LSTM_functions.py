@@ -120,6 +120,8 @@ def eval_model1(test_dl, model,threshold, save_dir):
     specificity = tn / (tn + fp)
     sensitivity = tp / (tp + fn)
 
+    auc_score = roc_auc_score(
+        test_labels, prob_preds_test)
     print('auc,sepcificity,sensitivity', roc_auc_score(
         test_labels, prob_preds_test), specificity, sensitivity)
     print('accuracy', accuracy_score(test_labels, test_preds))
