@@ -1,3 +1,4 @@
+
 import os
 import pickle
 import random
@@ -12,7 +13,6 @@ sys.path.insert(0, '../')
 
 import features.mimic3_function as mimic3_myfunc
 import features.dicts as dicts
-
 ################## Those for CV #############################
 
 def probs_extraction(prob_preds, labels, val_full_indices, a1=6):
@@ -236,9 +236,7 @@ def suboptimal_choice_patient_df(df, labels_true, prob_preds, a1=6, thresholds=n
     CMs = []
     patient_pred_label_list = []
     pred_septic_time_list = []
-
     for thred in thresholds:
-
         pred_labels = (prob_preds >= thred).astype('int')
 
         _, patient_pred_label, CM, pred_septic_time, _, _, _ = patient_level_pred(df, labels_true, pred_labels, a1,
