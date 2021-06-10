@@ -355,7 +355,7 @@ def model_fit_saving(model, train_set, train_labels, save_name, Data_Dir, x=24, 
     if thresholds is not None:
         index = np.where(tpr >= 0.85)[0][0]
         print(tpr[index])
-#         joblib.dump(thresholds_[index], save_name[:-4] + '_threshold' + save_name[-4:])
+        joblib.dump(thresholds_[index], save_name[:-4] + '_threshold' + save_name[-4:])
     
         train_preds=np.array((prob_preds_train >= thresholds_[index]).astype('int'))
     
@@ -377,7 +377,7 @@ def model_fit_saving(model, train_set, train_labels, save_name, Data_Dir, x=24, 
         tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
         threshold_patient = mimic3_myfunc_patientlevel.output_at_metric_level(thresholds, tprs, metric_required=[0.85])
     
-#         joblib.dump(threshold_patient, save_name[:-4] + '_threshold_patient' + save_name[-4:])
+        joblib.dump(threshold_patient, save_name[:-4] + '_threshold_patient' + save_name[-4:])
     
         auc_patient=metrics.auc(1 - tnrs, tprs)
     
