@@ -14,19 +14,21 @@ import pickle
 from lightgbm import LGBMClassifier
 
 
-def train_LGBM(T_list, x_y, definitions, data_folder, train_test='train', thresholds=np.arange(10000) / 10000,
-              fake_test=False):
+def train_LGBM(T_list, x_y, definitions, data_folder, thresholds=np.arange(10000) / 10000):
     results = []
     results_patient_level = []
 
-    data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
 
     Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(
         data_folder)
-    purpose = train_test
-    Data_Dir = Root_Data + purpose + '/'
+    Data_Dir = Root_Data +  'train/'
+    
+    mimic3_myfunc.create_folder(Data_Dir)
+    
+    if data_folder is not constants.exclusion_rules[0]:
+            _, Model_Dir, _, _ = mimic3_myfunc.folders(
+        constants.exclusion_rules[0])
 
-    print(Data_Dir)
     
     a2, k = 0, 5
     for x, y in x_y:
@@ -63,10 +65,11 @@ def train_LGBM(T_list, x_y, definitions, data_folder, train_test='train', thresh
                     
                     prob_preds_train,auc=\
                 lgbm_func.model_fit_saving(clf, features, labels, model_dir, Data_Dir, x=x, y=y, a1=a1,
-                                           definition=definition,thresholds=[None])
+                                           definition=definition,thresholds=None)
                 
                     results.append([str(x) + ',' + str(y), a1, definition, auc])
                     
+                mimic3_myfunc.create_folder(Output_predictions + 'train/')
                 np.save(Output_predictions + 'train/' + str(x) +
                         '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy', prob_preds_train)     
 
@@ -78,15 +81,15 @@ def train_LGBM(T_list, x_y, definitions, data_folder, train_test='train', thresh
         result_df = pd.DataFrame(
             results, columns=['x,y', 'T', 'definition', 'auc'])
 
-    result_df.to_csv(Output_predictions + purpose +
-                     '/lgbm_' + purpose + '_results.csv')  ##to change?
+    result_df.to_csv(Output_predictions+
+                     'train/train_results.csv')  ##to change?
     ############Patient level now ###############
     if data_folder == constants.exclusion_rules[0]:
         results_patient_level_df = pd.DataFrame(results_patient_level,
                                                 columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
                                                          'accuracy'])
-        results_patient_level_df.to_csv(Output_predictions + purpose +
-                                        '/' + purpose + '_patient_level_results.csv')  ##to change?    
+        results_patient_level_df.to_csv(Output_predictions  +
+                                        'train/train_patient_level_results.csv')  ##to change?    
 
                 
     
@@ -95,10 +98,8 @@ if __name__ == '__main__':
     
     data_folder = constants.exclusion_rules[0]
 
-    train_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
-              data_folder, train_test='train', fake_test=False)
+    train_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder)
 
-    data_folders = constants.exclusion_rules[1:]
+    data_folders = constants.exclusion_rules[-2:]
     for data_folder in data_folders:
-        eval_LGBM(constants.T_list[2:3], constants.xy_pairs[1:2], constants.FEATURES,
-              data_folder, train_test='train', fake_test=False)
+        train_LGBM(constants.T_list[2:3], constants.xy_pairs[1:2], constants.FEATURES, data_folder)
