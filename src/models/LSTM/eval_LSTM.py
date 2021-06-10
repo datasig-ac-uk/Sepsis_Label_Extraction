@@ -115,7 +115,7 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
             result_df = pd.DataFrame(
                 results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'sensitivity', 'accuracy'])
 
-            result_df.to_csv(Output_predictions + train_test +
+            result_df.to_csv(Output_results + train_test +
                              '_results.csv')
             ############Patient level now ###############
             results_patient_level_df = pd.DataFrame(results_patient_level,
