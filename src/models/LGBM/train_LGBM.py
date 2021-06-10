@@ -25,30 +25,29 @@ def train_LGBM(T_list, x_y, definitions, data_folder, thresholds=np.arange(10000
     
     mimic3_myfunc.create_folder(Data_Dir)
     
-    if data_folder is not constants.exclusion_rules[0]:
-            _, Model_Dir, _, _ = mimic3_myfunc.folders(
-        constants.exclusion_rules[0])
+
+    _, Model_Dir_parameter, _, _ = mimic3_myfunc.folders(constants.exclusion_rules[0])
 
     
     a2, k = 0, 5
     for x, y in x_y:
-        for definition in definitions:
-            for a1 in T_list:
+        for a1 in T_list:
+            for definition in definitions:
                 print(x, y, a1, definition)
                 labels, features, icustay_lengths, icustay_ids = lgbm_func.feature_loading(Data_Dir, definition,
                                                                                            a1, k=k, x=x, y=y, cv=False)
                                                                                          
-                with open(Model_Dir + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
+                with open(Model_Dir_parameter + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
                     best_paras_ = pickle.load(file)
 
                 clf = LGBMClassifier(random_state=42,n_jobs=4).set_params(**best_paras_)
-
+                
                 model_dir = Model_Dir + \
                             str(x) + '_' + str(y) + '_' + \
-                            str(a1) + definition[1:] + '.pkl'
+                            str(a1) + definition[1:] + '.pkl' 
                         
                 if data_folder == constants.exclusion_rules[0]:
-                    
+                   
                     prob_preds_train,auc,spe, sen,acc, auc_patient,spe_patient,ses_patient,acc_patient=\
                 lgbm_func.model_fit_saving(clf, features, labels, model_dir, Data_Dir, x=x, y=y, a1=a1,
                                            definition=definition,thresholds=thresholds)
@@ -62,7 +61,7 @@ def train_LGBM(T_list, x_y, definitions, data_folder, thresholds=np.arange(10000
                          "{:.3f}".format(spe_patient),  "{:.3f}".format(ses_patient), "{:.3f}".format(acc_patient)])                    
                     
                 else:
-                    
+                   
                     prob_preds_train,auc=\
                 lgbm_func.model_fit_saving(clf, features, labels, model_dir, Data_Dir, x=x, y=y, a1=a1,
                                            definition=definition,thresholds=None)
@@ -96,9 +95,9 @@ def train_LGBM(T_list, x_y, definitions, data_folder, thresholds=np.arange(10000
 if __name__ == '__main__':
     
     
-    data_folder = constants.exclusion_rules[0]
+#     data_folder = constants.exclusion_rules[0]
 
-    train_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder)
+#     train_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder)
 
     data_folders = constants.exclusion_rules[-2:]
     for data_folder in data_folders:
