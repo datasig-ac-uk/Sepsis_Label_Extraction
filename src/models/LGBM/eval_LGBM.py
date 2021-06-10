@@ -35,7 +35,7 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
     results_patient_level = []
 
     data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
-    #     config_dir = constants.MODELS_DIR + 'blood_only_data/LGBM/hyperparameter/config'
+
     Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(
         data_folder)
     purpose = train_test
@@ -103,15 +103,15 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
         result_df = pd.DataFrame(
             results, columns=['x,y', 'T', 'definition', 'auc'])
 
-    result_df.to_csv(Output_predictions + purpose +
-                     '/lgbm_' + purpose + '_results.csv')  ##to change?
+    result_df.to_csv(Output_results +
+                     '/' + purpose + '_results.csv') 
     ############Patient level now ###############
     if data_folder == constants.exclusion_rules[0]:
         results_patient_level_df = pd.DataFrame(results_patient_level,
                                                 columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
                                                          'accuracy'])
-        results_patient_level_df.to_csv(Output_predictions + purpose +
-                                        '/lgbm_' + purpose + '_patient_level_results.csv')  ##to change?
+        results_patient_level_df.to_csv(Output_results + 
+                                        '/' + purpose + '_patient_level_results.csv') 
     ############################################
 
 
@@ -123,7 +123,7 @@ if __name__ == '__main__':
               data_folder, train_test='test', fake_test=False)
 
 
-    data_folder_list = constants.exclusion_rules[1:]
+    data_folder_list = constants.exclusion_rules[-2:]
     xy_pairs = [(24, 12)]
     for data_folder in data_folder_list:
         eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder,train_test='test', fake_test=False)
