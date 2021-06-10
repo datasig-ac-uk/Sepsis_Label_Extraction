@@ -3,10 +3,11 @@ from torch.utils.data import Dataset
 
 from data.functions import pytorch_rolling
 
+
 class LSTM_Dataset(Dataset):
     """time series dataset class for generating rolling windows timeseries """
 
-    def __init__(self, x, y, p,lengths,device):
+    def __init__(self, x, y, p, lengths, device):
         """
 
         :param x(list of tensors with variable time length): each sample tensor in the list x has shape (W_i,C) where W
@@ -18,16 +19,16 @@ class LSTM_Dataset(Dataset):
                we have input timeseries X_(t-p+1),...,X_(t) with shape(p,C), and the corresponding output is label_t
         """
         #
-        self.lengths=lengths
-        x = pytorch_rolling(x,1,p,return_same_size=True)
+        self.lengths = lengths
+        x = pytorch_rolling(x, 1, p, return_same_size=True)
         x_list = []
         for i, l in enumerate(self.lengths):
             x_list.append(x[i, 0:int(l), :])
 
-        x = torch.cat(x_list).transpose(1,2)
+        x = torch.cat(x_list).transpose(1, 2)
 
         x[torch.isnan(x)] = 0
-        self.x=x
+        self.x = x
 
         self.y = y
         self.p = p
@@ -39,4 +40,3 @@ class LSTM_Dataset(Dataset):
     def __getitem__(self, idx):
 
         return self.x[idx].to(self.device), self.y[idx].to(self.device)
-
