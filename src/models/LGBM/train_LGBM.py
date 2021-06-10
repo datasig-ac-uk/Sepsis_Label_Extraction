@@ -98,7 +98,7 @@ if __name__ == '__main__':
     train_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
               data_folder, train_test='train', fake_test=False)
 
-    data_folder = constants.exclusion_rules[1:]
-
-    train_LGBM(constants.T_list[2:3], constants.xy_pairs[1:2], constants.FEATURES,
+    data_folders = constants.exclusion_rules[1:]
+    for data_folder in data_folders:
+        eval_LGBM(constants.T_list[2:3], constants.xy_pairs[1:2], constants.FEATURES,
               data_folder, train_test='train', fake_test=False)
