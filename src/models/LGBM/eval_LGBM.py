@@ -119,14 +119,11 @@ if __name__ == '__main__':
 
     data_folder = constants.exclusion_rules[0]
 
-    eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES[:1],
-              data_folder, train_test='train', fake_test=False)
+    eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
+              data_folder, train_test='test', fake_test=False)
 
-    #     eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
-    #               data_folder, train_test='test',  fake_test=False)
 
-#     data_folder_list = constants.exclusion_rules[1:]
-#     xy_pairs = [(24, 12)]
-#     for data_folder in data_folder_list:
-#         eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder, train_test='train', fake_test=False)
-#         eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder,train_test='test', fake_test=False)
+    data_folder_list = constants.exclusion_rules[1:]
+    xy_pairs = [(24, 12)]
+    for data_folder in data_folder_list:
+        eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder,train_test='test', fake_test=False)
