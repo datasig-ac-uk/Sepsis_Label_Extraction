@@ -58,67 +58,59 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
                 # load trained coxph model
                 cph = omni_functions.load_pickle(
                     Model_Dir + str(x) + '_' + str(y) + '_' + str(T) + definition[1:])
-
-                # predict and evalute on test set
-                auc_score, specificity, accuracy = coxphm_functions.Coxph_eval(df_coxph, cph, T,
-                                                                               Output_predictions+train_test+'/' +
-                                                                               str(x) + '_' + str(y) + '_'+ str(T) +
-                                                                               definition[1:] + '.npy')
-                preds = np.load(Output_predictions+train_test+'/' + str(x) + '_' + str(y) + '_'+ str(T) + definition[1:] + '.npy')
-                fpr, tpr, thresholds_ = roc_curve(labels, preds, pos_label=1)
-
-                index = np.where(tpr >= 0.85)[0][0]
-                print(tpr[index])
-                omni_functions.save_pickle(thresholds_[index], Model_Dir +'thresholds/' +
+                threshold = omni_functions.load_pickle(Model_Dir +'thresholds/' +
                                            str(x) + '_' + str(y) + '_' +
                                            str(T) + definition[1:]+'_threshold.pkl')
+                auc_score, specificity,sensitivity, accuracy = coxphm_functions.Coxph_eval1(df_coxph, cph, T,threshold,
+                                                                               Output_predictions + train_test +'/'+
+                                                                               str(x) + '_' + str(y) + '_' + str(T) +
+                                                                               definition[1:] + '.npy')
+                preds = np.load(Output_predictions + train_test +'/'+ str(x) + '_' + str(y) + '_' + str(T) +
+                                definition[1:] + '.npy')
                 CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
-                df_sepsis, labels, preds, a1=T, thresholds=thresholds, sample_ids=None)
+                    df_sepsis, labels, preds, a1=T, thresholds=thresholds, sample_ids=None)
 
                 tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
-                threshold_patient = mimic3_myfunc_patientlevel.output_at_metric_level(thresholds, tprs,
-                                                                                      metric_required=[0.85])
 
-                omni_functions.save_pickle(threshold_patient,Model_Dir + 'thresholds_patients/' +
+                threhold_patient = omni_functions.load_pickle(Model_Dir + 'thresholds_patients/' +
                                            str(x) + '_' + str(y) + '_' +
-                                           str(T) +definition[1:]+ '_threshold_patient.pkl')
-                CMs, _, _ = suboptimal_choice_patient(df_sepsis, labels, preds, a1=6, thresholds=thresholds,
-                                                      sample_ids=None)
-                tprs, tnrs, fnrs, pres, accs = decompose_cms(CMs)
-                print(output_at_metric_level(
-                    tnrs, tprs, metric_required=[0.85]))
+                                           str(T) + definition[1:] + '_threshold_patient.pkl')
 
                 results_patient_level.append(
                     [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
-                     "{:.3f}".format(output_at_metric_level(
-                         tnrs, tprs, metric_required=[0.85])),
-                     "{:.3f}".format(output_at_metric_level(accs, tprs, metric_required=[0.85]))])
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
+                         tnrs, thresholds, metric_required=[threhold_patient])), \
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
+                         tprs, thresholds, metric_required=[threhold_patient])),
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
+                                                                                       metric_required=[
+                                                                                           threhold_patient]))])
 
                 results.append([str(x) + ',' + str(y), T,
-                               definition, auc_score, specificity, accuracy])
+                                definition, auc_score, specificity,sensitivity, accuracy])
+            results_patient_level_df = pd.DataFrame(results_patient_level,
+                                                    columns=['x,y', 'T', 'definition', 'auc', 'sepcificity',
+                                                             'sensitivity', 'accuracy'])
 
-        # save numerical results
-    results_patient_level_df = pd.DataFrame(results_patient_level,
-                                            columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'accuracy'])
-
-    results_patient_level_df.to_csv(
-        Output_results + train_test + '_patient_level_results.csv')
-    result_df = pd.DataFrame(
-        results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'accuracy'])
-    result_df.to_csv(Output_results + train_test + '_results.csv')
+            results_patient_level_df.to_csv(
+                Output_results + train_test + '_patient_level_results1.csv')
+            result_df = pd.DataFrame(
+                results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'sensitivity', 'accuracy'])
+            result_df.to_csv(Output_results + train_test + '_results1.csv')
 
 
 if __name__ == '__main__':
     train_test = 'train'
     T_list = constants.T_list
-    data_folder = constants.exclusion_rules1[0]
-    x_y = constants.xy_pairs
-    eval_CoxPHM(T_list, x_y, constants.FEATURES, data_folder,
+    data_folder = constants.exclusion_rules[0]
+    x_y = constants.xy_pairs[-1:]
+    eval_CoxPHM(T_list[-1:], x_y, constants.FEATURES, data_folder,
                 train_test, True, fake_test=False)
-
+    '''
     x_y = [(24, 12)]
     data_folder_list = constants.exclusion_rules1[1:]
     for data_folder in data_folder_list:
         print(data_folder)
         eval_CoxPHM(T_list, x_y, constants.FEATURES, data_folder,
                    train_test, True, fake_test=False)
+    '''

@@ -96,12 +96,11 @@ def Coxph_eval1(df, model, T,threshold,save_dir=None):
     tn, fp, fn, tp = confusion_matrix(test_labels, test_preds).ravel()
     specificity = tn / (tn + fp)
     sensitivity = tp / (tp + fn)
-
-    print('auc,sepcificity,sensitivity', roc_auc_score(
-        test_labels, prob_preds_test), specificity, sensitivity)
+    auc_score = roc_auc_score(
+        test_labels, prob_preds_test)
+    print('auc,sepcificity,sensitivity', auc_score, specificity, sensitivity)
     print('accuracy', accuracy_score(test_labels, test_preds))
     accuracy = accuracy_score(df['label'].values, test_preds)
-    print('auc, sepcificity,accuracy', auc_score, specificity, accuracy)
 
     return auc_score, specificity,sensitivity, accuracy
 

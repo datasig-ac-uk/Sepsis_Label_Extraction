@@ -16,10 +16,9 @@ import omni.functions as omni_functions
 from data.dataset import TimeSeriesDataset
 import constants
 import visualization.patientlevel_function as mimic3_myfunc_patientlevel
-from multiprocessing import Pool
 
-
-def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.arange(10000) / 10000, fake_test=False):
+def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
+                thresholds=np.arange(10000) / 10000, fake_test=False):
     """
     This function compute evaluation on trained CoxPHM model, will save the prediction probability and numerical results
     for both online predictions and patient level predictions in the outputs directoty.
@@ -29,6 +28,7 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
     :param definitions:(list of str) list of definitions. e.g.['t_suspision','t_sofa','t_sepsis_min']
     :param data_folder:(str) folder name specifying
     :param train_test:(bool)True: evaluate the model on train set, False: evaluate the model on test set
+    :param signature:(bool) True:use the signature features + original features, False: only use original features
     :param thresholds:(np array) A discretized array of probability thresholds for patient level evaluation
     :return: save prediction probability of online predictions, and save the results
               (auc/specificity/accuracy) for both online predictions and patient level predictions
@@ -43,9 +43,6 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
 
         Data_Dir = Root_Data + train_test + '/'
 
-        #     Save_Dir = DATA_DIR + '/processed/experiments_' + str(x) + '_' + str(y) + '/H3_subset/'
-
-        #         for T in [6]:
         for T in T_list:
             for definition in definitions:
                 config = omni_functions.load_pickle(
@@ -74,59 +71,59 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test, thresholds=np.a
                 model.load_state_dict(
                     torch.load(Model_Dir + '_' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:],
                                map_location=torch.device('cpu')))
-
-
-
-                auc_score, specificity, accuracy, true, preds = lstm_functions.eval_model(test_dl, model,
-                                                                                          save_dir=Output_predictions+train_test+'/' + str(
-                                                                                              x) + '_' + str(y) + '_'
-                                                                                                   + str(
-                                                                                              T) + definition[
-                                                                                              1:] + '.npy')
-                df_sepsis = pd.read_pickle(
-                    Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
-                preds = np.load(Output_predictions+train_test+'/' + str(x) + '_' + str(y) + '_'+ str(T) + definition[1:] + '.npy')
-                fpr, tpr, thresholds_ = roc_curve(true, preds, pos_label=1)
-
-                index = np.where(tpr >= 0.85)[0][0]
-                print(tpr[index])
-                omni_functions.save_pickle(thresholds_[index], Model_Dir +'thresholds/' +
+                threshold = omni_functions.load_pickle(Model_Dir +'thresholds/' +
                                            str(x) + '_' + str(y) + '_' +
                                            str(T) + definition[1:]+'_threshold.pkl')
+                auc_score, specificity, sensitivity, accuracy, true, preds = lstm_functions.eval_model1(train_dl, model,threshold,
+                                                                                                       save_dir=Output_predictions + train_test +'/'+
+                                                                                                                str(
+                                                                                                                    x) + '_' + str(
+                                                                                                           y) + '_' + str(
+                                                                                                           T) +
+                                                                                                                definition[
+                                                                                                                1:] + '.npy')
+
+                df_sepsis = pd.read_pickle(
+                    Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
+                preds = np.load(
+                    Output_predictions + train_test +'/'+ str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
+
+
                 CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
-                df_sepsis, true, preds, a1=T, thresholds=thresholds, sample_ids=None)
+                    df_sepsis, true, preds, a1=T, thresholds=thresholds, sample_ids=None)
 
                 tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
-                threshold_patient = mimic3_myfunc_patientlevel.output_at_metric_level(thresholds, tprs,
-                                                                                      metric_required=[0.85])
-
-                omni_functions.save_pickle(threshold_patient,Model_Dir + 'thresholds_patients/' +
+                threshold_patient = omni_functions.load_pickle(Model_Dir + 'thresholds_patients/' +
                                            str(x) + '_' + str(y) + '_' +
-                                           str(T) +definition[1:]+ '_threshold_patient.pkl')
-                CMs, _, _ = suboptimal_choice_patient(df_sepsis, true, preds, a1=6, thresholds=thresholds,
-                                                      sample_ids=None)
-                tprs, tnrs, fnrs, pres, accs = decompose_cms(CMs)
+                                           str(T) + definition[1:] + '_threshold_patient.pkl')
 
                 results_patient_level.append(
                     [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
-                     "{:.3f}".format(output_at_metric_level(
-                         tnrs, tprs, metric_required=[0.85])),
-                     "{:.3f}".format(output_at_metric_level(accs, tprs, metric_required=[0.85]))])
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
+                         tnrs, thresholds, metric_required=[threshold_patient])), \
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
+                         tprs, thresholds, metric_required=[threshold_patient])),
+                     "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
+                                                                                       metric_required=[
+                                                                                           threshold_patient]))])
 
                 # auc_score, specificity, accuracy = eval_model(test_dl, model,
                 #                                             save_dir=None)
                 results.append([str(x) + ',' + str(y), T,
-                               definition, auc_score, specificity, accuracy])
-            # save numerical results
+                                definition, auc_score, specificity, sensitivity, accuracy])
 
-    results_patient_level_df = pd.DataFrame(results_patient_level,
-                                            columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'accuracy'])
+            result_df = pd.DataFrame(
+                results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'sensitivity', 'accuracy'])
 
-    results_patient_level_df.to_csv(
-        Output_results + train_test + '_patient_level_results.csv')
-    result_df = pd.DataFrame(
-        results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'accuracy'])
-    result_df.to_csv(Output_results + train_test + '_results.csv')
+            result_df.to_csv(Output_predictions + train_test +
+                             '_results.csv')
+            ############Patient level now ###############
+            results_patient_level_df = pd.DataFrame(results_patient_level,
+                                                    columns=['x,y', 'T', 'definition', 'auc', 'sepcificity',
+                                                             'sensitivity',
+                                                             'accuracy'])
+            results_patient_level_df.to_csv(
+                Output_results + train_test + '_patient_level_results.csv')
 
 
 if __name__ == '__main__':
@@ -144,13 +141,13 @@ if __name__ == '__main__':
     train_test = 'train'
     T_list = constants.T_list
     data_folder = constants.exclusion_rules1[0]
-    x_y = constants.xy_pairs
-    eval_LSTM(T_list, x_y, constants.FEATURES,
+    x_y = constants.xy_pairs[1:]
+    eval_LSTM(T_list, x_y, constants.FEATURES[1:],
               data_folder, train_test, fake_test=False)
-
+    """
     x_y = [(24, 12)]
     data_folder_list = constants.exclusion_rules1[1:]
     for data_folder in data_folder_list:
         eval_LSTM(T_list, x_y, constants.FEATURES,
                   data_folder, train_test, fake_test=False)
-
+    """
