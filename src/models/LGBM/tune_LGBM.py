@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     a1, a2, k = 6, 0, 5
     x, y = 24, 12
-    n_iter, n_jobs = 500,8
+    n_iter, n_jobs = 1,8
 
 
     Data_Dir = Root_Data + 'train/'

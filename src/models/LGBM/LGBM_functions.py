@@ -92,7 +92,7 @@ def model_validation(model, dataset, labels, tra_full_indices, val_full_indices)
            roc_auc_score(labels_true, prob_preds), \
            1 - fpr[index], accuracy_score(labels_true, tra_preds)
 
-
+'''
 grid_parameters = {  # LightGBM
     'n_estimators': [40, 70, 100, 200, 400, 500, 800],
     'learning_rate': [0.08, 0.1, 0.12, 0.05],
@@ -107,6 +107,20 @@ grid_parameters = {  # LightGBM
     'max_bin': [100, 250, 500, 1000],
     'min_child_samples': [49, 99, 159, 199, 259, 299],
     'min_child_weight': np.arange(30) + 20}
+'''
+
+grid_parameters = { # LightGBM
+'n_estimators': [40, 70, 100, 200, 400, 500, 800],
+'learning_rate': [0.08, 0.1, 0.12, 0.05],
+'colsample_bytree': [0.5, 0.6, 0.7, 0.8],
+'max_depth': [4, 5, 6, 7, 8],
+'num_leaves': [5, 10, 16, 20, 25, 36, 49],
+'reg_alpha': [0.001, 0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 20, 50, 100],
+'reg_lambda': [0.001, 0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 20, 50, 100],
+'min_split_gain': [0.0, 0.1, 0.2, 0.3, 0.4],
+'max_bin': [100, 250, 500, 1000],
+'min_child_samples': [49, 99, 159, 199, 259, 299],
+'min_child_weight': np.arange(30) + 20}
 
 
 def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, param_grid,
@@ -154,6 +168,10 @@ def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, par
 
     fitted_model = gs.fit(X=dataset, y=labels)
     best_params_ = fitted_model.best_params_
+    print(best_params_)
+
+    print(roc_auc_score(
+        labels, fitted_model.predict_proba(dataset)[:,1]))
 
     return best_params_
 
