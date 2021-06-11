@@ -200,7 +200,7 @@ def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1, x=24, 
     with open(Model_Dir + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
         best_paras_ = pickle.load(file)
 
-    clf = LGBMClassifier(random_state=42).set_params(**best_paras_)
+    clf = LGBMClassifier(random_state=42,n_jobs=4).set_params(**best_paras_)
 
     _, prob_preds, _, auc, specificity, accuracy = model_validation(clf, feature_data,
                                                                     current_labels,
