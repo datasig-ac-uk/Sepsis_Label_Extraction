@@ -103,15 +103,13 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
         result_df = pd.DataFrame(
             results, columns=['x,y', 'T', 'definition', 'auc'])
 
-    result_df.to_csv(Output_results +
-                     '/' + purpose + '_results.csv') 
+    result_df.to_csv(Output_results + + purpose + '_results.csv') 
     ############Patient level now ###############
     if data_folder == constants.exclusion_rules[0]:
         results_patient_level_df = pd.DataFrame(results_patient_level,
                                                 columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
                                                          'accuracy'])
-        results_patient_level_df.to_csv(Output_results + 
-                                        '/' + purpose + '_patient_level_results.csv') 
+        results_patient_level_df.to_csv(Output_results + purpose + '_patient_level_results.csv') 
     ############################################
 
 
