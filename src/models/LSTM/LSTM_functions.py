@@ -57,16 +57,11 @@ def prepared_data_test(ts_dataset, labels, normalize, scaler, batch_size, device
     if normalize:
         ts_dataset.data = scaler.transform(ts_dataset.data)
 
-    def seed_worker(worker_id):
-        worker_seed = torch.initial_seed() % 2 ** 32
-        numpy.random.seed(worker_seed)
-        random.seed(worker_seed)
-
     data = torch.FloatTensor(ts_dataset.data.float())
     lengths = torch.FloatTensor(ts_dataset.lengths)
     labels = torch.LongTensor(labels)
     ds = LSTM_Dataset(x=data, y=labels, p=20, lengths=lengths, device=device)
-    dl = DataLoader(ds, batch_size=batch_size,num_workers=4,worker_init_fn=seed_worker)
+    dl = DataLoader(ds, batch_size=batch_size)
     return dl
 
 
@@ -116,7 +111,7 @@ def eval_model1(test_dl, model,threshold, save_dir):
     prob_preds_test = tfm(test_preds)[:,1]
     test_labels = tfm(test_y)
     test_preds = np.array((prob_preds_test >= threshold).astype('int'))
-    tn, fp, fn, tp = confusion_matrix(test_true, test_preds).ravel()
+    tn, fp, fn, tp = confusion_matrix(test_labels, test_preds).ravel()
     specificity = tn / (tn + fp)
     sensitivity = tp / (tp + fn)
 
@@ -125,12 +120,12 @@ def eval_model1(test_dl, model,threshold, save_dir):
     print('auc,sepcificity,sensitivity', roc_auc_score(
         test_labels, prob_preds_test), specificity, sensitivity)
     print('accuracy', accuracy_score(test_labels, test_preds))
-    accuracy = accuracy_score(df['label'].values, test_preds)
+    accuracy = accuracy_score(test_labels, test_preds)
     print('auc, sepcificity,accuracy', auc_score, specificity, accuracy)
     if save_dir is None:
         pass
     else:
-        omni_functions._create_folder_if_not_exist(filename)
+        omni_functions._create_folder_if_not_exist(save_dir)
         np.save(save_dir, prob_preds_test)
 
     return auc_score, specificity, sensitivity, accuracy, test_labels, prob_preds_test

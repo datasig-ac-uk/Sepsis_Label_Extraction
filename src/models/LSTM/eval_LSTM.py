@@ -52,7 +52,7 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
                     Data_Dir + str(x) + '_' +
                     str(y) + definition[1:] + '_ffill.tsd')
 
-                print('load train labels')
+                print('load labels')
                 labels = np.load(
                     Data_Dir + 'label' + '_' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
                 # get torch dataloader for lstm
@@ -74,7 +74,7 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
                 threshold = omni_functions.load_pickle(Model_Dir +'thresholds/' +
                                            str(x) + '_' + str(y) + '_' +
                                            str(T) + definition[1:]+'_threshold.pkl')
-                auc_score, specificity, sensitivity, accuracy, true, preds = lstm_functions.eval_model1(train_dl, model,threshold,
+                auc_score, specificity, sensitivity, accuracy, true, preds = lstm_functions.eval_model1(test_dl, model,threshold,
                                                                                                        save_dir=Output_predictions + train_test +'/'+
                                                                                                                 str(
                                                                                                                     x) + '_' + str(
@@ -116,14 +116,14 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
                 results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'sensitivity', 'accuracy'])
 
             result_df.to_csv(Output_results + train_test +
-                             '_results.csv')
+                             '_results1.csv')
             ############Patient level now ###############
             results_patient_level_df = pd.DataFrame(results_patient_level,
                                                     columns=['x,y', 'T', 'definition', 'auc', 'sepcificity',
                                                              'sensitivity',
                                                              'accuracy'])
             results_patient_level_df.to_csv(
-                Output_results + train_test + '_patient_level_results.csv')
+                Output_results + train_test + '_patient_level_results1.csv')
 
 
 if __name__ == '__main__':
@@ -140,14 +140,14 @@ if __name__ == '__main__':
     print(device)
     train_test = 'train'
     T_list = constants.T_list
-    data_folder = constants.exclusion_rules1[0]
-    x_y = constants.xy_pairs[1:]
-    eval_LSTM(T_list, x_y, constants.FEATURES[1:],
+    data_folder = constants.exclusion_rules[0]
+    x_y = constants.xy_pairs
+    eval_LSTM(T_list, x_y, constants.FEATURES,
               data_folder, train_test, fake_test=False)
-    """
+
     x_y = [(24, 12)]
     data_folder_list = constants.exclusion_rules1[1:]
     for data_folder in data_folder_list:
         eval_LSTM(T_list, x_y, constants.FEATURES,
                   data_folder, train_test, fake_test=False)
-    """
+

@@ -88,7 +88,7 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
                 omni_functions.save_pickle(thresholds_[index], Model_Dir + 'thresholds/' +
                                            str(x) + '_' + str(y) + '_' +
                                            str(T) + definition[1:] + '_threshold.pkl')
-                """
+
                 thresholds = np.arange(10000) / 10000
                 CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
                     df_sepsis, true, preds, a1=T, thresholds=thresholds, sample_ids=None)
@@ -113,7 +113,7 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
 
                 # auc_score, specificity, accuracy = eval_model(test_dl, model,
                 #                                             save_dir=None)
-                """
+
                 results.append([str(x) + ',' + str(y), T,
                                 definition, auc_score, specificity,sensitivity, accuracy])
 
@@ -123,15 +123,15 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
     result_df.to_csv(Output_results +'train'+
                      '_results.csv')
     ############Patient level now ###############
-    """
+
     results_patient_level_df = pd.DataFrame(results_patient_level,
                                                 columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
                                                          'accuracy'])
     results_patient_level_df.to_csv(
-        Output_results + 'train' + '_patient_level_results.csv')"""
+        Output_results + 'train' + '_patient_level_results.csv')
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "3,4"
     print(os.environ["CUDA_VISIBLE_DEVICES"])
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -144,13 +144,15 @@ if __name__ == '__main__':
 
 
     T_list = constants.T_list
+
     data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
 
-    train_LSTM(T_list[:1], x_y[:1], constants.FEATURES[:1], data_folder, fake_test=False)
+    train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
 
     #x_y = [(24, 12)]
-    #data_folder_list = constants.exclusion_rules1[1:]
+    #data_folder_list = constants.exclusion_rules[1:]
     #for data_folder in data_folder_list:
-        #train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
+     #   train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
+
 
