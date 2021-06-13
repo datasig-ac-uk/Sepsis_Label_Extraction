@@ -1,0 +1,60 @@
+#!/bin/bash
+
+MIMIC_DATA_PATH=~/Projects/physionet.org/files/mimiciii/1.4/
+POSTGRESQL_PATH=~/Projects/mimic_postgres_docker/ # TODO Create, if this doesn't exist, or check for its existence
+
+POSTGRES_USER_PASSWORD=postgres
+MIMIC_USER_PASSWORD=mimic
+POSTGRESQL_PORT=5432 # TODO We don't actually need to expose the port ultimately...
+
+function cleanup()
+{
+    if [ -n "${docker_id+set}" ]; then
+        # TODO Clean database
+        echo "Shutting down postgresql" 
+        docker exec -u postgres mimic pg_ctl stop
+        echo "Stopping container" 
+        docker stop "$docker_id" > /dev/null
+        echo "Removing container" 
+        docker rm "$docker_id" > /dev/null
+        echo "Removing image"
+        docker image rm postgres/mimic > /dev/null
+    fi
+
+    exit
+}
+trap cleanup INT TERM ERR
+
+echo "Building docker image"
+docker build -t postgres/mimic .
+
+if [[ -e "$POSTGRESQL_PATH/postgresql.conf" ]]; then
+    echo "Using already initialised postgresql database in $POSTGRESQL_PATH"
+    BUILD_MIMIC=0
+else
+    echo "Initialising postgresql database in $POSTGRESQL_PATH"
+    BUILD_MIMIC=1
+fi
+
+docker_id=$(docker run \
+--name mimic \
+-p $POSTGRESQL_PORT:$POSTGRESQL_PORT \
+-e BUILD_MIMIC=$BUILD_MIMIC \
+-e POSTGRES_PASSWORD=$POSTGRES_USER_PASSWORD \
+-e MIMIC_PASSWORD=$MIMIC_USER_PASSWORD \
+-v $MIMIC_DATA_PATH:/mimic_data \
+-v $POSTGRESQL_PATH:/var/lib/postgresql/data \
+-d postgres/mimic)
+
+echo "Waiting for postgresql server to start..."
+until docker exec mimic pg_isready ;
+    do sleep 5
+done
+
+
+# TODO uncomment
+#echo "Populating postgresql database with MIMIC data (this will take a while)..."
+#docker exec -u postgres mimic /usr/local/bin/load_mimic_database.sh
+
+# TODO Uncomment
+# cleanup

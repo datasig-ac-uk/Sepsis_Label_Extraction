@@ -1,1 +1,5 @@
-psql 'dbname=mimic user=mimicuser options=--search_path=mimiciii' -f id_tables.sql
+#!/bin/bash
+set -e
+
+cd $BASE_DIR
+psql -f id_tables.sql
