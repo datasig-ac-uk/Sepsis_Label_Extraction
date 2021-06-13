@@ -107,7 +107,7 @@ if __name__ == '__main__':
     eval_CoxPHM(T_list, x_y, constants.FEATURES, data_folder,
                 train_test, True, fake_test=False)
     x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules1[1:]
+    data_folder_list = constants.exclusion_rules[1:]
     for data_folder in data_folder_list:
         print(data_folder)
         eval_CoxPHM(T_list, x_y, constants.FEATURES, data_folder,
