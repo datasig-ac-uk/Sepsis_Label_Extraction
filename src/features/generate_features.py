@@ -37,18 +37,18 @@ def features_wrapper(data_list, x_y_list, purpose):
                   ' features for sensitity {}_{} definition'.format(x, y))
 
             mimic3_myfunc.featureset_generator(path_df, save_dir, x=x, y=y, a2=0, definitions=constants.FEATURES,
-                                               T_list=constants,
+                                               T_list=constants.T_list,
                                                strict_exclusion=True) if current_data == 'strict_exclusion' \
                 else mimic3_myfunc.featureset_generator(path_df, save_dir, x=x, y=y, a2=0,
                                                         definitions=constants.FEATURES,
-                                                        T_list=constants, strict_exclusion=False)
+                                                        T_list=constants.T_list, strict_exclusion=False)
 
 
 if __name__ == '__main__':
-    data_list = constants.exclusion_rules[:1]
-    features_wrapper(data_list, constants.xy_pairs[2:], purpose='train')
+   # data_list = constants.exclusion_rules[:1]
+   # features_wrapper(data_list, constants.xy_pairs[2:], purpose='train')
 
     # other exclusion rules
-    data_list = constants.exclusion_rules[1:]
+    data_list = constants.exclusion_rules[2:]
 
     features_wrapper(data_list, x_y_list=[(24, 12)], purpose='train')

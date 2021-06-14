@@ -145,14 +145,14 @@ if __name__ == '__main__':
 
     T_list = constants.T_list
 
-    data_folder = constants.exclusion_rules[0]
-    x_y = constants.xy_pairs
+    #data_folder = constants.exclusion_rules[0]
+    #x_y = constants.xy_pairs
 
-    train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
+    #train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
 
-    #x_y = [(24, 12)]
-    #data_folder_list = constants.exclusion_rules[1:]
-    #for data_folder in data_folder_list:
-     #   train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
+    x_y = [(24, 12)]
+    data_folder_list = constants.exclusion_rules[2:]
+    for data_folder in data_folder_list:
+        train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
 
 
