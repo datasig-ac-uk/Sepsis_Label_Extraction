@@ -73,7 +73,7 @@ def auc_plot(trues_list, probs_list, names, fontsize=14,
         plt.show()
 
 
-def auc_plot_xy_pairs(Data_Dir, Output_results,model=constants.MODELS[0], current_data='blood_only/', 
+def auc_plot_xy_pairs(Data_Dir, Output_results, current_data='blood_only/', 
                       precision=100, n=100, a1=6, names=['48,24', '24,12', '12,6', '6,3'], purpose='test'):
     """
         For each definition and fixed model, producing two AUC plots, one online prediction,one patien-level, across 4 different xy_pairs
