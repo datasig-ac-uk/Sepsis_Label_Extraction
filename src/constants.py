@@ -23,7 +23,7 @@ T_list = [12, 8, 6, 4]
 MODELS = ['LGBM', 'LSTM', 'CoxPHM']
 models = ['lgbm', 'lstm', 'coxph']
 
-exclusion_rules = ['blood_only', 'no_gcs', 'absolute_values', 'other_cultures', 'strict_exclusion']
+exclusion_rules = ['blood_only', 'other_cultures', 'strict_exclusion']
 
 MIMIC_DATA_DIRS = {}
 MIMIC_DATA_DIRS['strict_exclusion'] = {'train': data_location+'blood_only_data',
