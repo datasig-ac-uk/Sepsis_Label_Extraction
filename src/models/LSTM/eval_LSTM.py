@@ -5,9 +5,8 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
 import torch
 
-from visualization.plot_functions import suboptimal_choice_patient
-
 sys.path.insert(0, '../../')
+from visualization.plot_functions import suboptimal_choice_patient
 from visualization.patientlevel_function import decompose_cms, output_at_metric_level
 import features.mimic3_function as mimic3_myfunc
 from models.nets import LSTM
@@ -116,14 +115,14 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
                 results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity', 'sensitivity', 'accuracy'])
 
             result_df.to_csv(Output_results + train_test +
-                             '_results1.csv')
+                             '_results.csv')
             ############Patient level now ###############
             results_patient_level_df = pd.DataFrame(results_patient_level,
                                                     columns=['x,y', 'T', 'definition', 'auc', 'sepcificity',
                                                              'sensitivity',
                                                              'accuracy'])
             results_patient_level_df.to_csv(
-                Output_results + train_test + '_patient_level_results1.csv')
+                Output_results + train_test + '_patient_level_results.csv')
 
 
 if __name__ == '__main__':
@@ -146,7 +145,7 @@ if __name__ == '__main__':
               data_folder, train_test, fake_test=False)
 
     x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules1[1:]
+    data_folder_list = constants.exclusion_rules[1:]
     for data_folder in data_folder_list:
         eval_LSTM(T_list, x_y, constants.FEATURES,
                   data_folder, train_test, fake_test=False)
