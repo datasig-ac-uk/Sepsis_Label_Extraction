@@ -11,7 +11,7 @@ from scipy.stats import norm
 
 import sys
 sys.path.insert(0, '../')
-
+import omni.functions as omni_functions
 from visualization.patientlevel_function import decompose_confusion
 import visualization.patientlevel_function as mimic3_myfunc_patientlevel
 import features.mimic3_function as mimic3_myfunc
@@ -1034,30 +1034,26 @@ def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save
             Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
         septic_los_list.append(
             df_sepsis1.loc[df_sepsis1['sepsis_hour'].notnull()].groupby('icustay_id').rolling_los_icu.max().astype('int'))
-        current_label = np.load(Data_Dir + 'label' +
-                                definition[1:] + '_' + str(T) + '.npy')
-        for model in constants.MODELS:
-            _, _, Output_predictions, Output_results = mimic3_myfunc.folders(current_data,
+        current_label = np.load(Data_Dir + 'label_' + str(x) +
+                                 '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
+        for model in constants.MODELS[:1]:
+            _, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(current_data,
                                                                              model=model)
-            
-            if model==constants.MODELS[0]:
-                
-                prob_preds = np.load(Output_predictions + 'pro_preds'+str(x) + '_' + str(y) + '_' + str(T) +
-                                 definition[1:] + '_' + 'test' + '.npy')
-            else:    
-                prob_preds = np.load(Output_predictions + 'pro_preds'+ str(x) + '_' + str(y) + '_' + str(T) +
-                                 definition[1:] + '_' + 'test' + '.npy')
+            prob_preds = np.load(
+                Output_predictions + 'test/' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
 
-            CMs, patient_pred_label_list, pred_septic_time_list =suboptimal_choice_patient(df_sepsis1,
-                                                                                            current_label,
-                                                                                            prob_preds, a1=6,
-                                                                                            thresholds=thresholds,
-                                                                                            sample_ids=sample_ids)
-            _, _, _, _, idx = output_metric_level(CMs, patient_pred_label_list, levels=[metric_thresh],
-                                                  test_metric=test_metric)
-            threshold = thresholds[idx]
+
+            #CMs, patient_pred_label_list, pred_septic_time_list =suboptimal_choice_patient(df_sepsis1,
+                                                                                           # current_label,
+                                                                                          #  prob_preds, a1=6,
+                                                                                          #  thresholds=thresholds,
+                                                                                          #  sample_ids=sample_ids)
+            threshold_patient = omni_functions.load_pickle(Model_Dir +
+                                                           str(x) + '_' + str(y) + '_' +
+                                                           str(T) + definition[1:] + '_threshold_patient.pkl')
+            #threshold = thresholds[idx]
             # print(df_sepsis1.shape,current_labels.shape,pred_labels.shape,prob_preds.shape)
-            pred_labels = (prob_preds > threshold).astype('int')
+            pred_labels = (prob_preds > threshold_patient).astype('int')
             patient_true_label, _, _, pred_septic_time, true_septic_time, ids, patient_icustay = mimic3_myfunc_patientlevel.patient_level_pred(
                 df_sepsis1, current_label,
                 pred_labels, T, sample_ids=sample_ids,
@@ -1241,16 +1237,15 @@ def time_difference_dist_definitions1(true_septic_time_list, identified_pred_sep
     def_grid = ['H1', 'H2', 'H3']
 
     for i in range(3):
-        identified_true_sepsis_time = true_septic_time_list[3 * i].loc[
-            true_septic_time_list[3 * i].index.isin(identified_pred_sepsis_time[3 * i].index)]
-        identified_time_difference = identified_true_sepsis_time.values - identified_pred_sepsis_time[
-            3 * i].values
+        identified_true_sepsis_time = true_septic_time_list[i].loc[
+            true_septic_time_list[i].index.isin(identified_pred_sepsis_time[i].index)]
+        identified_time_difference = identified_true_sepsis_time.values - identified_pred_sepsis_time[i].values
         for time in time_grid:
             time_diff.append(r'$\geq$' + str(time))
             defs.append(def_grid[i])
 
             proportion.append(
-                np.where(identified_time_difference > time)[0].shape[0] / len(true_septic_time_list[3 * i]))
+                np.where(identified_time_difference > time)[0].shape[0] / len(true_septic_time_list[i]))
         # print(len(true_septic_time_list[3 * i]))
     defs = []
     proportion1 = []
@@ -1262,8 +1257,8 @@ def time_difference_dist_definitions1(true_septic_time_list, identified_pred_sep
         for time in time_grid:
             time_diff.append(r'$\geq$' + str(time))
             defs.append(def_grid[i])
-            patient_proportion = (np.where(true_septic_time_list[3 * i] > time)[0].shape[0]) / len(
-                true_septic_time_list[3 * i])
+            patient_proportion = (np.where(true_septic_time_list[i] > time)[0].shape[0]) / len(
+                true_septic_time_list[i])
             proportion1.append(patient_proportion)
 
     data_dict = {'HBO': time_diff, 'def': defs, 'proportion': proportion}
@@ -1296,10 +1291,9 @@ def proprotion_HBO_line_plot(patient_true_label_list, true_septic_time_list, ide
     patience_def = ['flagged as septic', 'true septic']
 
     for i in range(3):
-        identified_true_sepsis_time = true_septic_time_list[3 * i].loc[
-            true_septic_time_list[3 * i].index.isin(identified_pred_sepsis_time[3 * i].index)]
-        identified_time_difference = identified_true_sepsis_time.values - identified_pred_sepsis_time[
-            3 * i].values
+        identified_true_sepsis_time = true_septic_time_list[i].loc[
+            true_septic_time_list[i].index.isin(identified_pred_sepsis_time[i].index)]
+        identified_time_difference = identified_true_sepsis_time.values - identified_pred_sepsis_time[i].values
         fn_ids = [x for x in true_septic_time_list[3 * i].index if
                   x not in identified_pred_sepsis_time[3 * i].index]
         fn_icustay = patient_icustay_list[3 * i].loc[fn_ids]
@@ -1494,8 +1488,9 @@ def onset_time_stacked_bar(patient_true_label_list, true_septic_time_list, ident
 
     fp_sepsis_time = pred_septic_time_list[i].loc[pred_septic_time_list[i].index.isin(
         negative_ids)]
+    fp_ids = [x for x in negative_ids if x in fp_sepsis_time.index]
     fp_icustay = patient_icustay_list[i].loc[patient_icustay_list[i].index.isin(
-        negative_ids)]
+        fp_ids)]
     tn_ids = [x for x in negative_ids if x not in fp_sepsis_time.index]
     tn_icustay = patient_icustay_list[i].loc[tn_ids]
     time_diff = time_grid[1] - time_grid[0]

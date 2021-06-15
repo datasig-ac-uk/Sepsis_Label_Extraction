@@ -1,7 +1,7 @@
 #pip install gdown
 
-gdown --id 1Nx_3kC_l5mcyVzMIryEYs40G-2A1HYEu
+gdown --id 17FZNA65asNMVxT9YCzqv0Epur-Dnj3KJ
 unzip models.zip
 rm -rf model.zip
 
-https://drive.google.com/file/d/1Nx_3kC_l5mcyVzMIryEYs40G-2A1HYEu/view?usp=sharing
+https://drive.google.com/file/d/17FZNA65asNMVxT9YCzqv0Epur-Dnj3KJ/view?usp=sharing
