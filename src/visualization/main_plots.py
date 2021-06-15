@@ -37,12 +37,12 @@ if __name__ == '__main__':
     print("The interim results will be collected from ",
           Output_predictions + purpose)
     
+    Data_save_plots = constants.OUTPUT_DIR + 'plots/'
+    mimic3_myfunc.create_folder(Data_save_plots)    
 
     Output_results=Output_results[:-5]
-    Data_save_plots = Output_results + purpose+'/plots/'
-    mimic3_myfunc.create_folder(Data_save_plots)
 
-    Data_save_tables = Output_results + purpose + '/tables/'
+    Data_save_tables = constants.OUTPUT_DIR + 'tables/'
     mimic3_myfunc.create_folder(Data_save_tables)
 
     labels_list_list = []
@@ -155,7 +155,7 @@ if __name__ == '__main__':
 ######################################  To produce AUC FIgures of LSTM/COXPHM ###################################
     purpose = 'test'
 
-    plot_functions.auc_plot_xy_pairs(Data_Dir, Data_save_plots,model=constants.MODELS, current_data=current_data)
+    plot_functions.auc_plot_xy_pairs(Data_Dir, Data_save_plots, current_data=current_data)
 ######################################  To produce FIgure 5,6  ###################################
     print('produce sepsis onset time plots')
 #     plot_functions.sepsis_onset_time_plots(

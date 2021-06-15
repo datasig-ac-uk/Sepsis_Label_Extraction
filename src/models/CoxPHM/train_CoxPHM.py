@@ -99,10 +99,10 @@ def train_CoxPHM(T_list, x_y, definitions, data_folder, signature, fake_test):
                                             columns=['x,y', 'T', 'definition', 'auc', 'sepcificity','sensitivity', 'accuracy'])
 
     results_patient_level_df.to_csv(
-        Output_results + 'train' + '_patient_level_results1.csv')
+        Output_results + 'train' + '_patient_level_results.csv')
     result_df = pd.DataFrame(
         results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity','sensitivity', 'accuracy'])
-    result_df.to_csv(Output_results + 'train' + '_results1.csv')
+    result_df.to_csv(Output_results + 'train' + '_results.csv')
 
 
 if __name__ == '__main__':
@@ -114,7 +114,7 @@ if __name__ == '__main__':
                  data_folder, True, fake_test=False)
 
     x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules[1:]
+    data_folder_list = constants.exclusion_rules[2:]
     for data_folder in data_folder_list:
-        train_CoxPHM(T_list, x_y, constants.FEATURES[1:],
+        train_CoxPHM(T_list, x_y, constants.FEATURES,
                      data_folder, True, fake_test=False)
