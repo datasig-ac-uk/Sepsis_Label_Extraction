@@ -1015,11 +1015,11 @@ def plot_venn(x, y, T, test_metric, metric_thresh, precision, save_dir):
     plt.tight_layout()
     plt.savefig(save_dir + 'Venn_diagram_compare_models' + '.png')
     
-def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save_dir,current_data):
+def sepsis_onset_time_plots(x, y, T, save_dir,current_data):
 
     Root_Data, _, _, _ = mimic3_myfunc.folders(current_data)
     Data_Dir = Root_Data + 'test/'
-    thresholds = np.arange(precision) / precision
+
     sample_ids = None
     true_septic_time_list = []
     pred_septic_time_sublists = []
@@ -1042,17 +1042,10 @@ def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save
             prob_preds = np.load(
                 Output_predictions + 'test/' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
 
-
-            #CMs, patient_pred_label_list, pred_septic_time_list =suboptimal_choice_patient(df_sepsis1,
-                                                                                           # current_label,
-                                                                                          #  prob_preds, a1=6,
-                                                                                          #  thresholds=thresholds,
-                                                                                          #  sample_ids=sample_ids)
             threshold_patient = omni_functions.load_pickle(Model_Dir +
                                                            str(x) + '_' + str(y) + '_' +
                                                            str(T) + definition[1:] + '_threshold_patient.pkl')
-            #threshold = thresholds[idx]
-            # print(df_sepsis1.shape,current_labels.shape,pred_labels.shape,prob_preds.shape)
+
             pred_labels = (prob_preds > threshold_patient).astype('int')
             patient_true_label, _, _, pred_septic_time, true_septic_time, ids, patient_icustay = mimic3_myfunc_patientlevel.patient_level_pred(
                 df_sepsis1, current_label,
