@@ -10,7 +10,7 @@ from matplotlib.patches import Rectangle
 from scipy.stats import norm
 
 import sys
-sys.path.insert(0, '../')
+
 import omni.functions as omni_functions
 from visualization.patientlevel_function import decompose_confusion
 import visualization.patientlevel_function as mimic3_myfunc_patientlevel
