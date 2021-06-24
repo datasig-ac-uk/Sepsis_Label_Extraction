@@ -134,7 +134,7 @@ Next, change the relational format of the database by invoking the script
 ```console
 ./30_sepsis_time.sh
 ```
-NB: Please provision for several hours for `./20_load_mimic_database.sh` and `./30_sepsis_time.sh` to complete.
+NB: Please allow several hours for `./20_load_mimic_database.sh` and `./30_sepsis_time.sh` to complete.
 
 Note also that our adaptations and database loading scripts are based on the [mimic-code repository](https://github.com/MIT-LCP/mimic-code/tree/5f563bd40fac781eaa3d815b71503a6857ce9599) at commit 5f563bd40fac781eaa3d815b71503a6857ce9599. We include all required scripts as part of this repository, therefore it is not necessary to check out any of the aforementioned repository separately.
 
