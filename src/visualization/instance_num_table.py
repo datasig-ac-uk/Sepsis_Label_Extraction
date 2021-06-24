@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import sys
 
-sys.path.insert(0, '../')
+
 import features.mimic3_function as mimic3_myfunc
 import constants as constants
 
