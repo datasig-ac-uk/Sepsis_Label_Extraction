@@ -435,8 +435,8 @@ def featureset_generator(path_df, Save_Dir, x=24, y=12, a2=0, T_list=constants.T
     print('save icu spetic ratio to csv')
     result_df = pd.DataFrame(results, columns=[
                              'x,y', 'definition', 'total_icu_no', 'sepsis_no', 'septic_ratio'])
-    result_df.to_csv(Save_Dir + 'icu_number.csv')
 
+    result_df.to_csv(Save_Dir + str(x)+'_'+str(y)+'_icu_number.csv')
 
 ################################### CV splitting  ########################################
 
