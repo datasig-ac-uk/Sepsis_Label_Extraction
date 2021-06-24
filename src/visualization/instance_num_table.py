@@ -48,4 +48,4 @@ for x,y in constants.xy_pairs:
 instances_df = pd.DataFrame(instances, columns=['x,y','a1', 'instance'+constants.FEATURES[0][1:],\
                                                'instance'+constants.FEATURES[1][1:],'instance'+constants.FEATURES[2][1:]])
 
-instances_df.to_csv(Data_Dir+'instance_number(forwrite).csv')
+instances_df.to_csv(Data_Dir+'instance_number.csv')
