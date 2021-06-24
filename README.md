@@ -64,21 +64,44 @@ brew services start postgresql
 
 Another possibility is to install from source by cloning the repository at https://github.com/postgres/postgres. If your operating system does not permit you to follow the steps, then you should consider installing from source too.
 Steps to install from source:
-* Make a new directory at a suitable location,  e.g. `mkdir source`
-* Clone repository `git clone git@github.com:postgres/postgres.git`
-* Go to the cloned directory
-* `./configure --prefix=/path_to_installation_directory`
-* `make`
-* `make install`
+* Make a new directory at a suitable location,  e.g. 
+```console
+mkdir source
+```
+* Clone repository 
+```console
+git clone git@github.com:postgres/postgres.git
+```
+* Go to the cloned directory with `cd ...` 
+* Next execute the following commands
+```console
+./configure --prefix=/path_to_installation_directory
+make
+make install
+```
 * Add the line `export PATH=/path_of_directory_of_installation` to your .bashrc file.
-* `source .bashrc`
-* `cd path_of_directory_of_installation`
-* `mkdir data`
-* `cd data`
-* Initialise the server with `initdb`.
-* Now go back to the .bashrc file and add the line `export PGDATA=path_of_directory_of_installation/data`
-* `source .bashrc`
-* Now you should be able to initialise the database server with `path_of_directory_of_installation/bin/pg_ctl -D path_of_directory_of_installation/data/ -l logfile start`
+* Source this file
+```console
+source .bashrc
+```
+* Then change directory again e.g.`cd path_of_directory_of_installation`
+* Then make a new folder and move there:
+```console
+mkdir data
+cd data
+```
+* Initialise the server with 
+```console
+initdb
+```
+* Now go back to the .bashrc file and add the line `export PGDATA=path_of_directory_of_installation/data` and again source the file with
+```console
+source .bashrc
+```
+* Now you should be able to initialise the database server with (changing the placeholder name)
+```console
+path_of_directory_of_installation/bin/pg_ctl -D path_of_directory_of_installation/data/ -l logfile start
+```
 
 ## Test the PostgreSQL Installation
 Check that you have psql installed with
