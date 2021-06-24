@@ -1,6 +1,4 @@
-#import sys
 import time
-
 import numpy as np
 from ray.tune.utils import get_pinned_object
 from ray import tune
@@ -9,8 +7,6 @@ from torch import nn, optim
 from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score, roc_curve, auc
 import random
-#sys.path.insert(0, '../../')
-
 from models.nets import LSTM
 from data.torch_timeseries_dataset import LSTM_Dataset
 import features.scaler as scaler

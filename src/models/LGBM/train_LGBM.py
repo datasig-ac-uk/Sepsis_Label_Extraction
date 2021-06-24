@@ -1,7 +1,3 @@
-#import sys
-
-#sys.path.insert(0, '../../')
-
 import models.LGBM.LGBM_functions as lgbm_func
 import features.mimic3_function as mimic3_myfunc
 import constants

@@ -1,11 +1,8 @@
-#import sys
 import os
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
 import torch
-
-#sys.path.insert(0, '../../')
 from visualization.plot_functions import suboptimal_choice_patient
 from visualization.patientlevel_function import decompose_cms, output_at_metric_level
 import features.mimic3_function as mimic3_myfunc

@@ -1,5 +1,4 @@
 import pickle
-#import sys
 import pandas as pd
 from lightgbm import LGBMClassifier
 import numpy as np
@@ -7,8 +6,6 @@ from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 from sklearn import metrics
 import joblib
-
-#sys.path.insert(0, '../../')
 import features.mimic3_function as mimic3_myfunc
 import visualization.patientlevel_function as mimic3_myfunc_patientlevel
 
