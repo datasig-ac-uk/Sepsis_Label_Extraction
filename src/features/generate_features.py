@@ -1,6 +1,6 @@
-import sys
+#import sys
 
-sys.path.insert(0, '../')
+#sys.path.insert(0, '../')
 import constants
 import features.mimic3_function as mimic3_myfunc
 

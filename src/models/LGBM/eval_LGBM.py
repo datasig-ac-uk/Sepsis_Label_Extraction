@@ -1,5 +1,5 @@
 import os
-import sys
+#import sys
 
 import numpy as np
 import pandas as pd
@@ -7,7 +7,7 @@ from sklearn import metrics
 
 import joblib
 
-sys.path.insert(0, '../../')
+#sys.path.insert(0, '../../')
 
 import models.LGBM.LGBM_functions as lgbm_functions
 import visualization.patientlevel_function as mimic3_myfunc_patientlevel

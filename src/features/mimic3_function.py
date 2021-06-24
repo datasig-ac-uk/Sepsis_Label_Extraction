@@ -1,5 +1,5 @@
 import os
-import sys
+#import sys
 
 import iisignature
 import numpy as np
@@ -9,7 +9,7 @@ from sklearn.model_selection import KFold
 import torch
 
 # from dicts import *
-sys.path.insert(0, '../')
+#sys.path.insert(0, '../')
 import constants
 from data.dataset import TimeSeriesDataset
 from data.functions import torch_ffill

@@ -1,9 +1,9 @@
-import sys
+#import sys
 import numpy as np
 import pandas as pd
 
 
-sys.path.insert(0, '../../')
+#sys.path.insert(0, '../../')
 import constants
 import models.CoxPHM.coxphm_functions as coxphm_functions
 import omni.functions as omni_functions

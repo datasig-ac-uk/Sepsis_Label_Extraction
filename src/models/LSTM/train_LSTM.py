@@ -1,10 +1,10 @@
-import sys
+#import sys
 
 import numpy as np
 import torch
 from torch import nn, optim
 import os
-sys.path.insert(0, '../../')
+#sys.path.insert(0, '../../')
 import features.mimic3_function as mimic3_myfunc
 import omni.functions as omni_functions
 import models.LSTM.LSTM_functions as lstm_functions

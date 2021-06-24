@@ -1,4 +1,4 @@
-import sys
+#import sys
 
 import numpy as np
 import pandas as pd
@@ -7,7 +7,7 @@ from ray import tune
 from ray.tune.utils import pin_in_object_store
 import random
 
-sys.path.insert(0, '../../')
+#sys.path.insert(0, '../../')
 import constants
 import features.mimic3_function as mimic3_myfunc
 import models.CoxPHM.coxphm_functions as coxphm_functions

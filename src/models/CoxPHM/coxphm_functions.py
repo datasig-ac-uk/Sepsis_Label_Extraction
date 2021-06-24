@@ -1,5 +1,5 @@
-import sys
-sys.path.insert(0, '../../')
+#import sys
+#sys.path.insert(0, '../../')
 from lifelines import CoxPHFitter
 import numpy as np
 import pandas as pd
