@@ -9,7 +9,6 @@ import pickle
 
 
 import sys
-sys.path.insert(0, '../')
 
 import visualization.table_functions as table_functions
 import visualization.plot_functions as plot_functions
