@@ -12,11 +12,11 @@ source pythonpath.sh
 # Data Extraction Pipeline
 
 To train and evaluate our models, we will change the relational format of the [MIMIC-III database](https://mimic.mit.edu/iii/gettingstarted/overview/) to a pivoted view which includes key demographic information, vital signs, and laboratory readings. We will also create tables for the possible sepsis onset times of each patient. We will subsequently output the pivoted data to comma-separated value (CSV) files, which serve as input for model training and evaluation. 
-We provide more detailed instructions under [/src/database] subdirecotry, make sure you run all all data extraction pipeline under that subdirecotry:
+We provide more detailed instructions under **/src/database** subdirecotry, make sure you run all all data extraction pipeline under that subdirecotry:
 ```console
 cd /src/database
 ```
-Depending on your preferred choice of installing PostgreSQL on your machine yourself or using a Docker container, please proceed with the relevant section in [/src/database/README.md]
+Depending on your preferred choice of installing PostgreSQL on your machine yourself or using a Docker container, please proceed with the relevant section in **/src/database/README.md**
 
 
 # Model Training and Testing Pipeline
