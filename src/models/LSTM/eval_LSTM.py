@@ -56,7 +56,7 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
                     Model_Dir + 'hyperparameter/scaler' + definition[1:])
                 #               scaler=load_pickle(MODELS_DIR+'/LSTM/hyperparameter/scaler'+definition[1:]+'H3_subset')
                 test_dl = lstm_functions.prepared_data_test(
-                    dataset, labels, True, scaler, 1000, device)
+                    dataset, labels, True, scaler, labels.shape[0], device)
 
                 # specify torch model architecture and load trained model
                 model = LSTM(in_channels=dataset.data.shape[-1], num_layers=1,
