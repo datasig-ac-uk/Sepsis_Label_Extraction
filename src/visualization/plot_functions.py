@@ -8,7 +8,7 @@ from sklearn.metrics import roc_auc_score, roc_curve, auc, confusion_matrix
 from matplotlib_venn import venn3
 from matplotlib.patches import Rectangle
 from scipy.stats import norm
-
+from matplotlib.colors import ListedColormap
 import sys
 
 import omni.functions as omni_functions
@@ -1015,7 +1015,7 @@ def plot_venn(x, y, T, test_metric, metric_thresh, precision, save_dir):
     plt.tight_layout()
     plt.savefig(save_dir + 'Venn_diagram_compare_models' + '.png')
     
-def sepsis_onset_time_plots(x, y, T, save_dir,current_data):
+def sepsis_onset_time_plots(x, y, T, save_dir,current_data=constants.exclusion_rules[0]):
 
     Root_Data, _, _, _ = mimic3_myfunc.folders(current_data)
     Data_Dir = Root_Data + 'test/'
@@ -1259,17 +1259,30 @@ def time_difference_dist_definitions1(true_septic_time_list, identified_pred_sep
                   'proportion': np.array(proportion1)}
     color_pal = sns.color_palette("colorblind", 3).as_hex()
     colors = ','.join(color_pal)
-    plt.figure(figsize=(12, 9))
-    plt.rcParams.update({'font.size': 17})
+    fig, ax = plt.subplots(1, 1)
+    sns.set_theme()
+    sns.set_style('white')
+    fig.set_figheight(12)
+    fig.set_figwidth(18)
+    ax.tick_params(axis='both', which='major', labelsize=30)
+    params = {'legend.fontsize': 30,
+              'legend.handlelength': 0.5, 'axes.labelsize': 30}
+    plt.rcParams.update(params)
+
+
+    # plt.rcParams.update({'font.size': 30})
     sns.barplot(x="HBO", y="proportion", hue="def",
                 data=pd.DataFrame.from_dict(data_dict))
-    sns.lineplot(x="HBO", y="proportion",
+    gfg = sns.lineplot(x="HBO", y="proportion",
                  hue="def",
                  data=pd.DataFrame.from_dict(data_dict1), style='def', sort=False,
                  markers=['o', 'o', 'o'],
                  dashes=[(5, 5), (5, 5), (5, 5)])
-
+    ax.set_ylabel('proportion',fontsize=30)
+    ax.set_xlabel('HBO',fontsize=30)
+    plt.setp(gfg.get_legend().get_texts(), fontsize=30)
     plt.savefig(save_dir + 'Time_diff_dist_definitions' + '.jpeg', dpi=350)
+    plt.savefig(save_dir + 'Time_diff_dist_definitions' + '.png', dpi=350)
 
 
 def proprotion_HBO_line_plot(patient_true_label_list, true_septic_time_list, identified_pred_sepsis_time,
@@ -1314,7 +1327,7 @@ def proprotion_HBO_line_plot(patient_true_label_list, true_septic_time_list, ide
     colors = ','.join(color_pal)
     # print(pd.DataFrame.from_dict(data_dict1))
     plt.figure(figsize=(12, 9))
-    plt.rcParams.update({'font.size': 17, 'legend.handlelength': 1.2})
+    plt.rcParams.update({'font.size': 17,"axes.labelsize":16, 'legend.handlelength': 1.2})
     sns.lineplot(x="Hours before sepsis onset", y="proportion (septic patients in ICU / septic patients)",
                  hue="def",
                  data=pd.DataFrame.from_dict(data_dict1), style='cohort', sort=False, color=colors)
@@ -1520,17 +1533,32 @@ def onset_time_stacked_bar(patient_true_label_list, true_septic_time_list, ident
     new_header = df1.iloc[0]
     df1 = df1[1:]  # take the data less the header row
     df1.columns = new_header
-    plt.figure(figsize=(30, 14))
+    fig, ax = plt.subplots(1, 1)
+    fig.set_figheight(12)
+    fig.set_figwidth(18)
+    ax.tick_params(axis='both', which='major', labelsize=30)
+    sns.set_theme()
+    sns.set_style('white')
     # plt.rcParams.update({'font.size': 30})
-    params = {'legend.fontsize': 17,
-              'legend.handlelength': 0.5, 'axes.labelsize': 17}
+    params = {'legend.fontsize': 27,
+              'legend.handlelength': 0.5, 'axes.labelsize': 30}
     plt.rcParams.update(params)
-    color_pal = sns.color_palette("colorblind", 6).as_hex()
-    colors = ','.join(color_pal)
-    ax = df1.T.plot(kind='bar', stacked=True, figsize=(12, 9),
-                    fontsize=14, rot=0, legend=True, color=color_pal)
-    ax.set_title(definition)
-    ax.set_ylabel('proportion (patients in ICU/ total patients)')
+    color_pal = ListedColormap(sns.color_palette("colorblind", 6).as_hex())
+    #colors = ','.join(color_pal)
+
+    ax.stackplot(icustay,df1.loc['flagged,ultimately septic'].values.astype(np.float),
+                       df1.loc['flagged,septic until discharge'].values.astype(np.float),
+                       df1.loc['flagged,ultimately non-septic'].values.astype(np.float),
+                       df1.loc['unflagged,ultimately non-septic'].values.astype(np.float),
+                       df1.loc['unflagged,ultimately septic'].values.astype(np.float),cmap=color_pal,alpha=0.6,
+                       labels=['flagged,ultimately septic','flagged,septic until discharge',
+                               'flagged,ultimately non-septic','unflagged,ultimately non-septic',
+                               'unflagged,ultimately septic'])
+    #ax = df1.T.plot(kind='line', stacked=True, figsize=(12, 9),
+                    #fontsize=25, rot=0, legend=True, color=color_pal)
+    ax.set_title(definition,fontsize=30)
+    ax.set_ylabel('proportion (patients in ICU/ total patients)',fontsize=30)
+    ax.set_xlabel('Hours since ICU admission',fontsize=30)
     handles, labels = ax.get_legend_handles_labels()
     ax.legend(reversed(handles), reversed(labels))
     for i, t in enumerate(ax.get_xticklabels()):
@@ -1538,8 +1566,11 @@ def onset_time_stacked_bar(patient_true_label_list, true_septic_time_list, ident
             t.set_visible(False)
     # patches, labels = ax.get_legend_handles_labels()
     # ax.legend(patches, labels, loc='best')
-    plt.savefig(save_dir + 'outcome_stacked_bar_plot_' +
+    fig.savefig(save_dir + 'outcome_stacked_bar_plot_' +
                 definition + '.jpeg', dpi=350)
+    fig.savefig(save_dir + 'outcome_stacked_bar_plot_' +
+                definition + '.png', dpi=350)
+    plt.show()
     return df1
 
 
@@ -1593,6 +1624,7 @@ def proprotion_HBO_line_plot(patient_true_label_list, true_septic_time_list, ide
     # plt.title('proportion of predicted septic and septic+ non_septic conditional on septic patients')
     locs, labels = plt.xticks()
     # ax.set_ylabel('proportion (patients in ICU/ total patients)')
+
     plt.xticks(np.arange(0, time_grid[-1] + 1, step=5))
     plt.savefig(save_dir + 'proprotion_HBO_line_plot' + '.jpeg', dpi=350)
     return pd.DataFrame.from_dict(data_dict1)

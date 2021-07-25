@@ -22,7 +22,7 @@ def prepared_data_train(ts_dataset, labels, normalize, batch_size, device):
     lengths = torch.FloatTensor(dataset.lengths)
     labels = torch.LongTensor(labels)
     ds = LSTM_Dataset(x=data, y=labels, p=20, lengths=lengths, device=device)
-    dl = DataLoader(ds, batch_size=batch_size)
+    dl = DataLoader(ds, batch_size=batch_size,num_workers=0)
     return dl, my_scaler
 
 

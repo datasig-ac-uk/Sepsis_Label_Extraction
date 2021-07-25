@@ -137,13 +137,13 @@ if __name__ == '__main__':
     train_test = 'train'
     T_list = constants.T_list
     data_folder = constants.exclusion_rules[0]
-    x_y = constants.xy_pairs
-    eval_LSTM(T_list, x_y, constants.FEATURES,
+    x_y = [(24, 12)]
+    eval_LSTM(T_list[2:3], x_y, constants.FEATURES[2:3],
               data_folder, train_test, fake_test=False)
 
     x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules[1:]
+    data_folder_list = constants.exclusion_rules[2:]
     for data_folder in data_folder_list:
-        eval_LSTM(T_list, x_y, constants.FEATURES,
+        eval_LSTM(T_list[2:3], x_y, constants.FEATURES[2:3],
                   data_folder, train_test, fake_test=False)
 

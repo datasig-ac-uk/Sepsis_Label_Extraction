@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import random
 from torch import nn, optim
 import os
 import features.mimic3_function as mimic3_myfunc
@@ -25,6 +26,7 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
     """
     results = []
     results_patient_level = []
+
     for x, y in x_y:
         data_folder = 'fake_test1/' + data_folder if fake_test else data_folder
         Root_Data, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(
@@ -47,6 +49,14 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
                 print('load train labels')
                 labels_train = np.load(
                     Data_Dir + 'label'+'_'+str(x)+'_'+str(y)+'_'+str(T) + definition[1:] + '.npy')
+
+                seed = 1023
+                torch.manual_seed(seed)
+                random.seed(seed)
+                np.random.seed(seed)
+                if torch.cuda.is_available():
+                    torch.cuda.manual_seed(seed)
+                    torch.backends.cudnn.deterministic = True
 
                 # get torch dataloader for lstm
                 train_dl, scaler = lstm_functions.prepared_data_train(
@@ -86,6 +96,7 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
                                            str(x) + '_' + str(y) + '_' +
                                            str(T) + definition[1:] + '_threshold.pkl')
 
+
                 thresholds = np.arange(10000) / 10000
                 CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
                     df_sepsis, true, preds, a1=T, thresholds=thresholds, sample_ids=None)
@@ -108,8 +119,6 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
                                                                                        metric_required=[
                                                                                            threshold_patient]))])
 
-                # auc_score, specificity, accuracy = eval_model(test_dl, model,
-                #                                             save_dir=None)
 
                 results.append([str(x) + ',' + str(y), T,
                                 definition, auc_score, specificity,sensitivity, accuracy])
@@ -118,38 +127,34 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
             results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity','sensitivity', 'accuracy'])
 
     result_df.to_csv(Output_results +'train'+
-                     '_results.csv')
+                     '_results1.csv')
     ############Patient level now ###############
 
     results_patient_level_df = pd.DataFrame(results_patient_level,
                                                 columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
                                                          'accuracy'])
     results_patient_level_df.to_csv(
-        Output_results + 'train' + '_patient_level_results.csv')
+        Output_results + 'train' + '_patient_level_results1.csv')
+
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "3,4"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
     print(os.environ["CUDA_VISIBLE_DEVICES"])
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(device)
-    seed = 1023
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-        torch.backends.cudnn.deterministic = True
 
 
     T_list = constants.T_list
 
     data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
-
-    train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
+    train_LSTM(T_list[2:3], x_y, constants.FEATURES[2:3],
+                 data_folder, True)
 
     x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules[2:]
+    data_folder_list = constants.exclusion_rules[1:]
     for data_folder in data_folder_list:
-        train_LSTM(T_list, x_y, constants.FEATURES, data_folder, fake_test=False)
-
+        train_LSTM(T_list[2:3], x_y, constants.FEATURES[2:3],
+                     data_folder, True)
 
