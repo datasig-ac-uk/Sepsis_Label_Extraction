@@ -68,7 +68,8 @@ def train_LGBM(T_list, x_y, definitions, data_folder, thresholds=np.arange(10000
                     prob_preds_train,auc=\
                 lgbm_func.model_fit_saving(clf, features, labels, model_dir, Data_Dir, x=x, y=y, a1=a1,
                                            definition=definition,thresholds=None)
-                
+                    np.save(Output_predictions + 'train/' + str(x) +
+                        '_' + str(y) + '_' + str(a1) + definition[1:] + '_for_test.npy', prob_preds_train)                 
                     results.append([str(x) + ',' + str(y), a1, definition, auc])
                     
                 mimic3_myfunc.create_folder(Output_predictions + 'train/')
