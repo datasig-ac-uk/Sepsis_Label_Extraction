@@ -80,11 +80,11 @@ psql -V
 
 The script `00_define_database_environment.sh` contains relevant environment variables for connecting to PostgreSQL. It should not be necessary to change the value of any of these variables, with the exception of MIMIC_DATA_PATH, which you should change to the path containing the MIMIC-III data files you downloaded previously.
 
-To initialise the PostgreSQL installation with a new database for storing MIMIC-III data, invoke the script 
+To initialise the PostgreSQL installation with a new database for storing MIMIC-III data, run the following command:
 ```console
 ./10_initialise_mimic_database.sh
 ```
-Note that this script and all subsequent scripts in the pipeline should be invoked from within this directory. If you are asked to provide a password, try authenticating using the default password `postgres`.
+Note that this command and all subsequent steps the pipeline should be run from within this directory. If you are asked to provide a password, try authenticating using the default password `postgres`.
 
 ## Populate the database using MIMIC-III data files
 
@@ -132,7 +132,7 @@ The scripts for executing the analogous pipeline based on Docker are located ins
 
 The script `./docker/00_define_database_environment.sh` contains relevant environment variables for connecting to PostgreSQL. It should not be necessary to change the values of MIMIC_POSTGRES_PORT and MIMIC_POSTGRES_PASSWORD. However, you should change MIMIC_DATA_PATH to the path containing the MIMIC-III data files you downloaded previously. In addition, you should change POSTGRESQL_DATA_PATH to a newly created directory which will be used to store the database.
 
-To initialise the PostgreSQL installation with a new database for storing MIMIC-III data, invoke the script with
+To initialise the PostgreSQL installation with a new database for storing MIMIC-III data, run the following command:
 ```console
 (cd docker && ./10_initialise_mimic_database.sh)
 ```
