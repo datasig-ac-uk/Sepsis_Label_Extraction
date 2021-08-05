@@ -3,7 +3,7 @@ FROM postgres:latest
 # in the docker initialization, we do not build the data
 ENV BUILD_MIMIC 0
 
-RUN mkdir /mimic_data /docker-entrypoint-initdb.d/custom_sql /docker-entrypoint-initdb.d/split_ids
+RUN mkdir /mimic_data /docker-entrypoint-initdb.d/custom_sql /docker-entrypoint-initdb.d/split_ids /docker-entrypoint-initdb.d/original_ids
 COPY mimic-code/ /docker-entrypoint-initdb.d/
 COPY sql/ /docker-entrypoint-initdb.d/custom_sql/
 
