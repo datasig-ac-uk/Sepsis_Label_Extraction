@@ -8,7 +8,7 @@ This is the code for the paper entitled "Variation of sepsis-III definitions inf
 The code is composed with the following part:
 1. Extracting the sepsis labelling from the MIMIC-III data based on three sepsis criteria H1-3 and their variants;
 2. Training three types of models (i.e. LGBM, LSTM and CoxPHM) for the early sepsis prediction on the datasets produced in Step 1.
-3. Evaluating each trained model using the test metrics, such as AUC.
+3. Evaluating each trained model using the test metrics (e.g. AUROC) and producing the visulaziation plots.
 
 Data
 ------------
