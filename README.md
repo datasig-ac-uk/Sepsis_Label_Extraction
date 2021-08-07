@@ -36,8 +36,11 @@ Export PYTHONPATH
 ```
 source pythonpath.sh
 ```
-Raw Data  
+Step-by-Step Instruction
 ------------
+
+## Raw Data Import  
+
 You may indicate where the raw data is stored by making changes to `MIMIC_DATA_DIRS` in `src/constants.py`.
 
 
