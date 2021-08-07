@@ -39,7 +39,7 @@ source pythonpath.sh
 Step-by-Step Instruction
 ------------
 
-## Raw Data Import  
+### Raw Data Import  
 
 You may indicate where the raw data is stored by making changes to `MIMIC_DATA_DIRS` in `src/constants.py`.
 
