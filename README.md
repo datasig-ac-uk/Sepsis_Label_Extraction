@@ -12,8 +12,8 @@ The code is composed with the following parts:
 
 Data
 ------------
-Data is extracted from the MIMIC-III database.
-------------
+Data is extracted from the [MIMIC-III database](https://www.nature.com/articles/sdata201635?source=post_page---------------------------).
+
 
 TODO list:
 - [ ] connection between database code and analysis code: one line command output the all pivot csv files in /data/raw/.
