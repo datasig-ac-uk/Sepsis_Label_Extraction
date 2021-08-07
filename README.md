@@ -39,12 +39,13 @@ source pythonpath.sh
 Step-by-Step Instruction
 ------------
 
-### Raw Data Import  
+### Step 1: Raw Data Import  
 
 You may indicate where the raw data is stored by making changes to `MIMIC_DATA_DIRS` in `src/constants.py`.
 
+### Step 2: Sepsis Label Extraction
 
-Feature extraction
+### Step 3: Feature Extraction
 ------------
 
 ```
@@ -52,8 +53,8 @@ python3 features/generate_features.py
 ```
 This commmand will generate list of features which are required for model implementaion and the they will be saved in data/processed.   
 
-Model tuning/training/evaluation 
-------------
+### Step 4: Model Tuning/Training/Evaluation 
+
 run the main.py script in src/models with two arguments: model:'LGMB','LSTM','CoxPHM' and process:'train','tune','eval', e.g. For train a LGBM model:
 ```
 python3 models/main.py --model 'LGBM' --process 'train'
@@ -63,8 +64,14 @@ Hyperparameter tuning, model training and evaluation should be done in sequence 
 2. Then model is trained and saved in /model/ directory for later use on evaluation.
 3. Evaluation will produce numerical results and predictions, which are saved in outputs/results and outputs/predictions respectively. 
 
+### Step 5: Illustration of Prediction Results
+------------
+In order to reproduce all the plots in the paper, run the following command after obtaining all predictions from model evaluation step.   
+```
+python3 visualization/main_plots.py
+```
 
-Note:
+## Pre-trained Models
 In order to reproduce our results with our trained model, you can download all the trained model by
 ```
 bash download_models.sh
@@ -74,9 +81,4 @@ this will automatically set up the models folder and then run the evaluation for
 python3 models/main.py --model 'LGBM' --process 'eval'
 ```
 
-Illustration 
-------------
-In order to reproduce all the plots in the paper, run the following command after obtaining all predictions from model evaluation step.   
-```
-python3 visualization/main_plots.py
-```
+
