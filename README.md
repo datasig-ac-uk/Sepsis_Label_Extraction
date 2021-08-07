@@ -12,7 +12,7 @@ The code is composed with the following parts:
 
 Data
 ------------
-Data is extracted from the [MIMIC-III database](https://www.nature.com/articles/sdata201635?source=post_page---------------------------).
+Data is extracted from the [MIMIC-III database](https://www.nature.com/articles/sdata201635?source=post_page---------------------------)(Massachusetts, USA), a freely accessible critical care database.
 
 
 TODO list:
@@ -23,6 +23,9 @@ TODO list:
 - [x] code cleaning: delete all unnecessary codes, code linting, code commenting.
 - [ ] add notebooks.
 
+------------
+
+Requirements
 ------------
 
 Create a new environment and run
