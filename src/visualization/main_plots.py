@@ -20,7 +20,7 @@ import constants as constants
 
 
 if __name__ == '__main__':
-    """
+
     purpose = 'test'  # purpose can be 'test' or 'train'
 
     print("Collecting results on " + purpose+" set at setting x,y,T=24,12,6 from three models",
@@ -156,6 +156,6 @@ if __name__ == '__main__':
 
     plot_functions.auc_plot_xy_pairs(Data_Dir, Data_save_plots, current_data=current_data)
 ######################################  To produce FIgure 5,6  ###################################
-    """
+
     print('produce sepsis onset time plots')
     plot_functions.sepsis_onset_time_plots(24, 12, 6, save_dir=constants.OUTPUT_DIR + 'plots/',)
