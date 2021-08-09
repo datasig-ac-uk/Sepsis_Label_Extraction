@@ -11,11 +11,15 @@ The code is composed with the following parts:
 2. Training three types of models (i.e. LGBM, LSTM and CoxPHM) for the early sepsis prediction on the datasets produced in Step 1.
 3. Evaluating each trained model using the test metrics (e.g. AUROC) and producing the visulaziation plots.
 
+
+
+
 # Environment setup
 ```console
 pip install -r requirements.txt
 source pythonpath.sh
 ```
+
 
 # Data Extraction Pipeline
 
@@ -35,6 +39,7 @@ Feature Extraction
 python3 features/generate_features.py
 ```
 This commmand will generate list of features which are required for model implementaion and the they will be saved in data/processed.   
+
 
 Model tuning/training/evaluation 
 ------------
@@ -56,3 +61,4 @@ In order to reproduce all the plots in the paper, run the following command afte
 ```console
 python3 visualization/main_plots.py
 ```
+
