@@ -1,5 +1,7 @@
 import os
 import argparse
+import sys
+sys.path.insert(0, '/')
 model_parser = argparse.ArgumentParser(
     description='Argument for specifying model types and process')
 model_parser.add_argument('--model', type=str, required=True, default='lgbm')

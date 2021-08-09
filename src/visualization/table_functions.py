@@ -8,7 +8,6 @@ import pandas as pd
 
 from sklearn.metrics import roc_auc_score, roc_curve, auc
 
-sys.path.insert(0, '../')
 
 
 headers = ['H1', 'H2', 'H3']

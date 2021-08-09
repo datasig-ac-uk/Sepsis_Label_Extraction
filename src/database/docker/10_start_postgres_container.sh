@@ -25,6 +25,7 @@ docker run \
 -v $MIMIC_DATA_PATH:/mimic_data \
 -v $POSTGRESQL_DATA_PATH:/var/lib/postgresql/data \
 -v $(cd ../split_ids && pwd):/docker-entrypoint-initdb.d/split_ids \
+-v $(cd ../original_ids && pwd):/docker-entrypoint-initdb.d/original_ids \
 -d postgres/mimic
 
 echo "Waiting for postgresql server to start..."

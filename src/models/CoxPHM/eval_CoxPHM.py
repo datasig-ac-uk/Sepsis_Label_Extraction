@@ -1,9 +1,6 @@
-import sys
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
-
-sys.path.insert(0, '../../')
 import constants
 import models.CoxPHM.coxphm_functions as coxphm_functions
 import omni.functions as omni_functions

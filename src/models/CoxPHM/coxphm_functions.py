@@ -1,5 +1,3 @@
-import sys
-sys.path.insert(0, '../../')
 from lifelines import CoxPHFitter
 import numpy as np
 import pandas as pd
@@ -7,7 +5,6 @@ from ray import tune
 from ray.tune.utils import get_pinned_object
 from sklearn.metrics import roc_curve, auc, accuracy_score
 import random
-
 import features.dicts as dicts
 import omni.functions as omni_functions
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc

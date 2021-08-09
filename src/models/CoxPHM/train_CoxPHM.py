@@ -1,9 +1,5 @@
-import sys
 import numpy as np
 import pandas as pd
-
-
-sys.path.insert(0, '../../')
 import constants
 import models.CoxPHM.coxphm_functions as coxphm_functions
 import omni.functions as omni_functions
@@ -110,11 +106,11 @@ if __name__ == '__main__':
 
     data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
-    train_CoxPHM(T_list, x_y, constants.FEATURES[1:],
+    train_CoxPHM(T_list, x_y, constants.FEATURES,
                  data_folder, True, fake_test=False)
 
     x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules[2:]
+    data_folder_list = constants.exclusion_rules[1:]
     for data_folder in data_folder_list:
         train_CoxPHM(T_list, x_y, constants.FEATURES,
                      data_folder, True, fake_test=False)

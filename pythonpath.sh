@@ -3,7 +3,7 @@ function join() {
     shift
     echo "$*"
 }
-mystring=$(join ':' $PWD/*)
+mystring=$(join ':' $PWD/src/*)
 
 export PYTHONPATH="$mystring:$PYTHONPATH"
 echo $PYTHONPATH

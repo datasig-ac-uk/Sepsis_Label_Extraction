@@ -9,7 +9,6 @@ import pickle
 
 
 import sys
-sys.path.insert(0, '../')
 
 import visualization.table_functions as table_functions
 import visualization.plot_functions as plot_functions
@@ -157,5 +156,6 @@ if __name__ == '__main__':
 
     plot_functions.auc_plot_xy_pairs(Data_Dir, Data_save_plots, current_data=current_data)
 ######################################  To produce FIgure 5,6  ###################################
+
     print('produce sepsis onset time plots')
-    plot_functions.sepsis_onset_time_plots(24, 12, 6, save_dir=constants.OUTPUT_DIR + 'plots/')
+    plot_functions.sepsis_onset_time_plots(24, 12, 6, save_dir=constants.OUTPUT_DIR + 'plots/',)

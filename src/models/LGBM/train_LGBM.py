@@ -1,7 +1,3 @@
-import sys
-
-sys.path.insert(0, '../../')
-
 import models.LGBM.LGBM_functions as lgbm_func
 import features.mimic3_function as mimic3_myfunc
 import constants
@@ -95,9 +91,9 @@ def train_LGBM(T_list, x_y, definitions, data_folder, thresholds=np.arange(10000
 if __name__ == '__main__':
     
     
-#     data_folder = constants.exclusion_rules[0]
+    data_folder = constants.exclusion_rules[0]
 
-#     train_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder)
+    train_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES, data_folder)
 
     data_folders = constants.exclusion_rules[-2:]
     for data_folder in data_folders:

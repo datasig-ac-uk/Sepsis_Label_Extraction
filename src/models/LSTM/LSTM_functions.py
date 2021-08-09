@@ -1,6 +1,4 @@
-import sys
 import time
-
 import numpy as np
 from ray.tune.utils import get_pinned_object
 from ray import tune
@@ -9,8 +7,6 @@ from torch import nn, optim
 from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score, roc_curve, auc
 import random
-sys.path.insert(0, '../../')
-
 from models.nets import LSTM
 from data.torch_timeseries_dataset import LSTM_Dataset
 import features.scaler as scaler
@@ -26,7 +22,7 @@ def prepared_data_train(ts_dataset, labels, normalize, batch_size, device):
     lengths = torch.FloatTensor(dataset.lengths)
     labels = torch.LongTensor(labels)
     ds = LSTM_Dataset(x=data, y=labels, p=20, lengths=lengths, device=device)
-    dl = DataLoader(ds, batch_size=batch_size)
+    dl = DataLoader(ds, batch_size=batch_size,num_workers=0)
     return dl, my_scaler
 
 
@@ -61,7 +57,7 @@ def prepared_data_test(ts_dataset, labels, normalize, scaler, batch_size, device
     lengths = torch.FloatTensor(ts_dataset.lengths)
     labels = torch.LongTensor(labels)
     ds = LSTM_Dataset(x=data, y=labels, p=20, lengths=lengths, device=device)
-    dl = DataLoader(ds, batch_size=batch_size)
+    dl = DataLoader(ds, batch_size=batch_size,num_workers=0)
     return dl
 
 
@@ -114,9 +110,10 @@ def eval_model1(test_dl, model,threshold, save_dir):
     tn, fp, fn, tp = confusion_matrix(test_labels, test_preds).ravel()
     specificity = tn / (tn + fp)
     sensitivity = tp / (tp + fn)
+    fpr, tpr, thresholds = roc_curve(
+        test_labels + 1, prob_preds_test, pos_label=2)
 
-    auc_score = roc_auc_score(
-        test_labels, prob_preds_test)
+    auc_score = auc(fpr, tpr)
     print('auc,sepcificity,sensitivity', roc_auc_score(
         test_labels, prob_preds_test), specificity, sensitivity)
     print('accuracy', accuracy_score(test_labels, test_preds))

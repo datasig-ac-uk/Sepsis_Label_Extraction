@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 import sys
-sys.path.insert(0, '../')
+
 
 import features.mimic3_function as mimic3_myfunc
 import features.dicts as dicts
