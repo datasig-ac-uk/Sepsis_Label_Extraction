@@ -12,7 +12,7 @@ import omni.functions as omni_functions
 from data.dataset import TimeSeriesDataset
 import constants
 import visualization.patientlevel_function as mimic3_myfunc_patientlevel
-
+import random
 def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
                 thresholds=np.arange(10000) / 10000, fake_test=False):
     """
@@ -51,6 +51,13 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
                 print('load labels')
                 labels = np.load(
                     Data_Dir + 'label' + '_' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
+                seed = 1023
+                torch.manual_seed(seed)
+                random.seed(seed)
+                np.random.seed(seed)
+                if torch.cuda.is_available():
+                    torch.cuda.manual_seed(seed)
+                    torch.backends.cudnn.deterministic = True
                 # get torch dataloader for lstm
                 scaler = omni_functions.load_pickle(
                     Model_Dir + 'hyperparameter/scaler' + definition[1:])
@@ -125,25 +132,20 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
 if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     print(os.environ["CUDA_VISIBLE_DEVICES"])
-    seed = 1023
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-        torch.backends.cudnn.deterministic = True
 
-    device = torch.device(
-        'cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+    device = torch.device('cpu')
     print(device)
     train_test = 'train'
     T_list = constants.T_list
     data_folder = constants.exclusion_rules[0]
     x_y = [(24, 12)]
-    eval_LSTM(T_list[2:3], x_y, constants.FEATURES[2:3],
+    eval_LSTM(T_list, x_y, constants.FEATURES,
               data_folder, train_test, fake_test=False)
 
     x_y = [(24, 12)]
-    data_folder_list = constants.exclusion_rules[2:]
+    data_folder_list = constants.exclusion_rules[1:]
     for data_folder in data_folder_list:
-        eval_LSTM(T_list[2:3], x_y, constants.FEATURES[2:3],
+        eval_LSTM(T_list, x_y, constants.FEATURES,
                   data_folder, train_test, fake_test=False)
 
