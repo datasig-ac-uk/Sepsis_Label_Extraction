@@ -43,11 +43,11 @@ This commmand will generate list of features which are required for model implem
 
 Model tuning/training/evaluation 
 ------------
-run the main.py script in src/models with two arguments: model:'LGMB','LSTM','CoxPHM' and process:'train','tune','eval'.
+Run the main.py script in src/models with two arguments: model:'LGMB','LSTM','CoxPHM' and process:'train','tune','eval'.
 ```console
 python3 models/main.py --model [Model_name] --process [Process_name]
 ```
-Where [Model_name] = 'LGBM', 'LSTM', 'CoxPHM', [Process_name] = 'train', 'eval', 'tune'
+where [Model_name] = 'LGBM', 'LSTM', 'CoxPHM', [Process_name] = 'train', 'eval', 'tune'
 
 Hyperparameter tuning, model training and evaluation should be done in sequence as follows:
 1. Running the tuning step will compute and save the optimised hyperparameter for later use on model training and evaluation.
