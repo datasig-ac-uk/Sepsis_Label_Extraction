@@ -1,4 +1,4 @@
-Variation of sepsis-III definitions influences predictive performance of machine learning
+Subtle variation in sepsis-III definitions influences predictive performance of machine learning
 ==============================
 
 
