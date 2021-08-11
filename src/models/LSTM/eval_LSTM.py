@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
     device = torch.device('cpu')
     print(device)
-    train_test = 'train'
+    train_test = 'test'
     T_list = constants.T_list
     data_folder = constants.exclusion_rules[0]
     x_y = [(24, 12)]

@@ -97,7 +97,7 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
 
 
 if __name__ == '__main__':
-    train_test = 'train'
+    train_test = 'test'
     T_list = constants.T_list
     data_folder = constants.exclusion_rules[0]
     x_y = constants.xy_pairs
