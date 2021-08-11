@@ -35,30 +35,35 @@ Depending on your preferred choice of installing PostgreSQL on your machine your
 
 Feature Extraction
 ------------
+To generate the derived features mentioned in our paper, simply run the following script
 ```console
-python3 features/generate_features.py
+python3 src/features/generate_features.py
 ```
-This commmand will generate list of features which are required for model implementaion and the they will be saved in data/processed.   
+This commmand will save features which are required for model implementaion in `data/processed`.   
 
 
 Model tuning/training/evaluation 
 ------------
-run the main.py script in src/models with two arguments: model:'LGMB','LSTM','CoxPHM' and process:'train','tune','eval'.
+You can interact with the models through the `main.py` script in `src/models` with two arguments: model:'LGMB','LSTM','CoxPHM' and process:'tune', 'train', 'eval'.
 ```console
 python3 models/main.py --model [Model_name] --process [Process_name]
 ```
-Where [Model_name] = 'LGBM', 'LSTM', 'CoxPHM', [Process_name] = 'train', 'eval', 'tune'
+Where [Model_name] = 'LGBM', 'LSTM', 'CoxPHM', [Process_name] = 'tune', 'train', 'eval'.
 
 Hyperparameter tuning, model training and evaluation should be done in sequence as follows:
 1. Running the tuning step will compute and save the optimised hyperparameter for later use on model training and evaluation.
 2. Then model is trained and saved in /model/ directory for later use on evaluation.
 3. Evaluation will produce numerical results and predictions, which are saved in outputs/results and outputs/predictions respectively. 
 
+If you want to replicate our pipeline, then we have automated the whole process in a `bash` script. Simply use the following command
+```console
+bash src/models/run_models.sh
+```
 
 Visualizations
 ------------
 In order to reproduce all the plots in the paper, run the following command after obtaining all predictions from model evaluation step.   
 ```console
-python3 visualization/main_plots.py
+python3 src/visualization/main_plots.py
 ```
 
