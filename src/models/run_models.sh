@@ -1,7 +1,7 @@
 #!/bin/bash
 
 models=("LGBM", "LSTM", "CoxPHM")
-processes=("tune", "train", "tune")
+processes=("tune", "train", "eval")
 
 for model in ${models[@]}; do
     for process in ${processes[@]}; do
