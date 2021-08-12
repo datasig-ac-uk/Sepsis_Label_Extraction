@@ -13,7 +13,7 @@ This repository contains code for the following parts in our experimental pipeli
 # Environment Setup
 The code has been tested successfully using Python 3.6; thus we suggest using this version or a later version of Python. A typical process for installing the package dependencies involves creating a new Python virtual environment.
 
-Then, to install the required packages, run the following:
+To install the required packages, run the following:
 ```console
 pip install -r requirements.txt
 ```
