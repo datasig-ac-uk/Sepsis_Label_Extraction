@@ -130,10 +130,6 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
 
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-    print(os.environ["CUDA_VISIBLE_DEVICES"])
-
-
     device = torch.device('cpu')
     print(device)
     train_test = 'test'

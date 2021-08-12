@@ -138,7 +138,7 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
 
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     print(os.environ["CUDA_VISIBLE_DEVICES"])
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')

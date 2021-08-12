@@ -11,11 +11,11 @@ from data.dataset import TimeSeriesDataset
 import omni.functions as omni_functions
 from functools import partial
 import constants
-
+import argparse
 
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     print(os.environ["CUDA_VISIBLE_DEVICES"])
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -51,7 +51,7 @@ if __name__ == '__main__':
         tra_patient_indices, tra_full_indices, val_patient_indices, val_full_indices = \
             mimic3_myfunc.cv_pack(
                 icustay_lengths, k=k, definition=definition, path_save=Data_Dir, save=True)
-        ray.init(num_gpus=4)
+        ray.init(num_gpus=1)
         data = pin_in_object_store([dataset, labels, tra_patient_indices, tra_full_indices,
                                    val_patient_indices, val_full_indices, k])
         analysis = tune.run(partial(lstm_functions.model_cv, data_list=data, device=device),

@@ -9,10 +9,9 @@ import features.mimic3_function as mimic3_myfunc
 import models.CoxPHM.coxphm_functions as coxphm_functions
 import omni.functions as omni_functions
 from functools import partial
-
+import argparse
 
 if __name__ == '__main__':
-
     current_data = constants.exclusion_rules[0]
     signature = True
     model = 'CoxPHM' if signature else 'CoxPHM_no_sig'
@@ -46,7 +45,7 @@ if __name__ == '__main__':
         # prepare dataframe for coxph model
         df_coxph = coxphm_functions.Coxph_df(
             df, features, coxphm_functions.original_features, T, labels, signature=False)
-        ray.init(num_cpus=5)
+        ray.init(num_cpus=1)
         data = pin_in_object_store(
             [df_coxph, tra_full_indices, val_full_indices, k])
         analysis = tune.run(partial(coxphm_functions.model_cv, data=data, a1=T),
