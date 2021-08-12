@@ -1,14 +1,17 @@
+import random
+
 from lifelines import CoxPHFitter
 import numpy as np
 import pandas as pd
 from ray import tune
 from ray.tune.utils import get_pinned_object
-from sklearn.metrics import roc_curve, auc, accuracy_score
-import random
+from sklearn.metrics import accuracy_score, auc, confusion_matrix, roc_curve, roc_auc_score
+
 import features.dicts as dicts
 import omni.functions as omni_functions
-from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
-def Coxph_df(df, features, feature_dict, T, labels,signature=True):
+
+
+def Coxph_df(df, features, feature_dict, T, labels, signature=True):
     """
     :param df:
     :param features:

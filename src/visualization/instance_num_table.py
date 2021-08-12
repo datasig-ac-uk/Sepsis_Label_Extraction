@@ -1,13 +1,13 @@
-import numpy as np
-import pandas as pd
 import sys
 
+import numpy as np
+import pandas as pd
 
-import features.mimic3_function as mimic3_myfunc
 import constants as constants
+import features.mimic3_function as mimic3_myfunc
 
 
-instances=[]
+instances = []
 
 current_data = constants.exclusion_rules[0]
 Root_Data = constants.DATA_processed + current_data
