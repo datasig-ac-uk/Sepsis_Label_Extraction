@@ -19,7 +19,6 @@ FEATURES = ['t_sofa', 't_suspicion', 't_sepsis_min']
 T_list = [12, 8, 6, 4]
 
 MODELS = ['LGBM', 'LSTM', 'CoxPHM']
-models = ['lgbm', 'lstm', 'coxph']
 exclusion_rules = ['blood_only', 'other_cultures', 'strict_exclusion']
 
 MIMIC_DATA_DIRS = {}
