@@ -11,7 +11,7 @@ This repository contains code for the following parts in our experimental pipeli
 3. Evaluating each trained model using the test metrics (e.g. AUROC) and producing the visualization plots (see [src/visualization](src/visualization))
 
 # Environment Setup
-The code has been tested successfully using Python 3.6; thus we suggest using this version or a later version of Python. A typical process for installing the package dependencies involves creating a new Python virtual environment.
+The code has been tested successfully using Python 3.7; thus we suggest using this version or a later version of Python. A typical process for installing the package dependencies involves creating a new Python virtual environment.
 
 To install the required packages, run the following:
 ```console
