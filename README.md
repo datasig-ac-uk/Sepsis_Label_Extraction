@@ -45,20 +45,20 @@ The preceding command will save features required for model training/tuning/eval
 
 Model tuning/training/evaluation 
 ------------
-You can manually initiate model tuning, training and evaluation  using the [main.py](src/models/main.py) script. This script takes two arguments: `--model` and `--process`:
+Initiate model tuning, training and evaluation using the [main.py](src/models/main.py) script. This script takes two optional arguments: `--model` and `--process`:
 ```console
-python3 models/main.py --model MODEL_NAME --process PROCESS_NAME  
+python3 src/models/main.py --model MODEL_NAME --step STEP_NAME  
 ```
-where `MODEL_NAME` may be either `LGBM`, `LSTM`, or `CoxPHM` and where `PROCESS_NAME` may be either `tune` `train`, or `eval`.
+where `MODEL_NAME` is either `LGBM`, `LSTM`, or `CoxPHM` and where `STEP_NAME` is either `tune` `train`, or `eval`.
 
 For each of the three models (`LGBM`, `LSTM`, and `CoxPHM`), the required sequence of steps is `tune`, `train`, `eval`:
 1. `tune`: For a given model, running the tuning step computes and saves optimal hyperparameters for subsequent training and evaluation.
 2. `train`: The model is trained and saved to the [model/](model/) directory for subsequent evaluation.
 3. `eval`: Evaluation involves generating numerical results and predictions, which are respectively saved to [outputs/results](outputs/results) and [outputs/predictions](outputs/predictions). 
 
-**Note:** To simplify replicating our pipeline, we provide a script which runs `tune`, `train`, `eval` for each of the three models. You may run the script as follows:
+**Note:** To run all three above steps in the required order for all three models, simply run [main.py](src/models/main.py) without any arguments, i.e.
 ```console
-bash src/models/run_models.sh
+python3 src/models/main.py 
 ```
 
 Visualizations
