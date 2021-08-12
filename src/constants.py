@@ -23,11 +23,11 @@ models = ['lgbm', 'lstm', 'coxph']
 exclusion_rules = ['blood_only', 'other_cultures', 'strict_exclusion']
 
 MIMIC_DATA_DIRS = {}
-MIMIC_DATA_DIRS['strict_exclusion'] = {'train': DATA_DIR+'raw/train/blood_only_data',
-                                       'test': DATA_DIR + 'raw/test/blood_only_data'}
+MIMIC_DATA_DIRS['strict_exclusion'] = {'train': DATA_DIR+'raw/train/blood_only',
+                                       'test': DATA_DIR + 'raw/test/blood_only'}
 #MIMIC_DATA_DIRS['blood_only'] = MIMIC_DATA_DIRS['strict_exclusion']
-MIMIC_DATA_DIRS['blood_only'] = {'train': DATA_DIR+'raw/train/blood_only_data',
-                                       'test': DATA_DIR + 'raw/test/blood_only_data'}
+MIMIC_DATA_DIRS['blood_only'] = {'train': DATA_DIR+'raw/train/blood_only',
+                                       'test': DATA_DIR + 'raw/test/blood_only'}
 
 MIMIC_DATA_DIRS['other_cultures'] = {'train': DATA_DIR+'raw/train/other_cultures',
                                      'test': DATA_DIR + 'raw/test/other_cultures'}
