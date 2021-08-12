@@ -19,14 +19,11 @@ def features_wrapper(data_list, x_y_list, purpose):
         path_prefix = constants.MIMIC_DATA_DIRS[current_data][purpose]
 
         for x, y in x_y_list:
-            if purpose == 'test':
+            if purpose in ['train', 'test']:
 
                 path_df = path_prefix + '_sensitivity_' + \
                           str(x) + '_' + str(y) + '.csv'
 
-            elif purpose == 'train':
-                path_df = path_prefix + '_sensitivity_' + \
-                          str(x) + '_' + str(y) + '.csv'
             else:
                 raise TypeError("purpose not recognised!")
 
@@ -42,10 +39,12 @@ def features_wrapper(data_list, x_y_list, purpose):
 
 
 if __name__ == '__main__':
-   # data_list = constants.exclusion_rules[:1]
-   # features_wrapper(data_list, constants.xy_pairs[2:], purpose='train')
+    data_list = constants.exclusion_rules[0]
+    features_wrapper(data_list, constants.xy_pairs, purpose='train')
+    features_wrapper(data_list, constants.xy_pairs, purpose='test')
+
 
     # other exclusion rules
-    data_list = constants.exclusion_rules[2:]
-
+    data_list = constants.exclusion_rules[1:]
     features_wrapper(data_list, x_y_list=[(24, 12)], purpose='train')
+    features_wrapper(data_list, x_y_list=[(24, 12)], purpose='test')
