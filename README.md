@@ -1,69 +1,69 @@
-Subtle variation in sepsis-III definitions influences predictive performance of machine learning
+Subtle Variation in Sepsis-III Definitions Influences Predictive Performance of Machine Learning
 ==============================
 
+The early detection of sepsis is a key research priority to help facilitate timely intervention.  Criteria used to identify the onset time of sepsis from health records vary, hindering comparison and progress in this field. We considered the effects of variations in sepsis onset definition on the predictive performance of three representative models (i.e. Light gradient boosting machine (LGBM), Long short term memory (LSTM) and Cox proportional-harzard models (CoxPHM)) for early sepsis detection.
 
-The early detection of sepsis is a key research priority to help facilitate timely intervention.  Criteria used to identify the onset time of sepsis from health records vary, hindering comparison and progress in this field. We considered the effects of variations in sepsis onset definition on the predictive performance of three representive models (i.e. Light gradient boosting machine (LGBM), Long short term memory (LSTM) and Cox proportional-harzard models (CoxPHM)) for early sepsis detection.
+This repository is the official implementation of the paper entitled "Variation of Sepsis-III Definitions Influences Predictive Performance of Machine Learning".
 
-This repository is the official implementation of the paper entitled "Variation of sepsis-III definitions influences predictive performance of machine learning".
+This repository contains code for the following parts in our experimental pipeline:
+1. Extracting the sepsis labelling from the MIMIC-III data based on three sepsis criteria H1-3 and their variants (see [src/database](src/database))
+2. Training three types of models (i.e. LGBM, LSTM and CoxPHM) for the early sepsis prediction on the datasets produced in Step 1. (see [src/models](src/models))
+3. Evaluating each trained model using the test metrics (e.g. AUROC) and producing the visualization plots (see [src/visualization](src/visualization))
 
-The code is composed with the following parts:
-1. Extracting the sepsis labelling from the MIMIC-III data based on three sepsis criteria H1-3 and their variants;
-2. Training three types of models (i.e. LGBM, LSTM and CoxPHM) for the early sepsis prediction on the datasets produced in Step 1.
-3. Evaluating each trained model using the test metrics (e.g. AUROC) and producing the visulaziation plots.
+# Environment Setup
+The code has been tested successfully using Python 3.6; thus we suggest using this version or a later version of Python. A typical process for installing the package dependencies involves creating a new Python virtual environment.
 
-
-
-
-# Environment setup
+Then, to install the required packages, run the following:
 ```console
 pip install -r requirements.txt
+```
+
+Finally, to prepare the environment for running the code, run the following:
+```console
 source pythonpath.sh
 ```
 
-
 # Data Extraction Pipeline
-
 To train and evaluate our models, we will change the relational format of the [MIMIC-III database](https://mimic.mit.edu/iii/gettingstarted/overview/) to a pivoted view which includes key demographic information, vital signs, and laboratory readings. We will also create tables for the possible sepsis onset times of each patient. We will subsequently output the pivoted data to comma-separated value (CSV) files, which serve as input for model training and evaluation. 
-We provide more detailed instructions under **/src/database** subdirecotry, make sure you run all all data extraction pipeline under that subdirecotry:
-```console
-cd /src/database
-```
-Depending on your preferred choice of installing PostgreSQL on your machine yourself or using a Docker container, please proceed with the relevant section in **/src/database/README.md**
 
+Prior to running any of the data extraction commands, make sure to change to the [src/database](src/database) subdirectory:
+```console
+cd src/database
+```
+
+Next, please follow the instructions in the [data extraction README.md](src/database/README.md). (Depending on your preferred choice of installing PostgreSQL on your machine yourself or using a Docker container, please follow the relevant sections in the [data extraction README.md](src/database/README.md).)
 
 # Model Training and Testing Pipeline
 
 Feature Extraction
 ------------
-To generate the derived features mentioned in our paper, simply run the following script
+To generate the derived features mentioned in our paper, simply run the following:
 ```console
 python3 src/features/generate_features.py
 ```
-This commmand will save features which are required for model implementaion in `data/processed`.   
-
+The preceding command will save features required for model training/tuning/evaluation to [data/processed](data/processed).
 
 Model tuning/training/evaluation 
 ------------
-You can interact with the models through the `main.py` script in `src/models` with two arguments: model:'LGMB','LSTM','CoxPHM' and process:'tune', 'train', 'eval'.
+You can manually initiate model tuning, training and evaluation  using the [main.py](src/models/main.py) script. This script takes two arguments: `--model` and `--process`:
 ```console
-python3 models/main.py --model [Model_name] --process [Process_name]
+python3 models/main.py --model MODEL_NAME --process PROCESS_NAME  
 ```
-Where [Model_name] = 'LGBM', 'LSTM', 'CoxPHM', [Process_name] = 'tune', 'train', 'eval'.
+where `MODEL_NAME` may be either `LGBM`, `LSTM`, or `CoxPHM` and where `PROCESS_NAME` may be either `tune` `train`, or `eval`.
 
-Hyperparameter tuning, model training and evaluation should be done in sequence as follows:
-1. Running the tuning step will compute and save the optimised hyperparameter for later use on model training and evaluation.
-2. Then model is trained and saved in /model/ directory for later use on evaluation.
-3. Evaluation will produce numerical results and predictions, which are saved in outputs/results and outputs/predictions respectively. 
+For each of the three models (`LGBM`, `LSTM`, and `CoxPHM`), the required sequence of steps is `tune`, `train`, `eval`:
+1. `tune`: For a given model, running the tuning step computes and saves optimal hyperparameters for subsequent training and evaluation.
+2. `train`: The model is trained and saved to the [model/](model/) directory for subsequent evaluation.
+3. `eval`: Evaluation involves generating numerical results and predictions, which are respectively saved to [outputs/results](outputs/results) and [outputs/predictions](outputs/predictions). 
 
-If you want to replicate our pipeline, then we have automated the whole process in a `bash` script. Simply use the following command
+**Note:** To simplify replicating our pipeline, we provide a script which runs `tune`, `train`, `eval` for each of the three models. You may run the script as follows:
 ```console
 bash src/models/run_models.sh
 ```
 
 Visualizations
 ------------
-In order to reproduce all the plots in the paper, run the following command after obtaining all predictions from model evaluation step.   
+To reproduce all the plots in the paper, after having run the model evaluation step run the following command:  
 ```console
 python3 src/visualization/main_plots.py
 ```
-
