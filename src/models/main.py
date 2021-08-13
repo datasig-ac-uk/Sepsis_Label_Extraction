@@ -27,4 +27,4 @@ else:
 
 for model in models_to_include:
     for step in steps_to_include:
-        os.system('python3 models/{}/{}_{}.py'.format(model, step, model))
+        os.system('python3 src/models/{}/{}_{}.py'.format(model, step, model))
