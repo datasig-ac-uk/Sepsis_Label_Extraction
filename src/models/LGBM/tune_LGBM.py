@@ -1,10 +1,8 @@
-import models.LGBM.LGBM_functions as lgbm_func
-import features.mimic3_function as mimic3_myfunc
-import constants
-
-
 from lightgbm import LGBMClassifier
 
+import constants
+import features.mimic3_function as mimic3_myfunc
+import models.LGBM.LGBM_functions as lgbm_func
 
 
 if __name__ == '__main__':
