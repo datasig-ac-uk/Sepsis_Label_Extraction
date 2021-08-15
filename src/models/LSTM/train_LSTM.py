@@ -127,14 +127,14 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
             results, columns=['x,y', 'T', 'definition', 'auc', 'speciticity','sensitivity', 'accuracy'])
 
     result_df.to_csv(Output_results +'train'+
-                     '_results1.csv')
+                     '_results.csv')
     ############Patient level now ###############
 
     results_patient_level_df = pd.DataFrame(results_patient_level,
                                                 columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
                                                          'accuracy'])
     results_patient_level_df.to_csv(
-        Output_results + 'train' + '_patient_level_results1.csv')
+        Output_results + 'train' + '_patient_level_results.csv')
 
 
 if __name__ == '__main__':
