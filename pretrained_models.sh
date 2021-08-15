@@ -1,3 +1,3 @@
-gdown --id 10A1Pef9S6GvxM-cGF3WyA24f49rLqvUX --output models.zip
+gdown --id 12PY_HVNmy7mQVsS8Sji027eN0xmhJ8Po --output models.zip
 unzip models.zip
 rm -rf model.zip
