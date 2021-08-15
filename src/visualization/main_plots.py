@@ -1,22 +1,16 @@
-import numpy as np
-import pandas as pd
-import random
-
 import os
 import pickle
-
-
-
-
+import random
 import sys
 
-import visualization.table_functions as table_functions
+import numpy as np
+import pandas as pd
+
+import constants as constants
+import features.mimic3_function as mimic3_myfunc
 import visualization.plot_functions as plot_functions
 import visualization.patientlevel_function as patientlevel
-import features.mimic3_function as mimic3_myfunc
-import constants as constants
-
-
+import visualization.table_functions as table_functions
 
 
 if __name__ == '__main__':

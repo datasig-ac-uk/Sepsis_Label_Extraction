@@ -1,18 +1,21 @@
+import random
 import time
+
 import numpy as np
 from ray.tune.utils import get_pinned_object
 from ray import tune
+from sklearn.metrics import accuracy_score, auc, confusion_matrix, roc_auc_score, roc_curve
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
-from sklearn.metrics import accuracy_score, roc_curve, auc
-import random
-from models.nets import LSTM
+
+import constants
 from data.torch_timeseries_dataset import LSTM_Dataset
 import features.scaler as scaler
-import constants
+from models.nets import LSTM
 import omni.functions as omni_functions
-from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
+
+
 def prepared_data_train(ts_dataset, labels, normalize, batch_size, device):
     dataset = ts_dataset
     if normalize:

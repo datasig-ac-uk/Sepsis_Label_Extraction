@@ -1,19 +1,17 @@
-
 import os
 import pickle
 import random
-
+import sys
 
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
-import sys
-
 
 import features.mimic3_function as mimic3_myfunc
 import features.dicts as dicts
 ################## Those for CV #############################
+
 
 def probs_extraction(prob_preds, labels, val_full_indices, a1=6):
     """

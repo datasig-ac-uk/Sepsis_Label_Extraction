@@ -39,7 +39,7 @@ def features_wrapper(data_list, x_y_list, purpose):
 
 
 if __name__ == '__main__':
-    data_list = constants.exclusion_rules[0]
+    data_list = [constants.exclusion_rules[0]]
     features_wrapper(data_list, constants.xy_pairs, purpose='train')
     features_wrapper(data_list, constants.xy_pairs, purpose='test')
 

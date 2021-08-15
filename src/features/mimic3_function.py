@@ -1,10 +1,12 @@
 import os
+import random
+
 import iisignature
 import numpy as np
 import pandas as pd
-import random
 from sklearn.model_selection import KFold
 import torch
+
 import constants
 from data.dataset import TimeSeriesDataset
 from data.functions import torch_ffill

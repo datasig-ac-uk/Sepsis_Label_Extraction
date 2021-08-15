@@ -3,7 +3,8 @@ function join() {
     shift
     echo "$*"
 }
-mystring=$(join ':' $PWD/src/*)
 
-export PYTHONPATH="$mystring:$PYTHONPATH"
+paths_to_append=$(join ':' $PWD/src/{.,features,models,omni,visualization})
+
+export PYTHONPATH="$PYTHONPATH:$paths_to_append"
 echo $PYTHONPATH

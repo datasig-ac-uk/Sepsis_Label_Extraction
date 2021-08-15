@@ -75,7 +75,7 @@ class LSTM_variable_length(nn.Module):
                             bias=bias,
                             dropout=dropout,
                             batch_first=True)
-        #self.bn = torch.nn.BatchNorm1d(self.in_channels)
+        # self.bn = torch.nn.BatchNorm1d(self.in_channels)
         self.linear1 = nn.Linear(self.hidden_channels, hidden_1)
         self.linear2 = nn.Linear(self.hidden_1, self.out_channels)
 
@@ -106,7 +106,7 @@ class LSTM(nn.Module):
         self.hidden_1 = hidden_1
         self.num_layers = num_layers
         self.bias = bias
-        #self.dropout = dropout
+        # self.dropout = dropout
         self.dropout1 = torch.nn.Dropout(p=dropout)
         self.total_hidden_size = num_layers * hidden_channels
 
@@ -117,7 +117,7 @@ class LSTM(nn.Module):
                             dropout=dropout,
                             batch_first=True,
                             bidirectional=True)
-        #self.bn = torch.nn.BatchNorm1d(self.in_channels)
+        # self.bn = torch.nn.BatchNorm1d(self.in_channels)
         self.linear1 = nn.Linear(self.hidden_channels*2, hidden_1)
         self.linear2 = nn.Linear(self.hidden_1, self.out_channels)
 
