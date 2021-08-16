@@ -60,6 +60,11 @@ For each of the three models (`LGBM`, `LSTM`, and `CoxPHM`), the required sequen
 ```console
 python3 src/models/main.py 
 ```
+**Note:** The full pipeline could takes several to complete, you can also download our pretrained model and  obtain the results directly by the following commands:
+```console
+bash pretrained_models.sh
+python3 src/models/main.py --model MODEL_NAME --step 'eval'
+```
 
 Visualizations
 ------------
