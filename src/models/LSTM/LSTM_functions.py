@@ -199,7 +199,7 @@ def model_cv(config, data_list, device):
 
 
 search_space = {
-    "p": tune.choice([20]),
+    "p": 20,
     "hidden_channels": tune.sample_from(lambda _: np.random.choice(np.array([16,32,48,64]))),
     "linear_channels": tune.sample_from(lambda _: np.random.choice(np.array([16,32,48,64]))),
     "epochs": tune.sample_from(lambda _: np.random.randint(low=10, high=30)),

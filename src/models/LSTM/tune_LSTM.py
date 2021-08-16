@@ -66,6 +66,11 @@ if __name__ == '__main__':
         print("Best trial config: {}".format(best_trial.config))
         print("Best trial final validation auc: {}".format(
             best_trial.last_result["mean_accuracy"]))
+        save_dir = Model_Dir + 'hyperparameter/' + 'config' + definition[1:]
+        if save_dir is None:
+            pass
+        else:
+            omni_functions._create_folder_if_not_exist(save_dir)
         omni_functions.save_pickle(
             best_trial.config, Model_Dir + 'hyperparameter/' + 'config' + definition[1:])
         ray.shutdown()
