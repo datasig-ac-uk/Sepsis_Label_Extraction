@@ -73,17 +73,17 @@ def auc_plot(trues_list, probs_list, names, fontsize=14,
         plt.show()
 
 
-def auc_plot_xy_pairs(Data_Dir, Output_results, current_data='blood_only/', 
+def auc_plot_xy_pairs(Data_Dir, Output_results, current_data='blood_only/',
                       precision=100, n=100, a1=6, names=['48,24', '24,12', '12,6', '6,3'], purpose='test'):
     """
         For each definition and fixed model, producing two AUC plots, one online prediction,one patien-level, across 4 different xy_pairs
 
     """
     for model in constants.MODELS:
-       
+
         _, _, Output_predictions, _ = mimic3_myfunc.folders(
             current_data, model=model)
-        
+
         for definition in constants.FEATURES:
 
             labels_list = []
@@ -94,32 +94,34 @@ def auc_plot_xy_pairs(Data_Dir, Output_results, current_data='blood_only/',
             for x, y in constants.xy_pairs:
                 print(definition, x, y, model)
 
-
                 labels_now = np.load(Data_Dir + 'label_' + str(x) +
-                                 '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy')
-                probs_now = np.load(Output_predictions + purpose+'/' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy')                
+                                     '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy')
+                probs_now = np.load(Output_predictions + purpose+'/' + str(x) +
+                                    '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy')
 
-                icu_lengths_now = np.load(Data_Dir + 'icustay_lengths_' + str(x) + '_' + str(y) + definition[1:] + '.npy')
+                icu_lengths_now = np.load(
+                    Data_Dir + 'icustay_lengths_' + str(x) + '_' + str(y) + definition[1:] + '.npy')
                 icustay_fullindices_now = mimic3_myfunc_patientlevel.patient_idx(
-                icu_lengths_now)
+                    icu_lengths_now)
 
                 tpr, fpr = mimic3_myfunc_patientlevel.patient_level_auc(labels_now, probs_now, icustay_fullindices_now,
-                                                                    precision, n=n, a1=a1)
+                                                                        precision, n=n, a1=a1)
 
                 labels_list.append(labels_now)
                 probs_list.append(probs_now)
                 tprs_list.append(tpr)
                 fprs_list.append(fpr)
-            
-            save_pickle(fprs_list,Output_results+model+definition[1:]+'_fprs.pkl')
-            save_pickle(tprs_list,Output_results+model+definition[1:]+'_tprs.pkl')
-            
+
+            save_pickle(fprs_list, Output_results +
+                        model+definition[1:]+'_fprs.pkl')
+            save_pickle(tprs_list, Output_results +
+                        model+definition[1:]+'_tprs.pkl')
+
             auc_plot(labels_list, probs_list, names=names,
-                 save_name=Output_results + 'auc_plot_instance_level_' + model + definition[1:] + '_' + purpose)
+                     save_name=Output_results + 'auc_plot_instance_level_' + model + definition[1:] + '_' + purpose)
             auc_plot_patient_level(fprs_list, tprs_list, names=names,
-                               save_name=Output_results+ 'auc_plot_patient_level_' + model + definition[
-                                   1:] + '_' + purpose)
-        
+                                   save_name=Output_results + 'auc_plot_patient_level_' + model + definition[
+                                       1:] + '_' + purpose)
 
     #########################For CI ################################################
 
@@ -162,7 +164,7 @@ def CI_AUC_bootstrapping(n_bootstraps, alpha, y_true, y_pred, rng_seed=1):
     return [lower1, up1], fprs, tprs
 
 
-def fprs_tprs_output(labels_list_list, probs_list_list, n_bootstraps=100, alpha=0.95,MODELS=constants.MODELS):
+def fprs_tprs_output(labels_list_list, probs_list_list, n_bootstraps=100, alpha=0.95, MODELS=constants.MODELS):
     fprs_lists = [[] for kk in range(len(MODELS))]
     tprs_lists = [[] for kk in range(len(MODELS))]
 
@@ -383,6 +385,7 @@ def fprs_tprs_output_patient_level(labels_list_list, probs_list_list, indices_li
 
     return fprs_lists, tprs_lists, labels_list, probs_list
 
+
 def auc_plot_patient_level(fprs, tprs, names, fontsize=14,
                            colors=colors_auc, titles=constants.MODELS,
                            linestyles=linestyles, lw=2,
@@ -434,7 +437,7 @@ def auc_plot_patient_level(fprs, tprs, names, fontsize=14,
 
         plt.show()
 
-        
+
 colors_shade = [sns.color_palette("Pastel2")[0], sns.color_palette("Pastel2")[
     2], sns.color_palette("Pastel2")[1]]
 colors_auc = sns.color_palette("Dark2")
@@ -664,8 +667,6 @@ def recall_specificity_subplots_patient_level(pres_list, tprs_list, names,
     else:
 
         plt.show()
-
-
 
 
 ############################ For trajectory level plot ############################
@@ -1014,8 +1015,9 @@ def plot_venn(x, y, T, test_metric, metric_thresh, precision, save_dir):
         # plt.show()
     plt.tight_layout()
     plt.savefig(save_dir + 'Venn_diagram_compare_models' + '.png')
-    
-def sepsis_onset_time_plots(x, y, T, save_dir,current_data=constants.exclusion_rules[0]):
+
+
+def sepsis_onset_time_plots(x, y, T, save_dir, current_data=constants.exclusion_rules[0]):
 
     Root_Data, _, _, _ = mimic3_myfunc.folders(current_data)
     Data_Dir = Root_Data + 'test/'
@@ -1028,17 +1030,16 @@ def sepsis_onset_time_plots(x, y, T, save_dir,current_data=constants.exclusion_r
     patient_icustay_list = []
     septic_los_list = []
     for definition in constants.FEATURES:
-        
 
         df_sepsis1 = pd.read_pickle(
             Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
         septic_los_list.append(
             df_sepsis1.loc[df_sepsis1['sepsis_hour'].notnull()].groupby('icustay_id').rolling_los_icu.max().astype('int'))
         current_label = np.load(Data_Dir + 'label_' + str(x) +
-                                 '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
+                                '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
         for model in constants.MODELS[:1]:
             _, Model_Dir, Output_predictions, Output_results = mimic3_myfunc.folders(current_data,
-                                                                             model=model)
+                                                                                     model=model)
             prob_preds = np.load(
                 Output_predictions + 'test/' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
 
@@ -1085,7 +1086,7 @@ def sepsis_onset_time_plots(x, y, T, save_dir,current_data=constants.exclusion_r
                            patient_icustay_list, septic_los_list, time_grid=np.arange(
                                41),
                            save_dir=save_dir, definition='H3')
- 
+
 
 # def sepsis_onset_time_plots(x, y, T, test_metric, metric_thresh, precision, save_dir):
 #     definitions = ['t_sofa', 't_suspicion', 't_sepsis_min']
@@ -1232,7 +1233,8 @@ def time_difference_dist_definitions1(true_septic_time_list, identified_pred_sep
     for i in range(3):
         identified_true_sepsis_time = true_septic_time_list[i].loc[
             true_septic_time_list[i].index.isin(identified_pred_sepsis_time[i].index)]
-        identified_time_difference = identified_true_sepsis_time.values - identified_pred_sepsis_time[i].values
+        identified_time_difference = identified_true_sepsis_time.values - \
+            identified_pred_sepsis_time[i].values
         for time in time_grid:
             time_diff.append(r'$\geq$' + str(time))
             defs.append(def_grid[i])
@@ -1269,17 +1271,16 @@ def time_difference_dist_definitions1(true_septic_time_list, identified_pred_sep
               'legend.handlelength': 0.5, 'axes.labelsize': 30}
     plt.rcParams.update(params)
 
-
     # plt.rcParams.update({'font.size': 30})
     sns.barplot(x="HBO", y="proportion", hue="def",
                 data=pd.DataFrame.from_dict(data_dict))
     gfg = sns.lineplot(x="HBO", y="proportion",
-                 hue="def",
-                 data=pd.DataFrame.from_dict(data_dict1), style='def', sort=False,
-                 markers=['o', 'o', 'o'],
-                 dashes=[(5, 5), (5, 5), (5, 5)])
-    ax.set_ylabel('proportion',fontsize=30)
-    ax.set_xlabel('HBO',fontsize=30)
+                       hue="def",
+                       data=pd.DataFrame.from_dict(data_dict1), style='def', sort=False,
+                       markers=['o', 'o', 'o'],
+                       dashes=[(5, 5), (5, 5), (5, 5)])
+    ax.set_ylabel('proportion', fontsize=30)
+    ax.set_xlabel('HBO', fontsize=30)
     plt.setp(gfg.get_legend().get_texts(), fontsize=30)
     plt.savefig(save_dir + 'Time_diff_dist_definitions' + '.jpeg', dpi=350)
     plt.savefig(save_dir + 'Time_diff_dist_definitions' + '.png', dpi=350)
@@ -1299,7 +1300,8 @@ def proprotion_HBO_line_plot(patient_true_label_list, true_septic_time_list, ide
     for i in range(3):
         identified_true_sepsis_time = true_septic_time_list[i].loc[
             true_septic_time_list[i].index.isin(identified_pred_sepsis_time[i].index)]
-        identified_time_difference = identified_true_sepsis_time.values - identified_pred_sepsis_time[i].values
+        identified_time_difference = identified_true_sepsis_time.values - \
+            identified_pred_sepsis_time[i].values
         fn_ids = [x for x in true_septic_time_list[3 * i].index if
                   x not in identified_pred_sepsis_time[3 * i].index]
         fn_icustay = patient_icustay_list[3 * i].loc[fn_ids]
@@ -1327,7 +1329,8 @@ def proprotion_HBO_line_plot(patient_true_label_list, true_septic_time_list, ide
     colors = ','.join(color_pal)
     # print(pd.DataFrame.from_dict(data_dict1))
     plt.figure(figsize=(12, 9))
-    plt.rcParams.update({'font.size': 17,"axes.labelsize":16, 'legend.handlelength': 1.2})
+    plt.rcParams.update(
+        {'font.size': 17, "axes.labelsize": 16, 'legend.handlelength': 1.2})
     sns.lineplot(x="Hours before sepsis onset", y="proportion (septic patients in ICU / septic patients)",
                  hue="def",
                  data=pd.DataFrame.from_dict(data_dict1), style='cohort', sort=False, color=colors)
@@ -1546,19 +1549,22 @@ def onset_time_stacked_bar(patient_true_label_list, true_septic_time_list, ident
     color_pal = ListedColormap(sns.color_palette("colorblind", 6).as_hex())
     #colors = ','.join(color_pal)
 
-    ax.stackplot(icustay,df1.loc['flagged,ultimately septic'].values.astype(np.float),
-                       df1.loc['flagged,septic until discharge'].values.astype(np.float),
-                       df1.loc['flagged,ultimately non-septic'].values.astype(np.float),
-                       df1.loc['unflagged,ultimately non-septic'].values.astype(np.float),
-                       df1.loc['unflagged,ultimately septic'].values.astype(np.float),cmap=color_pal,alpha=0.6,
-                       labels=['flagged,ultimately septic','flagged,septic until discharge',
-                               'flagged,ultimately non-septic','unflagged,ultimately non-septic',
-                               'unflagged,ultimately septic'])
-    #ax = df1.T.plot(kind='line', stacked=True, figsize=(12, 9),
-                    #fontsize=25, rot=0, legend=True, color=color_pal)
-    ax.set_title(definition,fontsize=30)
-    ax.set_ylabel('proportion (patients in ICU/ total patients)',fontsize=30)
-    ax.set_xlabel('Hours since ICU admission',fontsize=30)
+    ax.stackplot(icustay, df1.loc['flagged,ultimately septic'].values.astype(np.float),
+                 df1.loc['flagged,septic until discharge'].values.astype(
+                     np.float),
+                 df1.loc['flagged,ultimately non-septic'].values.astype(
+                     np.float),
+                 df1.loc['unflagged,ultimately non-septic'].values.astype(
+                     np.float),
+                 df1.loc['unflagged,ultimately septic'].values.astype(np.float), cmap=color_pal, alpha=0.6,
+                 labels=['flagged,ultimately septic', 'flagged,septic until discharge',
+                         'flagged,ultimately non-septic', 'unflagged,ultimately non-septic',
+                         'unflagged,ultimately septic'])
+    # ax = df1.T.plot(kind='line', stacked=True, figsize=(12, 9),
+    # fontsize=25, rot=0, legend=True, color=color_pal)
+    ax.set_title(definition, fontsize=30)
+    ax.set_ylabel('proportion (patients in ICU/ total patients)', fontsize=30)
+    ax.set_xlabel('Hours since ICU admission', fontsize=30)
     handles, labels = ax.get_legend_handles_labels()
     ax.legend(reversed(handles), reversed(labels))
     for i, t in enumerate(ax.get_xticklabels()):
@@ -1570,7 +1576,7 @@ def onset_time_stacked_bar(patient_true_label_list, true_septic_time_list, ident
                 definition + '.jpeg', dpi=350)
     fig.savefig(save_dir + 'outcome_stacked_bar_plot_' +
                 definition + '.png', dpi=350)
-    plt.show()
+    # plt.show()
     return df1
 
 
