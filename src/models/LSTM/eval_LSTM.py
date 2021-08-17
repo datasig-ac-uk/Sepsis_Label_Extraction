@@ -3,7 +3,7 @@ import random
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
+from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix, auc
 import torch
 
 import constants
@@ -18,7 +18,7 @@ import visualization.patientlevel_function as mimic3_myfunc_patientlevel
 
 
 def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
-                thresholds=np.arange(10000) / 10000, fake_test=False):
+              thresholds=np.arange(10000) / 10000, fake_test=False):
     """
     This function compute evaluation on trained CoxPHM model, will save the prediction probability and numerical results
     for both online predictions and patient level predictions in the outputs directoty.
@@ -78,36 +78,36 @@ def eval_LSTM(T_list, x_y, definitions, data_folder, train_test,
                 model.load_state_dict(
                     torch.load(Model_Dir + '_' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:],
                                map_location=torch.device('cpu')))
-                threshold = omni_functions.load_pickle(Model_Dir +'thresholds/' +
-                                           str(x) + '_' + str(y) + '_' +
-                                           str(T) + definition[1:]+'_threshold.pkl')
-                auc_score, specificity, sensitivity, accuracy, true, preds = lstm_functions.eval_model1(test_dl, model,threshold,
-                                                                                                       save_dir=Output_predictions + train_test +'/'+
-                                                                                                                str(
-                                                                                                                    x) + '_' + str(
-                                                                                                           y) + '_' + str(
-                                                                                                           T) +
-                                                                                                                definition[
-                                                                                                                1:] + '.npy')
+                threshold = omni_functions.load_pickle(Model_Dir + 'thresholds/' +
+                                                       str(x) + '_' + str(y) + '_' +
+                                                       str(T) + definition[1:]+'_threshold.pkl')
+                auc_score, specificity, sensitivity, accuracy, true, preds = lstm_functions.eval_model1(test_dl, model, threshold,
+                                                                                                        save_dir=Output_predictions + train_test + '/' +
+                                                                                                        str(
+                                                                                                            x) + '_' + str(
+                                                                                                            y) + '_' + str(
+                                                                                                            T) +
+                                                                                                        definition[
+                                                                                                            1:] + '.npy')
 
                 df_sepsis = pd.read_pickle(
                     Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
                 preds = np.load(
-                    Output_predictions + train_test +'/'+ str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
-
+                    Output_predictions + train_test + '/' + str(x) + '_' + str(y) + '_' + str(T) + definition[1:] + '.npy')
 
                 CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
                     df_sepsis, true, preds, a1=T, thresholds=thresholds, sample_ids=None)
 
-                tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
+                tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(
+                    CMs)
                 threshold_patient = omni_functions.load_pickle(Model_Dir + 'thresholds_patients/' +
-                                           str(x) + '_' + str(y) + '_' +
-                                           str(T) + definition[1:] + '_threshold_patient.pkl')
+                                                               str(x) + '_' + str(y) + '_' +
+                                                               str(T) + definition[1:] + '_threshold_patient.pkl')
 
                 results_patient_level.append(
                     [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
-                         tnrs, thresholds, metric_required=[threshold_patient])), \
+                         tnrs, thresholds, metric_required=[threshold_patient])),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
                          tprs, thresholds, metric_required=[threshold_patient])),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
@@ -139,8 +139,7 @@ if __name__ == '__main__':
     train_test = 'test'
     T_list = constants.T_list
     data_folder = constants.exclusion_rules[0]
-    x_y = [(24, 12)]
-    eval_LSTM(T_list, x_y, constants.FEATURES,
+    eval_LSTM(T_list, constants.xy_pairs, constants.FEATURES,
               data_folder, train_test, fake_test=False)
 
     x_y = [(24, 12)]
