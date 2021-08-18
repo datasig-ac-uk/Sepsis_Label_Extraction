@@ -65,6 +65,12 @@ def train_LSTM(T_list, x_y, definitions, data_folder='blood_only/', fake_test=Fa
                 train_dl, scaler = lstm_functions.prepared_data_train(
                     dataset, labels_train, True, 128, device)
 
+                save_dir = Model_Dir + 'hyperparameter/' + 'scaler' + definition[1:]
+                if save_dir is None:
+                    pass
+                else:
+                    omni_functions._create_folder_if_not_exist(save_dir)
+
                 omni_functions.save_pickle(
                     scaler, Model_Dir + 'hyperparameter/scaler' + definition[1:])
 

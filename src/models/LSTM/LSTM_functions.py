@@ -25,7 +25,7 @@ def prepared_data_train(ts_dataset, labels, normalize, batch_size, device):
     lengths = torch.FloatTensor(dataset.lengths)
     labels = torch.LongTensor(labels)
     ds = LSTM_Dataset(x=data, y=labels, p=20, lengths=lengths, device=device)
-    dl = DataLoader(ds, batch_size=batch_size,num_workers=0)
+    dl = DataLoader(ds, batch_size=batch_size, num_workers=0)
     return dl, my_scaler
 
 
@@ -60,7 +60,7 @@ def prepared_data_test(ts_dataset, labels, normalize, scaler, batch_size, device
     lengths = torch.FloatTensor(ts_dataset.lengths)
     labels = torch.LongTensor(labels)
     ds = LSTM_Dataset(x=data, y=labels, p=20, lengths=lengths, device=device)
-    dl = DataLoader(ds, batch_size=batch_size,num_workers=0)
+    dl = DataLoader(ds, batch_size=batch_size, num_workers=0)
     return dl
 
 
@@ -95,9 +95,10 @@ def eval_model(test_dl, model, save_dir):
     accuracy = accuracy_score(test_true, test_pred_labels)
     print('accuracy=', accuracy)
 
-    return auc_score, specificity,sensitivity, accuracy, test_true, test_preds[:, 1]
+    return auc_score, specificity, sensitivity, accuracy, test_true, test_preds[:, 1]
 
-def eval_model1(test_dl, model,threshold, save_dir):
+
+def eval_model1(test_dl, model, threshold, save_dir):
     model.eval()
     test_preds, test_y = [], []
     with torch.no_grad():
@@ -107,7 +108,7 @@ def eval_model1(test_dl, model,threshold, save_dir):
 
     def tfm(x): return torch.cat(x).cpu().detach().numpy()
 
-    prob_preds_test = tfm(test_preds)[:,1]
+    prob_preds_test = tfm(test_preds)[:, 1]
     test_labels = tfm(test_y)
     test_preds = np.array((prob_preds_test >= threshold).astype('int'))
     tn, fp, fn, tp = confusion_matrix(test_labels, test_preds).ravel()
@@ -135,7 +136,7 @@ def model_cv(config, data_list, device):
     ts_dataset, labels, train_patient_indices, train_full_indices, test_patient_indices, \
         test_full_indices, k = get_pinned_object(data_list)
     p, hidden_channels, linear_channels, epochs, seed = config["p"], config["hidden_channels"], \
-        config["linear_channels"], config["epochs"],config['seed']
+        config["linear_channels"], config["epochs"], config['seed']
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -186,7 +187,7 @@ def model_cv(config, data_list, device):
                     loss_func=nn.CrossEntropyLoss(), optimizer=optim.Adam(model.parameters(), lr=1e-3))
         model.load_state_dict(torch.load(constants.MODELS_DIR + '/LSTM_mimic' + 'cv_' + str(i),
                                          map_location=torch.device('cpu')))
-        _, _, _,_, true, preds = eval_model(test_dl, model, None)
+        _, _, _, _, true, preds = eval_model(test_dl, model, None)
         test_true.append(true)
         test_preds.append(preds)
     test_true_full = np.concatenate(
@@ -199,10 +200,10 @@ def model_cv(config, data_list, device):
 
 
 search_space = {
-    "p": tune.choice([20]),
-    "hidden_channels": tune.sample_from(lambda _: np.random.choice(np.array([16,32,48,64]))),
-    "linear_channels": tune.sample_from(lambda _: np.random.choice(np.array([16,32,48,64]))),
-    "epochs": tune.sample_from(lambda _: np.random.randint(low=10, high=30)),
+    "p": 20,
+    "hidden_channels": tune.sample_from(lambda _: np.random.choice(np.array([16, 32, 48, 64]))),
+    "linear_channels": tune.sample_from(lambda _: np.random.choice(np.array([16, 32, 48, 64]))),
+    "epochs": tune.sample_from(lambda _: np.random.randint(low=1, high=2)),
     "lr": tune.uniform(1e-4, 8e-4),
     "seed": 1234
 }

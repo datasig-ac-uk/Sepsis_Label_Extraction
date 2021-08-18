@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix,auc
+from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix, auc
 
 import constants
 import models.CoxPHM.coxphm_functions as coxphm_functions
@@ -57,28 +57,29 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
                 # load trained coxph model
                 cph = omni_functions.load_pickle(
                     Model_Dir + str(x) + '_' + str(y) + '_' + str(T) + definition[1:])
-                threshold = omni_functions.load_pickle(Model_Dir +'thresholds/' +
-                                           str(x) + '_' + str(y) + '_' +
-                                           str(T) + definition[1:]+'_threshold.pkl')
-                auc_score, specificity,sensitivity, accuracy = coxphm_functions.Coxph_eval1(df_coxph, cph, T,threshold,
-                                                                               Output_predictions + train_test +'/'+
-                                                                               str(x) + '_' + str(y) + '_' + str(T) +
-                                                                               definition[1:] + '.npy')
-                preds = np.load(Output_predictions + train_test +'/'+ str(x) + '_' + str(y) + '_' + str(T) +
+                threshold = omni_functions.load_pickle(Model_Dir + 'thresholds/' +
+                                                       str(x) + '_' + str(y) + '_' +
+                                                       str(T) + definition[1:]+'_threshold.pkl')
+                auc_score, specificity, sensitivity, accuracy = coxphm_functions.Coxph_eval1(df_coxph, cph, T, threshold,
+                                                                                             Output_predictions + train_test + '/' +
+                                                                                             str(x) + '_' + str(y) + '_' + str(T) +
+                                                                                             definition[1:] + '.npy')
+                preds = np.load(Output_predictions + train_test + '/' + str(x) + '_' + str(y) + '_' + str(T) +
                                 definition[1:] + '.npy')
                 CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
                     df_sepsis, labels, preds, a1=T, thresholds=thresholds, sample_ids=None)
 
-                tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
+                tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(
+                    CMs)
 
                 threhold_patient = omni_functions.load_pickle(Model_Dir + 'thresholds_patients/' +
-                                           str(x) + '_' + str(y) + '_' +
-                                           str(T) + definition[1:] + '_threshold_patient.pkl')
+                                                              str(x) + '_' + str(y) + '_' +
+                                                              str(T) + definition[1:] + '_threshold_patient.pkl')
 
                 results_patient_level.append(
                     [str(x) + ',' + str(y), T, definition, "{:.3f}".format(auc(1 - tnrs, tprs)),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
-                         tnrs, thresholds, metric_required=[threhold_patient])), \
+                         tnrs, thresholds, metric_required=[threhold_patient])),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
                          tprs, thresholds, metric_required=[threhold_patient])),
                      "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
@@ -86,7 +87,7 @@ def eval_CoxPHM(T_list, x_y, definitions, data_folder, train_test, signature,
                                                                                            threhold_patient]))])
 
                 results.append([str(x) + ',' + str(y), T,
-                                definition, auc_score, specificity,sensitivity, accuracy])
+                                definition, auc_score, specificity, sensitivity, accuracy])
             results_patient_level_df = pd.DataFrame(results_patient_level,
                                                     columns=['x,y', 'T', 'definition', 'auc', 'sepcificity',
                                                              'sensitivity', 'accuracy'])
@@ -110,5 +111,4 @@ if __name__ == '__main__':
     for data_folder in data_folder_list:
         print(data_folder)
         eval_CoxPHM(T_list, x_y, constants.FEATURES, data_folder,
-                   train_test, True, fake_test=False)
-
+                    train_test, True, fake_test=False)

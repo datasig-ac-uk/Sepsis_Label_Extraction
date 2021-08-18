@@ -51,7 +51,8 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
                                   str(x) + '_' + str(y) + definition[1:] + '.npy')
 
                 model_dir = Model_Dir + \
-                            str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.pkl'
+                    str(x) + '_' + str(y) + '_' + \
+                    str(a1) + definition[1:] + '.pkl'
                 print('Trained model from dic:', model_dir)
                 if data_folder == constants.exclusion_rules[0]:
 
@@ -62,7 +63,8 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
                 else:
                     prob_preds, auc = lgbm_functions.model_training(
                         model_dir, feature, label)
-                    results.append([str(x) + ',' + str(y), a1, definition, auc])
+                    results.append(
+                        [str(x) + ',' + str(y), a1, definition, auc])
                 mimic3_myfunc.create_folder(Output_predictions + purpose)
                 np.save(Output_predictions + purpose + '/' + str(x) +
                         '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy', prob_preds)
@@ -78,13 +80,14 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
                     tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(
                         CMs)
 
-                    threshold_patient_dir = model_dir[:-4] + '_threshold_patient' + model_dir[-4:]
+                    threshold_patient_dir = model_dir[:-4] + \
+                        '_threshold_patient' + model_dir[-4:]
                     threshold_patient = joblib.load(threshold_patient_dir)
 
                     results_patient_level.append(
                         [str(x) + ',' + str(y), a1, definition, "{:.3f}".format(metrics.auc(1 - tnrs, tprs)),
                          "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
-                             tnrs, thresholds, metric_required=[threshold_patient])), \
+                             tnrs, thresholds, metric_required=[threshold_patient])),
                          "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(
                              tprs, thresholds, metric_required=[threshold_patient])),
                          "{:.3f}".format(mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
@@ -99,13 +102,14 @@ def eval_LGBM(T_list, x_y, definitions, data_folder, train_test='test', threshol
         result_df = pd.DataFrame(
             results, columns=['x,y', 'T', 'definition', 'auc'])
 
-    result_df.to_csv(Output_results + purpose + '_results.csv') 
+    result_df.to_csv(Output_results + purpose + '_results.csv')
     ############Patient level now ###############
     if data_folder == constants.exclusion_rules[0]:
         results_patient_level_df = pd.DataFrame(results_patient_level,
                                                 columns=['x,y', 'T', 'definition', 'auc', 'sepcificity', 'sensitivity',
                                                          'accuracy'])
-        results_patient_level_df.to_csv(Output_results + purpose + '_patient_level_results.csv') 
+        results_patient_level_df.to_csv(
+            Output_results + purpose + '_patient_level_results.csv')
     ############################################
 
 
@@ -116,8 +120,8 @@ if __name__ == '__main__':
     eval_LGBM(constants.T_list, constants.xy_pairs, constants.FEATURES,
               data_folder, train_test='test', fake_test=False)
 
-
     data_folder_list = constants.exclusion_rules[-2:]
     xy_pairs = [(24, 12)]
     for data_folder in data_folder_list:
-        eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder,train_test='test', fake_test=False)
+        eval_LGBM([6], xy_pairs, constants.FEATURES, data_folder,
+                  train_test='test', fake_test=False)

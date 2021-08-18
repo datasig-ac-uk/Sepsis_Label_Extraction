@@ -29,11 +29,11 @@ if __name__ == '__main__':
     print("Labels will be collected from ", Data_Dir)
     print("The interim results will be collected from ",
           Output_predictions + purpose)
-    
-    Data_save_plots = constants.OUTPUT_DIR + 'plots/'
-    mimic3_myfunc.create_folder(Data_save_plots)    
 
-    Output_results=Output_results[:-5]
+    Data_save_plots = constants.OUTPUT_DIR + 'plots/'
+    mimic3_myfunc.create_folder(Data_save_plots)
+
+    Output_results = Output_results[:-5]
 
     Data_save_tables = constants.OUTPUT_DIR + 'tables/'
     mimic3_myfunc.create_folder(Data_save_tables)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
                                  '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy')
 
             probs_now = np.load(
-                Output_predictions + purpose+'/' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy') 
+                Output_predictions + purpose+'/' + str(x) + '_' + str(y) + '_' + str(a1) + definition[1:] + '.npy')
 
             icu_lengths_now = np.load(
                 Data_Dir + 'icustay_lengths_' + str(x) + '_' + str(y) + definition[1:] + '.npy')
@@ -148,8 +148,10 @@ if __name__ == '__main__':
 ######################################  To produce AUC FIgures of LSTM/COXPHM ###################################
     purpose = 'test'
 
-    plot_functions.auc_plot_xy_pairs(Data_Dir, Data_save_plots, current_data=current_data)
+    plot_functions.auc_plot_xy_pairs(
+        Data_Dir, Data_save_plots, current_data=current_data)
 ######################################  To produce FIgure 5,6  ###################################
 
     print('produce sepsis onset time plots')
-    plot_functions.sepsis_onset_time_plots(24, 12, 6, save_dir=constants.OUTPUT_DIR + 'plots/',)
+    plot_functions.sepsis_onset_time_plots(
+        24, 12, 6, save_dir=constants.OUTPUT_DIR + 'plots/',)
