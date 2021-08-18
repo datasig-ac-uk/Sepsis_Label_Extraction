@@ -13,14 +13,15 @@ if __name__ == '__main__':
 
     a1, a2, k = 6, 0, 5
     x, y = 24, 12
-    n_iter, n_jobs = 500,8
+    n_iter, n_jobs = 500, 8
 
     Data_Dir = Root_Data + 'train/'
 
     print(Data_Dir)
-    
-    model = LGBMClassifier(random_state=42,n_jobs=4)
+
+    model = LGBMClassifier(random_state=42, n_jobs=1)
 
     for definition in constants.FEATURES:
         lgbm_func.feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition,
-                                               a1, lgbm_func.grid_parameters, n_iter=n_iter, k=k, n_jobs=n_jobs, save=True)
+                                               a1, lgbm_func.grid_parameters, n_iter=n_iter, k=k,
+                                               n_jobs=constants.N_CPUS, save=True)

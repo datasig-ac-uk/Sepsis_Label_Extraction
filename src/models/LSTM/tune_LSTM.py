@@ -54,12 +54,12 @@ if __name__ == '__main__':
         tra_patient_indices, tra_full_indices, val_patient_indices, val_full_indices = \
             mimic3_myfunc.cv_pack(
                 icustay_lengths, k=k, definition=definition, path_save=Data_Dir, save=True)
-        ray.init(num_gpus=1)
+        ray.init(num_gpus=constants.N_GPUS)
         data = pin_in_object_store([dataset, labels, tra_patient_indices, tra_full_indices,
                                    val_patient_indices, val_full_indices, k])
         analysis = tune.run(partial(lstm_functions.model_cv, data_list=data, device=device),
                             name='mimic_lstm' + definition[1:], config=lstm_functions.search_space,
-                            resources_per_trial={"gpu": 1}, num_samples=1,
+                            resources_per_trial={"gpu": constants.N_GPUS}, num_samples=1,
                             max_failures=5, reuse_actors=True, verbose=1)
         # TODO change num_samples back to 80
         best_trial = analysis.get_best_trial("mean_accuracy")
