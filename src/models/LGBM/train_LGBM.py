@@ -37,7 +37,7 @@ def train_LGBM(T_list, x_y, definitions, data_folder, thresholds=np.arange(10000
                 with open(Model_Dir_parameter + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
                     best_paras_ = pickle.load(file)
 
-                clf = LGBMClassifier(random_state=42,n_jobs=4).set_params(**best_paras_)
+                clf = LGBMClassifier(random_state=42, n_jobs=constants.N_CPUS).set_params(**best_paras_)
                 
                 model_dir = Model_Dir + \
                             str(x) + '_' + str(y) + '_' + \
