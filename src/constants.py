@@ -28,3 +28,6 @@ MIMIC_DATA_DIRS['blood_only'] = MIMIC_DATA_DIRS['strict_exclusion']
 
 MIMIC_DATA_DIRS['other_cultures'] = {'train': DATA_DIR+'raw/train/other_cultures',
                                      'test': DATA_DIR + 'raw/test/other_cultures'}
+
+N_CPUS = 1
+N_GPUS = 1
