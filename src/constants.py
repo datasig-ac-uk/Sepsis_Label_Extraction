@@ -2,6 +2,7 @@
 This file contains basic variables and definitions that we wish to make easily
 accessible for any script that requires it.
 """
+import os
 from pathlib import Path
 
 ROOT_DIR = str(Path(__file__).resolve().parents[1])
@@ -29,5 +30,12 @@ MIMIC_DATA_DIRS['blood_only'] = MIMIC_DATA_DIRS['strict_exclusion']
 MIMIC_DATA_DIRS['other_cultures'] = {'train': DATA_DIR+'raw/train/other_cultures',
                                      'test': DATA_DIR + 'raw/test/other_cultures'}
 
-N_CPUS = 1
-N_GPUS = 1
+if 'N_CPUS' in os.environ:
+    N_CPUS = int(os.environ['N_CPUS'])
+else:
+    N_CPUS = 1
+
+if 'N_GPUS' in os.environ:
+    N_GPUS = int(os.environ['N_GPUS'])
+else:
+    N_GPUS = 1
