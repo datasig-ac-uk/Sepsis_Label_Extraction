@@ -63,7 +63,7 @@ python3 src/models/main.py
 **Note:** The full pipeline may take several hours to complete, therefore you can alternatively download our pretrained model and obtain the results directly by the following commands:
 ```console
 bash pretrained_models.sh
-python3 src/models/main.py --model MODEL_NAME --step 'eval'
+python3 src/models/main.py --model MODEL_NAME --step eval
 ```
 
 Visualizations

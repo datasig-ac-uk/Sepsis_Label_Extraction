@@ -15,11 +15,11 @@ if __name__ == '__main__':
     x, y = 24, 12
     n_iter, n_jobs = 500, 8
 
-    Data_Dir = Root_Data + 'train/'
+    Data_Dir = Root_Data + 'test/'
 
     print(Data_Dir)
 
-    model = LGBMClassifier(random_state=42, n_jobs=1)
+    model = LGBMClassifier(random_state=42, n_jobs=constants.N_CPUS)
 
     for definition in constants.FEATURES:
         lgbm_func.feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition,

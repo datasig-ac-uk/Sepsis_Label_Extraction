@@ -59,7 +59,7 @@ if __name__ == '__main__':
                                    val_patient_indices, val_full_indices, k])
         analysis = tune.run(partial(lstm_functions.model_cv, data_list=data, device=device),
                             name='mimic_lstm' + definition[1:], config=lstm_functions.search_space,
-                            resources_per_trial={"gpu": constants.N_GPUS}, num_samples=1,
+                            resources_per_trial={"gpu": constants.N_GPUS}, num_samples=80,
                             max_failures=5, reuse_actors=True, verbose=1)
         # TODO change num_samples back to 80
         best_trial = analysis.get_best_trial("mean_accuracy")
