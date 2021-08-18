@@ -45,22 +45,22 @@ The preceding command will save features required for model training/tuning/eval
 
 Model tuning/training/evaluation 
 ------------
-Initiate model tuning, training and evaluation using the [main.py](src/models/main.py) script. This script takes two optional arguments: `--model` and `--process`:
+Initiate model tuning, training and evaluation using the [main.py](src/models/main.py) script. This script takes four optional arguments: `--model`, `--process`, `--n_cpus`, and `--n_gpus`:
 ```console
-python3 src/models/main.py --model MODEL_NAME --step STEP_NAME  
+python3 src/models/main.py --model MODEL_NAME --step STEP_NAME --n_cpus N_CPUS --n_gpus N_GPUS 
 ```
-where `MODEL_NAME` is either `LGBM`, `LSTM`, or `CoxPHM` and where `STEP_NAME` is either `tune` `train`, or `eval`.
+where `MODEL_NAME` is either `LGBM`, `LSTM`, or `CoxPHM` and where `STEP_NAME` is either `tune` `train`, or `eval`. Furthermore, `N_CPUS` is the number of CPUs and `N_GPUs` is the number of GPUs.
 
 For each of the three models (`LGBM`, `LSTM`, and `CoxPHM`), the required sequence of steps is `tune`, `train`, `eval`:
 1. `tune`: For a given model, running the tuning step computes and saves optimal hyperparameters for subsequent training and evaluation.
 2. `train`: The model is trained and saved to the [model/](model/) directory for subsequent evaluation.
 3. `eval`: Evaluation involves generating numerical results and predictions, which are respectively saved to [outputs/results](outputs/results) and [outputs/predictions](outputs/predictions). 
 
-**Note:** To run all three above steps in the required order for all three models, simply run [main.py](src/models/main.py) without any arguments, i.e.
+**Note:** To run all three above steps in the required order for all three models on 1 CPU and on 1 GPU, simply run [main.py](src/models/main.py) without any arguments, i.e.
 ```console
 python3 src/models/main.py 
 ```
-**Note:** The full pipeline could takes several to complete, you can also download our pretrained model and  obtain the results directly by the following commands:
+**Note:** The full pipeline may take several hours to complete, therefore you can alternatively download our pretrained model and obtain the results directly by the following commands:
 ```console
 bash pretrained_models.sh
 python3 src/models/main.py --model MODEL_NAME --step 'eval'
