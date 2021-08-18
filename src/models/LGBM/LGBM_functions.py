@@ -256,43 +256,6 @@ def model_training(model_dir, test_set, test_labels):
         return prob_preds_test, roc_auc_score(test_labels, prob_preds_test)
 
 
-# def model_fit_saving(model, train_set, train_labels, save_name, Data_Dir, x=24, y=12, a1=6, definition='t_sofa',
-#                      thresholds=np.arange(10000) / 10000):
-#     """
-
-#     For chosen model, conduct standard training and testing
-
-#     Input:
-#         model
-#         train_set,test_set: numpy version
-#         train_labels, test_labels: numpy array
-
-#     """
-
-#     model.fit(X=train_set, y=train_labels)
-
-#     joblib.dump(model, save_name)
-
-#     prob_preds_train = model.predict_proba(train_set)[:, 1]
-
-#     print('Model fitting:')
-#     fpr, tpr, thresholds_ = roc_curve(train_labels, prob_preds_train, pos_label=1)
-
-#     index = np.where(tpr >= 0.85)[0][0]
-#     print(tpr[index])
-#     joblib.dump(thresholds_[index], save_name[:-4] + '_threshold' + save_name[-4:])
-
-#     df_sepsis = pd.read_pickle(
-#         Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
-
-#     CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
-#         df_sepsis, train_labels, prob_preds_train, a1=a1, thresholds=thresholds, sample_ids=None)
-
-#     tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
-#     threshold_patient = mimic3_myfunc_patientlevel.output_at_metric_level(thresholds, tprs, metric_required=[0.85])
-
-#     joblib.dump(threshold_patient, save_name[:-4] + '_threshold_patient' + save_name[-4:])
-
 def model_fit_saving(model, train_set, train_labels, save_name, Data_Dir, x=24, y=12, a1=6, definition='t_sofa',
                      thresholds=np.arange(10000) / 10000):
     """
@@ -320,41 +283,38 @@ def model_fit_saving(model, train_set, train_labels, save_name, Data_Dir, x=24, 
         print(tpr[index])
         joblib.dump(thresholds_[index], save_name[:-4] + '_threshold' + save_name[-4:])
 
-        train_preds=np.array((prob_preds_train >= thresholds_[index]).astype('int'))
+        train_preds = np.array((prob_preds_train >= thresholds_[index]).astype('int'))
 
         tn, fp, fn, tp = confusion_matrix(train_labels, train_preds).ravel()
-        auc= roc_auc_score(train_labels, prob_preds_train)
+        auc = roc_auc_score(train_labels, prob_preds_train)
         spe = tn / (tn + fp)
         sen = tp / (tp + fn)
-        acc=accuracy_score(train_labels, train_preds)
+        acc = accuracy_score(train_labels, train_preds)
 
 
-    ###patient level
+    ### patient level
 
-        df_sepsis = pd.read_pickle(
-        Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
+        df_sepsis = pd.read_pickle(Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
 
         CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
-        df_sepsis, train_labels, prob_preds_train, a1=a1, thresholds=thresholds, sample_ids=None)
+            df_sepsis, train_labels, prob_preds_train, a1=a1, thresholds=thresholds, sample_ids=None)
 
         tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
         threshold_patient = mimic3_myfunc_patientlevel.output_at_metric_level(thresholds, tprs, metric_required=[0.85])
 
         joblib.dump(threshold_patient, save_name[:-4] + '_threshold_patient' + save_name[-4:])
 
-        auc_patient=metrics.auc(1 - tnrs, tprs)
+        auc_patient = metrics.auc(1 - tnrs, tprs)
 
-        spe_patient=mimic3_myfunc_patientlevel.output_at_metric_level(
-                             tnrs, thresholds, metric_required=[threshold_patient])
+        spe_patient = mimic3_myfunc_patientlevel.output_at_metric_level(tnrs, thresholds,
+                                                                        metric_required=[threshold_patient])
 
+        ses_patient = mimic3_myfunc_patientlevel.output_at_metric_level(tprs, thresholds,
+                                                                        metric_required=[threshold_patient])
 
-        ses_patient=mimic3_myfunc_patientlevel.output_at_metric_level(
-                             tprs, thresholds, metric_required=[threshold_patient])
+        acc_patient = mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
+                                                                        metric_required=[threshold_patient])
 
-        acc_patient=mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,metric_required=[
-                                                                                               threshold_patient])
-
-
-        return prob_preds_train,auc,spe, sen,acc, auc_patient,spe_patient,ses_patient,acc_patient
+        return prob_preds_train, auc, spe, sen, acc, auc_patient, spe_patient, ses_patient, acc_patient
     else:
-        return prob_preds_train,roc_auc_score(train_labels, prob_preds_train)
+        return prob_preds_train, roc_auc_score(train_labels, prob_preds_train)
