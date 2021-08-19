@@ -3,7 +3,7 @@ The aim of this query is to pivot entries related to blood gases and chemistry v
 
 The main change from MIT-LCP is that we have introduced more/tighter error bounds, motivated by the fact that base excess can be negative. 
 
-The assingment of icustay_ids match our other queries.
+The assignment of icustay_ids match our other queries.
 
 The definition of stg_fio2 is modified to include some other codes
 */
