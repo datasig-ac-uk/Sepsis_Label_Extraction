@@ -14,7 +14,8 @@ with isolated antibiotic events
 
 To increase specificity of the method, we only take the samples that are blood cultures
 
-We no longer filter out the patients who had an isolated antibiotic case
+We do not filter out the patients who had an isolated antibiotic case and check whether there is another dose of any antibiotic within 96 hours
+
 
 Some of the tables written by Alistair Johnson, we have changed the tables for exclusions by using 
 inputevents table as we want a more accurate time

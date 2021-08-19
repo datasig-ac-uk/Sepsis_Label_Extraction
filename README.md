@@ -1,9 +1,9 @@
 Subtle Variation in Sepsis-III Definitions Influences Predictive Performance of Machine Learning
 ==============================
 
-The early detection of sepsis is a key research priority to help facilitate timely intervention.  Criteria used to identify the onset time of sepsis from health records vary, hindering comparison and progress in this field. We considered the effects of variations in sepsis onset definition on the predictive performance of three representative models (i.e. Light gradient boosting machine (LGBM), Long short term memory (LSTM) and Cox proportional-harzard models (CoxPHM)) for early sepsis detection.
+The early detection of sepsis is a key research priority to help facilitate timely intervention.  Criteria used to identify the onset time of sepsis from health records vary, hindering comparison and progress in this field. We considered the effects of variations in sepsis onset definition on the predictive performance of three representative models (i.e. Light gradient boosting machine (LGBM), Long short term memory (LSTM) and Cox proportional-hazards models (CoxPHM)) for early sepsis detection.
 
-This repository is the official implementation of the paper entitled "Variation of Sepsis-III Definitions Influences Predictive Performance of Machine Learning".
+This repository is the official implementation of the paper entitled "Subtle Variation of Sepsis-III Definitions Influences Predictive Performance of Machine Learning".
 
 This repository contains code for the following parts in our experimental pipeline:
 1. Extracting the sepsis labelling from the MIMIC-III data based on three sepsis criteria H1-3 and their variants (see [src/database](src/database))
@@ -60,7 +60,7 @@ For each of the three models (`LGBM`, `LSTM`, and `CoxPHM`), the required sequen
 ```console
 python3 src/models/main.py 
 ```
-**Note:** The full pipeline could takes several to complete, you can also download our pretrained model and  obtain the results directly by the following commands:
+**Note:** The full pipeline could takes several days to complete, you can also download our pretrained model and  obtain the results directly by the following commands:
 ```console
 bash pretrained_models.sh
 python3 src/models/main.py --model MODEL_NAME --step eval
