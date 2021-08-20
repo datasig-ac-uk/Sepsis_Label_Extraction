@@ -80,7 +80,7 @@ psql -V
 
 The script `00_define_database_environment.sh` contains relevant environment variables for connecting to PostgreSQL. It should not be necessary to change the value of any of these variables, with the exception of MIMIC_DATA_PATH, which you should change to the path containing the MIMIC-III data files you downloaded previously.
 
-To initialise the PostgreSQL installation with a new database for storing MIMIC-III data, run the following command:
+To initialise the PostgreSQL installation with a new database for storing MIMIC-III data, run the following command (with e.g. bash):
 ```console
 ./10_initialise_mimic_database.sh
 ```
@@ -100,6 +100,8 @@ Next, change the relational format of the database by invoking the script
 ```console
 ./30_sepsis_time.sh
 ```
+This is the key step in extracting the data that we need to define the sepsis onset according to the three definitions in our paper. Quite a few scripts from our `sql` folder have been adapted from versions found in the [MIMIC-LCP](https://github.com/MIT-LCP/mimic-code/) and [sepsis3-mimic](https://github.com/alistairewj/sepsis3-mimic) repos, written by Alistair Johnson.
+
 NB: Please provision for several hours for `./20_load_mimic_database.sh` and `./30_sepsis_time.sh` to complete.
 
 Note also that our adaptations and database loading scripts are based on the [mimic-code repository](https://github.com/MIT-LCP/mimic-code/tree/5f563bd40fac781eaa3d815b71503a6857ce9599) at commit 5f563bd40fac781eaa3d815b71503a6857ce9599. We include all required scripts as part of this repository, therefore it is not necessary to check out any of the aforementioned repository separately.
@@ -118,11 +120,12 @@ This step requires first executing the script
 ```console
 ./50_make_ids.sh
 ```
-Once the script has completed, open the following notebook in Jupyter and execute all cells
+Once the script has completed, open the following notebooks in Jupyter and execute all cells
 ```console
 60_tables_to_csvs_final.ipynb
+70_tables_to_csvs_test_set.ipynb
 ```
-The result of executing 60_tables_to_csvs_final.ipynb should be that the CSV files for subsequent model training and testing are reproduced and output to the directory [../../data/raw/](../../data/raw/).
+The result of executing these notebooks should be that the CSV files for subsequent model training and testing are reproduced and output to the directory [../../data/raw/](../../data/raw/).
 
 # Deploy PostgreSQL using Docker
 

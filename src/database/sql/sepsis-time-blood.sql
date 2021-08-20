@@ -7,7 +7,7 @@ with isolated antibiotic events
 
 To increase specificity of the method, we only take the samples that are blood cultures
 
-We no longer filter out the patients who had an isolated antibiotic case
+We do not filter out the patients who had an isolated antibiotic case and check whether there is another dose of any antibiotic within 96 hours
 
 Some of the tables written by Alistair Johnson, we have changed the tables for exclusions by using 
 inputevents table as we want a more accurate time
@@ -54,7 +54,7 @@ CREATE MATERIALIZED VIEW :v1 AS
                , abx.antibiotic_time
                , abx.antibiotic_endtime
                , abx.route
-               -- Check if this patient has been given antibiotics before ICu admission 
+               -- Check if this patient has been given antibiotics before ICU admission 
                , CASE WHEN abx.antibiotic_time < CAST(ie.intime AS DATE) THEN 1 ELSE 0 END AS before_icu 
           FROM icustays ie
           LEFT JOIN admissions ad
