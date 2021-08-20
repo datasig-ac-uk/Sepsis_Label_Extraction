@@ -19,8 +19,9 @@ if __name__ == '__main__':
 
     print(Data_Dir)
 
-    model = LGBMClassifier(random_state=42, n_jobs=4)
+    model = LGBMClassifier(random_state=42, n_jobs=constants.N_CPUS)
 
     for definition in constants.FEATURES:
         lgbm_func.feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition,
-                                               a1, lgbm_func.grid_parameters, n_iter=n_iter, k=k, n_jobs=n_jobs, save=True)
+                                               a1, lgbm_func.grid_parameters, n_iter=n_iter, k=k,
+                                               n_jobs=constants.N_CPUS, save=True)

@@ -7,6 +7,7 @@ from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 from sklearn import metrics
 
+import constants
 import features.mimic3_function as mimic3_myfunc
 import visualization.patientlevel_function as mimic3_myfunc_patientlevel
 
@@ -109,7 +110,7 @@ grid_parameters = {  # LightGBM
 
 
 def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, param_grid,
-                 grid=False, n_iter=100, n_jobs=32, scoring='roc_auc', verbose=2):
+                 grid=False, n_iter=100, n_jobs=constants.N_CPUS, scoring='roc_auc', verbose=2):
     """
 
         For chosen base model, we conduct hyperparameter-tuning on given cv splitting.
@@ -153,18 +154,18 @@ def model_tuning(model, dataset, labels, tra_full_indices, val_full_indices, par
 
     fitted_model = gs.fit(X=dataset, y=labels)
     best_params_ = fitted_model.best_params_
-    
+
     print(best_params_)
-    
+
     print(roc_auc_score(
-            labels, fitted_model.predict_proba(dataset)[:,1]))
-    
+            labels, fitted_model.predict_proba(dataset)[:, 1]))
+
     return best_params_
 
 
 def feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition, a1, grid_parameters, x=24, y=12, n_iter=1000,
                                  k=5,
-                                 n_jobs=-1, scoring='roc_auc', save=True):
+                                 n_jobs=constants.N_CPUS, scoring='roc_auc', save=True):
     current_labels, feature_data, _, tra_full_indices, _, val_full_indices = feature_loading(Data_Dir,
                                                                                              definition,
                                                                                              a1,
@@ -180,7 +181,8 @@ def feature_loading_model_tuning(model, Data_Dir, Model_Dir, definition, a1, gri
         pickle.dump(lgbm_best_paras_, file)
 
 
-def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1, x=24, y=12, k=5, save=False):
+def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1, x=24, y=12, k=5, save=False,
+                                     n_jobs=constants.N_CPUS):
     """
 
         features loading and model validating altogether for different culture
@@ -198,7 +200,7 @@ def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1, x=24, 
     with open(Model_Dir + 'lgbm_best_paras' + definition[1:] + '.pkl', 'rb') as file:
         best_paras_ = pickle.load(file)
 
-    clf = LGBMClassifier(random_state=42,n_jobs=4).set_params(**best_paras_)
+    clf = LGBMClassifier(random_state=42, n_jobs=n_jobs).set_params(**best_paras_)
 
     _, prob_preds, _, auc, specificity, accuracy = model_validation(clf, feature_data,
                                                                     current_labels,
@@ -207,43 +209,6 @@ def feature_loading_model_validation(Data_Dir, Model_Dir, definition, a1, x=24, 
 
     return prob_preds, auc, specificity, accuracy
 
-
-# def model_training(model, train_set,test_set, train_labels, test_labels):
-
-#         """
-
-#         For chosen model, conduct standard training and testing
-
-#         Input:
-#             model
-#             train_set,test_set: numpy version
-#             train_labels, test_labels: numpy array
-
-#         Output:
-#             test_preds:  predicted labels on test set (numpy array)
-#             prob_preds_test: predicted risk scores for the predicted test labels (numpy array)
-
-#             auc score
-#             sepcificity at fixed sensitivity level
-#             accuracy at fixed sensitivity level
-
-
-#         """
-
-#         model.fit(X=train_set,y=train_labels)
-#         prob_preds_test=model.predict_proba(test_set)[:,1]
-
-
-#         print('Test:')
-#         fpr, tpr, thresholds = roc_curve(test_labels, prob_preds_test, pos_label=1)
-#         index=np.where(tpr>=0.85)[0][0]
-#         test_preds=np.array((prob_preds_test>=thresholds[index]).astype('int'))
-
-#         print('auc and sepcificity',roc_auc_score(test_labels,prob_preds_test),1-fpr[index])
-#         print('accuracy',accuracy_score(test_labels,test_preds))
-
-#         return test_preds, prob_preds_test, roc_auc_score(test_labels,prob_preds_test),\
-#                1-fpr[index],accuracy_score(test_labels,test_preds)
 
 def model_training(model_dir, test_set, test_labels):
     """
@@ -291,43 +256,6 @@ def model_training(model_dir, test_set, test_labels):
         return prob_preds_test, roc_auc_score(test_labels, prob_preds_test)
 
 
-# def model_fit_saving(model, train_set, train_labels, save_name, Data_Dir, x=24, y=12, a1=6, definition='t_sofa',
-#                      thresholds=np.arange(10000) / 10000):
-#     """
-
-#     For chosen model, conduct standard training and testing
-
-#     Input:
-#         model
-#         train_set,test_set: numpy version
-#         train_labels, test_labels: numpy array
-
-#     """
-
-#     model.fit(X=train_set, y=train_labels)
-
-#     joblib.dump(model, save_name)
-
-#     prob_preds_train = model.predict_proba(train_set)[:, 1]
-
-#     print('Model fitting:')
-#     fpr, tpr, thresholds_ = roc_curve(train_labels, prob_preds_train, pos_label=1)
-
-#     index = np.where(tpr >= 0.85)[0][0]
-#     print(tpr[index])
-#     joblib.dump(thresholds_[index], save_name[:-4] + '_threshold' + save_name[-4:])
-
-#     df_sepsis = pd.read_pickle(
-#         Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
-
-#     CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
-#         df_sepsis, train_labels, prob_preds_train, a1=a1, thresholds=thresholds, sample_ids=None)
-
-#     tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
-#     threshold_patient = mimic3_myfunc_patientlevel.output_at_metric_level(thresholds, tprs, metric_required=[0.85])
-
-#     joblib.dump(threshold_patient, save_name[:-4] + '_threshold_patient' + save_name[-4:])
-
 def model_fit_saving(model, train_set, train_labels, save_name, Data_Dir, x=24, y=12, a1=6, definition='t_sofa',
                      thresholds=np.arange(10000) / 10000):
     """
@@ -349,47 +277,44 @@ def model_fit_saving(model, train_set, train_labels, save_name, Data_Dir, x=24, 
 
     print('Model fitting:')
     fpr, tpr, thresholds_ = roc_curve(train_labels, prob_preds_train, pos_label=1)
-    
+
     if thresholds is not None:
         index = np.where(tpr >= 0.85)[0][0]
         print(tpr[index])
         joblib.dump(thresholds_[index], save_name[:-4] + '_threshold' + save_name[-4:])
-    
-        train_preds=np.array((prob_preds_train >= thresholds_[index]).astype('int'))
-    
+
+        train_preds = np.array((prob_preds_train >= thresholds_[index]).astype('int'))
+
         tn, fp, fn, tp = confusion_matrix(train_labels, train_preds).ravel()
-        auc= roc_auc_score(train_labels, prob_preds_train)
+        auc = roc_auc_score(train_labels, prob_preds_train)
         spe = tn / (tn + fp)
         sen = tp / (tp + fn)
-        acc=accuracy_score(train_labels, train_preds)
+        acc = accuracy_score(train_labels, train_preds)
 
-    
-    ###patient level
-    
-        df_sepsis = pd.read_pickle(
-        Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
+
+    ### patient level
+
+        df_sepsis = pd.read_pickle(Data_Dir + str(x) + '_' + str(y) + definition[1:] + '_dataframe.pkl')
 
         CMs, _, _ = mimic3_myfunc_patientlevel.suboptimal_choice_patient_df(
-        df_sepsis, train_labels, prob_preds_train, a1=a1, thresholds=thresholds, sample_ids=None)
+            df_sepsis, train_labels, prob_preds_train, a1=a1, thresholds=thresholds, sample_ids=None)
 
         tprs, tnrs, fnrs, pres, accs = mimic3_myfunc_patientlevel.decompose_cms(CMs)
         threshold_patient = mimic3_myfunc_patientlevel.output_at_metric_level(thresholds, tprs, metric_required=[0.85])
-    
+
         joblib.dump(threshold_patient, save_name[:-4] + '_threshold_patient' + save_name[-4:])
-    
-        auc_patient=metrics.auc(1 - tnrs, tprs)
-    
-        spe_patient=mimic3_myfunc_patientlevel.output_at_metric_level(
-                             tnrs, thresholds, metric_required=[threshold_patient])
-    
-                 
-        ses_patient=mimic3_myfunc_patientlevel.output_at_metric_level(
-                             tprs, thresholds, metric_required=[threshold_patient])
-    
-        acc_patient=mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,metric_required=[
-                                                                                               threshold_patient])
-    
-    
-        return prob_preds_train,auc,spe, sen,acc, auc_patient,spe_patient,ses_patient,acc_patient
+
+        auc_patient = metrics.auc(1 - tnrs, tprs)
+
+        spe_patient = mimic3_myfunc_patientlevel.output_at_metric_level(tnrs, thresholds,
+                                                                        metric_required=[threshold_patient])
+
+        ses_patient = mimic3_myfunc_patientlevel.output_at_metric_level(tprs, thresholds,
+                                                                        metric_required=[threshold_patient])
+
+        acc_patient = mimic3_myfunc_patientlevel.output_at_metric_level(accs, thresholds,
+                                                                        metric_required=[threshold_patient])
+
+        return prob_preds_train, auc, spe, sen, acc, auc_patient, spe_patient, ses_patient, acc_patient
     else:
-        return prob_preds_train,roc_auc_score(train_labels, prob_preds_train)
+        return prob_preds_train, roc_auc_score(train_labels, prob_preds_train)

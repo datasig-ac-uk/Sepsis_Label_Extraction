@@ -47,12 +47,12 @@ if __name__ == '__main__':
         # prepare dataframe for coxph model
         df_coxph = coxphm_functions.Coxph_df(
             df, features, coxphm_functions.original_features, T, labels, signature=False)
-        ray.init(num_cpus=1)
+        ray.init(num_cpus=constants.N_CPUS)
         data = pin_in_object_store(
             [df_coxph, tra_full_indices, val_full_indices, k])
         analysis = tune.run(partial(coxphm_functions.model_cv, data=data, a1=T),
                             name='mimic_coxph' + definition[1:], config=coxphm_functions.search_space,
-                            resources_per_trial={"cpu": 1}, num_samples=100,
+                            resources_per_trial={"cpu": constants.N_CPUS}, num_samples=100,
                             max_failures=5, reuse_actors=True, verbose=1)
         # TODO change num_samples back to 100
         best_trial = analysis.get_best_trial("mean_accuracy")
