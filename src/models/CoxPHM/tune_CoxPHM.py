@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     print(Data_Dir)
 
-    for definition in constants.FEATURES[1:]:
+    for definition in constants.FEATURES:
         labels = np.load(Data_Dir + 'label' + '_'+str(x)+'_' +
                          str(y)+'_'+str(T) + definition[1:] + '.npy')
         df = pd.read_pickle(Data_Dir + str(x) + '_' +
